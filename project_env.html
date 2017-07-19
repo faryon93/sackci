@@ -1,0 +1,31 @@
+<div ng-controller="projectenv">
+	Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+
+	<table class="table table-hover">
+	<thead>
+	  <tr>
+	    <th>Variable Name</th>
+	    <th>Value</th>
+	    <th>Actions</th>
+	  </tr>
+	</thead>
+	<tbody>
+	  <tr ng-repeat="env in project.env">
+	    <td>{{env.key}}</td>
+	    <td ng-if="!env.encrypted">{{env.value}}</td>
+	    <td ng-if="env.encrypted">*************</td>
+	    <td class="col-md-2">
+	      <button type="button" class="btn btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</button>
+	      <button ng-if="env.encrypted" type="button" class="btn btn-info"><i class="fa fa-key" aria-hidden="true"></i> Decrypt</button>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td class="col-md-6"></td>
+	    <td class="col-md-4"></td>
+	    <td class="col-md-2">
+	      <button type="button" class="btn btn-success"><i class="fa fa-plus" aria-hidden="true"></i> Add</button>
+	    </td>
+	  </tr>
+	</tbody>
+	</table>
+</div>

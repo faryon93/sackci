@@ -1,0 +1,124 @@
+div.boxItem.passed
+{
+	background-color: #39aa56;
+}
+
+div.boxItem.failed
+{
+	background-color: #db4545;
+}
+
+div.boxItem.ignored
+{
+	background-color: gray;
+	font-size: 25px;
+}
+
+div.boxItem { 
+  display: inline-block;
+ 
+  color: white;
+
+  margin-right: 5em;
+  position:relative;
+
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  font-size: 25px;
+
+  text-align: center;
+
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.boxItem:before,
+.boxItem:after
+{
+  content:'';
+  width:5em;	/* size of your margin */
+  border-bottom:5px solid;
+  position:absolute;
+  top:45%;
+  color: gray;
+  z-index: 99999;
+}
+
+.boxItem.edge-left:before
+{
+	border-left: 5px solid;
+	height: 65px;
+	top: -42px;
+	width: 2em;
+
+	border-radius: 0 0 0 15px;
+}
+
+.boxItem.edge-right:after
+{
+	border-right: 5px solid;
+	height: 65px;
+	top: -42px;
+	width: 2em;
+
+	border-radius: 0 0 15px 0;
+}
+
+.boxItem.long.edge-right:after
+{
+	height: 75px;
+	top: -52px;
+}
+
+.boxItem.long.edge-left:before
+{
+	height: 75px;
+	top: -52px;
+}
+
+.boxItem:after {
+  left:100%;
+}
+.boxItem:before {
+  right:100%;
+}
+
+.boxItem:first-of-type:before,
+.boxItem:last-of-type:after {
+  display:none;
+}
+
+.boxItem:last-of-type
+{
+	margin-right: 0;
+}
+
+
+
+.stages
+{
+	text-align: center;
+	white-space: nowrap;
+}
+
+.stages > .stage
+{
+	display: inline-block;
+	font-size: 15pt;
+	font-weight: bold;
+	width: 165px;
+
+	margin-bottom: 10px;
+}
+
+.myBox
+{
+	text-align: center;
+	white-space: nowrap;
+}
+
+.tab-pane .row
+{
+	margin-top: 10px;
+}

@@ -1,0 +1,15 @@
+.nav-tabs > li > a
+{
+  border-radius: 0;
+}
+
+.input-group > span.input-group-addon,
+.input-group > input.form-control
+{
+	border-radius: 0;
+}
+
+.panel
+{
+	border-radius: 0;
+}

@@ -1,0 +1,114 @@
+html,
+body
+{
+	height:100%;
+}
+
+body {
+	padding-top: 50px;
+}
+
+.fill { 
+    min-height: 100%;
+    height: 100%;
+  	box-sizing: border-box;
+}
+
+
+/********************************************************************
+ * project list
+ ********************************************************************/ 
+
+div.projectlist
+{
+	min-height:100%;
+	border: 1px solid #ddd;
+	border-width: 0 1px 0 0;
+}
+
+div.projectlist > form.filter
+{
+	padding-top: 22px;
+}
+
+div.projectlist > hr
+{
+	margin-bottom: 0;
+	padding-bottom: 0;
+	border-top: 1px solid #ddd
+}
+
+div.projectlist h5.details > i:not(:first-child)
+{
+	margin-left: 8px;
+}
+
+
+#projects
+{
+	padding: 0;
+}
+
+#projects > li
+{
+	padding: 10px 0 10px 0;
+	list-style-type	: none;
+
+	border-style: solid;
+	border-color: #ddd;
+	border-width: 0 0 1px 0;
+}
+
+#projects > li > .passed,
+#projects > li > .passed a
+{
+	color:#39aa56;
+}
+
+#projects > li > .failed,
+#projects > li > .failed a
+{
+	color:#db4545;
+}
+
+/********************************************************************
+ * project view
+ ********************************************************************/ 
+
+div.project-view > div.tab-content
+{
+	margin-top: 10px;
+}
+
+h5
+{
+	margin-top: 10px;
+}
+
+h5 > span
+{
+	margin-left: 5px;
+}
+
+.table tbody > tr > td{
+    vertical-align: middle;
+}
+
+div.card
+{
+	width: 100%;
+	border: 1px solid #ddd;
+	padding-left: 20px;
+}
+
+div.card.passed
+{
+	background: linear-gradient(to right,#39aa56 0,#39aa56 10px,#fff 10px,#fff 100%) no-repeat;
+}
+
+div.card.passed h5.commit
+{
+	color: #39aa56;
+	font-weight: bold;
+}
+

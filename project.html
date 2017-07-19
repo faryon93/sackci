@@ -1,0 +1,33 @@
+<div class="project-view" ng-controller="project">
+  <!-- header -->
+	<h1>
+    <b>{{project.name}}</b>
+    <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+    <span ng-if="tab == 'build'">Build Details</span>
+    <span ng-if="tab == 'history'">Build History</span>
+    <span ng-if="tab == 'pipeline'">Pipeline</span>
+    <span ng-if="tab == 'env'">Environment</span>
+    <span ng-if="tab == 'settings'">Settings</span>
+  </h1>
+
+  <!-- tabs -->
+  <ul class="nav nav-tabs">
+    <li ng-class="{active: tab == 'build'}">
+      <a ng-href="#!/project/{{project.id}}/build/{{build}}">
+        Build: 
+        <span ng-if="build != undefined">#{{build}}</span>
+        <span ng-if="build == undefined">latest</span>
+      </a>
+    </li>
+  	<li ng-class="{active: tab == 'history'}"><a href="#!/project/{{project.id}}/history">Build History</a></li>
+  	<li ng-class="{active: tab == 'pipeline'}"><a href="#!/project/{{project.id}}/pipeline">Pipeline</a></li>
+    <li ng-class="{active: tab == 'env'}"><a href="#!/project/{{project.id}}/env">Environment</a></li>
+  	<li ng-class="{active: tab == 'settings'}"><a href="#!/project/{{project.id}}/settings">Settings</a></li>
+  </ul>
+
+  <!-- tab content -->
+	<div class="tab-content clearfix">
+    <div class="tab-pane active" ng-if="tab == 'build'" ng-include="'project_build.html'"></div>
+		<div class="tab-pane active" ng-if="tab == 'env'" ng-include="'project_env.html'"></div>
+	</div>
+</div>

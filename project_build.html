@@ -1,0 +1,85 @@
+<div>
+  <!-- Build Details -->
+  <div class="card passed">
+    <div class="row">
+      <div class="col-md-6">
+        <h5 class="commit"><i class="fa fa-check" aria-hidden="true"></i><span>fixed: missing "provider" option in sample config file</span></h5>
+        <h5 class="text-muted"><i class="fa fa-user-o" aria-hidden="true"></i> <span><b>Author:</b> Maximilian Pachl</span></h5>
+        <h5 class="text-muted"><i class="fa fa-circle-o-notch" aria-hidden="true"></i><span><b>Commit:</b> #9df89cb</span></h5>         
+      </div>
+
+      <div class="col-md-3" style="padding-top: 0px;">
+        <h5 class="text-muted"><i class="fa fa-calendar" aria-hidden="true"></i><span><b>Time:</b> 2017/07/18 15:29</span></h5>
+        <h5 class="text-muted"><i class="fa fa-hourglass-half" aria-hidden="true"></i> <span><b>Duration:</b> 12min 34sec</span></h5>
+        <h5 class="text-muted"><i class="fa fa-server" aria-hidden="true"></i> <span><b>Node:</b> f48kjn2fh76</span></h5>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pipeline -->
+  <div class="row">
+    <div class="col-md-8">
+      <div class="panel panel-default">
+        <div class="panel-heading">Pipeline</div>
+        <div class="panel-body" style="overflow: hidden;">
+          <div class="stages">
+            <div class="stage">Setup</div>
+            <div class="stage">Build</div>
+            <div class="stage">Test</div>
+            <div class="stage">Deploy</div>
+            <div class="stage">Finished</div>
+          </div>
+          <div class="myBox">
+            <div class="boxItem ignored"><i class="fa fa-circle" aria-hidden="true"></i></div>
+            <div class="boxItem passed"><i class="fa fa-check" aria-hidden="true"></i></div>
+            <div class="boxItem passed"><i class="fa fa-check" aria-hidden="true"></i></div>
+            <div class="boxItem failed"><i class="fa fa-remove" aria-hidden="true"></i></div>
+            <div class="boxItem ignored"><i class="fa fa-circle" aria-hidden="true"></i></div>
+          </div><br/>
+          <div class="myBox">
+            <div class="boxItem passed" style="visibility:hidden;"><i class="fa fa-check" aria-hidden="true"></i></div>
+            <div class="boxItem passed edge-left edge-right"><i class="fa fa-check" aria-hidden="true"></i></div>
+            <div class="boxItem passed" style="visibility:hidden;"><i class="fa fa-check" aria-hidden="true"></i></div>
+            <div class="boxItem passed edge-left edge-right"><i class="fa fa-check" aria-hidden="true"></i></div>
+            <div class="boxItem ignored" style="visibility:hidden;"><i class="fa fa-circle" aria-hidden="true"></i></div>
+          </div>
+          <br />
+          <div class="myBox">
+            <div class="boxItem passed" style="visibility:hidden;"><i class="fa fa-check" aria-hidden="true"></i></div>
+            <div class="boxItem passed edge-left edge-right long"><i class="fa fa-check" aria-hidden="true"></i></div>
+            <div class="boxItem passed" style="visibility:hidden;"><i class="fa fa-check" aria-hidden="true"></i></div>
+            <div class="boxItem passed" style="visibility:hidden;"><i class="fa fa-check" aria-hidden="true"></i></div>
+            <div class="boxItem ignored" style="visibility:hidden;"><i class="fa fa-circle" aria-hidden="true"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="col-md-4">
+      <div class="panel panel-default">
+        <div class="panel-heading">Actions</div>
+        <div class="panel-body">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logs -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div style="width: 40px; height: 41px; margin-top: -10px; background-color: #39aa56; margin-left: -15px; margin-right: 10px; float: left; line-height: 40px; color: white; font-size: 25px; text-align: center;">
+            <i class="fa fa-check" aria-hidden="true"></i>
+          </div>
+          <b>Step:</b> Install Golang</div>
+        <div class="panel-body" style="background-color: #404040; color: #f1f1f1; font-family: Monaco,monospace;">
+          <span style="color: #FFFF91;">$: apt-get install go</span><br />
+          <span style="color: #FFFF91;">$: go version</span><br />
+          go version go1.7.6 linux/amd64<br />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
