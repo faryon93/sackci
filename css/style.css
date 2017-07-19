@@ -16,15 +16,19 @@ body {
 
 
 /********************************************************************
- * project list
+ * content view
  ********************************************************************/ 
 
-div.projectlist
+div.content-view
 {
 	min-height:100%;
 	border: 1px solid #ddd;
-	border-width: 0 1px 0 0;
+	border-width: 0 0 0 1px;
 }
+
+/********************************************************************
+ * project list
+ ********************************************************************/ 
 
 div.projectlist > form.filter
 {
@@ -71,6 +75,7 @@ div.projectlist h5.details > i:not(:first-child)
 	color:#db4545;
 }
 
+
 /********************************************************************
  * project view
  ********************************************************************/ 
@@ -94,21 +99,33 @@ h5 > span
     vertical-align: middle;
 }
 
-div.card
-{
-	width: 100%;
-	border: 1px solid #ddd;
-	padding-left: 20px;
-}
 
-div.card.passed
+/********************************************************************
+ * panel color defintions
+ ********************************************************************/ 
+
+div.panel-body.passed
 {
 	background: linear-gradient(to right,#39aa56 0,#39aa56 10px,#fff 10px,#fff 100%) no-repeat;
 }
 
-div.card.passed h5.commit
+div.panel-body.failed
 {
-	color: #39aa56;
+	background: linear-gradient(to right,#db4545 0,#db4545 10px,#fff 10px,#fff 100%) no-repeat;
+}
+
+div.panel-body h5.commit
+{
+	
 	font-weight: bold;
 }
 
+div.panel-body.passed h5.commit
+{
+	color: #39aa56;
+}
+
+div.panel-body.failed h5.commit
+{
+	color: #db4545;
+}

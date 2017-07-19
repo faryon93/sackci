@@ -5,6 +5,9 @@ app.config(function($routeProvider) {
     .when("/", {
         templateUrl : "project.html"
     })
+    .when("/admin", {
+        templateUrl : "admin.html"
+    })
     .when("/project/:id", {
         templateUrl : "project.html"
     })

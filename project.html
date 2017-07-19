@@ -8,7 +8,7 @@
     <span ng-if="tab == 'pipeline'">Pipeline</span>
     <span ng-if="tab == 'env'">Environment</span>
     <span ng-if="tab == 'settings'">Settings</span>
-    <span ng-if="build != undefined">(#{{build}})</span>
+    <span ng-if="build != undefined && build != 'latest'">(#{{build}})</span>
   </h1>
 
   <!-- tabs -->
@@ -16,8 +16,8 @@
     <li ng-class="{active: tab == 'build'}">
       <a ng-href="#!/project/{{project.id}}/build/{{build}}">
         Build: 
-        <span ng-if="build != undefined">#{{build}}</span>
-        <span ng-if="build == undefined">latest</span>
+        <span ng-if="build != undefined && build != 'latest'">#{{build}}</span>
+        <span ng-if="build == undefined || build == 'latest'">latest</span>
       </a>
     </li>
   	<li ng-class="{active: tab == 'history'}"><a href="#!/project/{{project.id}}/history">Build History</a></li>
