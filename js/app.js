@@ -1,6 +1,6 @@
 var app = angular.module('app', ["ngRoute", "ngResource"]);
 
-app.config(function($routeProvider) {
+app.config(function($routeProvider, $locationProvider) {
     $routeProvider
     .when("/", {
         templateUrl : "project.html"
@@ -19,6 +19,26 @@ app.config(function($routeProvider) {
     });
 });
 
+app.directive('capitalize', function() {
+	return {
+	  require: 'ngModel',
+	  link: function(scope, element, attrs, modelCtrl) {
+	    var capitalize = function(inputValue) {
+	      if (inputValue == undefined) inputValue = '';
+	      var capitalized = inputValue.toUpperCase();
+	      if (capitalized !== inputValue) {
+	        modelCtrl.$setViewValue(capitalized);
+	        modelCtrl.$render();
+	      }
+	      return capitalized;
+	    }
+
+	    modelCtrl.$parsers.push(capitalize);
+	    capitalize(scope[attrs.ngModel]);
+	  }
+	};
+});
+
 app.controller("navigation", function($scope, $location) {
 	$scope.isActive = function (viewLocation) { 
         return $location.path().startsWith(viewLocation);
@@ -34,12 +54,60 @@ app.controller("project", function($scope, $location, $routeParams, projects) {
 	$scope.tab = $routeParams.tab;
 	if ($scope.tab == undefined)
 		$scope.tab = "build";
-
 	$scope.build = $routeParams.build;
 });
 
 app.controller("projectenv", function($scope) {
-    console.log($scope.project);
+
+});
+
+app.controller("build_details", function($scope, $routeParams, builds) {
+	var buildId = 1;
+	if ($routeParams.build != undefined)
+		buildId = $routeParams.build;
+
+	$scope.build = builds.find($scope.project.id, buildId);
+});
+
+app.controller("build_history", function($scope, $routeParams, builds) {
+	$scope.builds = builds.get($scope.project.id);
+});
+
+app.factory('builds', function() {
+	var builds = [{
+		id: 1,
+		passed: false,
+		commit: {
+			message: "fixed: missing 'provider' option in sample config",
+			author: "Maximilian Pachl",
+			ref: "9df89cb",
+		},
+		duration: "12min 34sec",
+		node: "a89v9ef2d3c"
+	},
+	{
+		id: 2,
+		passed: true,
+		commit: {
+			message: "added \"Security Considerations\" to README",
+			author: "Maximilian Pachl",
+			ref: "171cb56",
+		},
+		duration: "1min 57sec",
+		node: "a89v9ef2d3c"
+	}];
+
+	var service = {};
+    service.find = function(project, id) {
+        return builds[id - 1];
+    };
+
+    service.get = function(project) {
+    	return builds;
+    }
+    
+    // other stubbed methods
+    return service;
 });
 
 app.factory('projects', function() {

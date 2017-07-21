@@ -115,16 +115,17 @@ div.panel-body.failed
 
 div.panel-body h5.commit
 {
-	
 	font-weight: bold;
 }
 
-div.panel-body.passed h5.commit
+div.panel-body.passed h5.commit,
+div.panel-body.passed h5.commit > a
 {
 	color: #39aa56;
 }
 
-div.panel-body.failed h5.commit
+div.panel-body.failed h5.commit,
+div.panel-body.failed h5.commit > a
 {
 	color: #db4545;
 }

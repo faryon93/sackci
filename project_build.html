@@ -1,19 +1,21 @@
-<div class="build-details">
+<div class="build-details" ng-controller="build_details">
   <!-- Build Details -->
-  <!--<div class="card passed">-->
   <div class="panel panel-default">
-    <div class="panel-body failed" style="padding-top: 0px; padding-bottom: 10px; padding-left: 30px;">
+    <div class="panel-body" ng-class="build.passed ? 'passed' : 'failed'" style="padding-top: 0px; padding-bottom: 10px; padding-left: 30px;">
       <div class="row">
         <div class="col-md-6">
-          <h5 class="commit"><i class="fa fa-remove" aria-hidden="true"></i><span>fixed: missing "provider" option in sample config file</span></h5>
-          <h5 class="text-muted"><i class="fa fa-user-o" aria-hidden="true"></i> <span><b>Author:</b> Maximilian Pachl</span></h5>
-          <h5 class="text-muted"><i class="fa fa-circle-o-notch" aria-hidden="true"></i><span><b>Commit:</b> #9df89cb</span></h5>         
+          <h5 class="commit">
+            <i class="fa " aria-hidden="true" ng-class="build.passed ? 'fa-check' : 'fa-remove'"></i>
+            <span>{{build.commit.message}}</span>
+          </h5>
+          <h5 class="text-muted"><i class="fa fa-user-o" aria-hidden="true"></i> <span><b>Author:</b> {{build.commit.author}}</span></h5>
+          <h5 class="text-muted"><i class="fa fa-circle-o-notch" aria-hidden="true"></i><span><b>Commit:</b> #{{build.commit.ref}}</span></h5>         
         </div>
 
         <div class="col-md-3" style="padding-top: 0px;">
           <h5 class="text-muted"><i class="fa fa-calendar" aria-hidden="true"></i><span><b>Time:</b> 2017/07/18 15:29</span></h5>
-          <h5 class="text-muted"><i class="fa fa-hourglass-half" aria-hidden="true"></i> <span><b>Duration:</b> 12min 34sec</span></h5>
-          <h5 class="text-muted"><i class="fa fa-server" aria-hidden="true"></i> <span><b>Node:</b> f48kjn2fh76</span></h5>
+          <h5 class="text-muted"><i class="fa fa-hourglass-half" aria-hidden="true"></i> <span><b>Duration:</b> {{build.duration}}</span></h5>
+          <h5 class="text-muted"><i class="fa fa-server" aria-hidden="true"></i> <span><b>Node:</b> {{build.node}}</span></h5>
         </div>
       </div>
     </div>
