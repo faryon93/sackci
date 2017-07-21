@@ -67,6 +67,8 @@ app.controller("build_details", function($scope, $routeParams, builds) {
 		buildId = $routeParams.build;
 
 	$scope.build = builds.find($scope.project.id, buildId);
+	if ($scope.build == undefined)
+		$scope.error = "build #" + buildId + " does not exist";
 });
 
 app.controller("build_history", function($scope, $routeParams, builds) {
@@ -76,25 +78,66 @@ app.controller("build_history", function($scope, $routeParams, builds) {
 app.factory('builds', function() {
 	var builds = [{
 		id: 1,
-		passed: false,
+		passed: true,
 		commit: {
 			message: "fixed: missing 'provider' option in sample config",
 			author: "Maximilian Pachl",
 			ref: "9df89cb",
 		},
 		duration: "12min 34sec",
-		node: "a89v9ef2d3c"
+		node: "a89v9ef2d3c",
+        stages: [{
+        	name: "Build",
+        	status: "passed"
+        },{
+        	name: "Test",
+        	status: "passed"
+        },{
+        	name: "Deploy",
+        	status: "passed"
+        }]
 	},
 	{
 		id: 2,
-		passed: true,
+		passed: false,
 		commit: {
 			message: "added \"Security Considerations\" to README",
 			author: "Maximilian Pachl",
 			ref: "171cb56",
 		},
 		duration: "1min 57sec",
-		node: "a89v9ef2d3c"
+		node: "a89v9ef2d3c",
+        stages: [{
+        	name: "Build",
+        	status: "passed"
+        },{
+        	name: "Test",
+        	status: "failed"
+        },{
+        	name: "Deploy",
+        	status: "ignored"
+        }]
+	},
+	{
+		id: 3,
+		passed: false,
+		commit: {
+			message: "check influx connectivity on application startup",
+			author: "Maximilian Pachl",
+			ref: "586f301",
+		},
+		duration: "58sec",
+		node: "a89v9ef2d3c",
+        stages: [{
+        	name: "Build",
+        	status: "failed"
+        },{
+        	name: "Test",
+        	status: "ignored"
+        },{
+        	name: "Deploy",
+        	status: "ignored"
+        }]
 	}];
 
 	var service = {};
@@ -141,7 +184,7 @@ app.factory('projects', function() {
         	{key: "XORBIT_DB_HOST", value: "172.16.1.59", encrypted: false},
         	{key: "XORBIT_DB_USER", value: "root", encrypted: false},
         	{key: "XORBIT_DB_PASSWORD", value: "", encrypted: true}
-        ],
+        ]
     }];
 
 	var service = {};

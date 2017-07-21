@@ -1,86 +1,84 @@
 <div class="build-details" ng-controller="build_details">
-  <!-- Build Details -->
-  <div class="panel panel-default">
-    <div class="panel-body" ng-class="build.passed ? 'passed' : 'failed'" style="padding-top: 0px; padding-bottom: 10px; padding-left: 30px;">
-      <div class="row">
-        <div class="col-md-6">
-          <h5 class="commit">
-            <i class="fa " aria-hidden="true" ng-class="build.passed ? 'fa-check' : 'fa-remove'"></i>
-            <span>{{build.commit.message}}</span>
-          </h5>
-          <h5 class="text-muted"><i class="fa fa-user-o" aria-hidden="true"></i> <span><b>Author:</b> {{build.commit.author}}</span></h5>
-          <h5 class="text-muted"><i class="fa fa-circle-o-notch" aria-hidden="true"></i><span><b>Commit:</b> #{{build.commit.ref}}</span></h5>         
-        </div>
-
-        <div class="col-md-3" style="padding-top: 0px;">
-          <h5 class="text-muted"><i class="fa fa-calendar" aria-hidden="true"></i><span><b>Time:</b> 2017/07/18 15:29</span></h5>
-          <h5 class="text-muted"><i class="fa fa-hourglass-half" aria-hidden="true"></i> <span><b>Duration:</b> {{build.duration}}</span></h5>
-          <h5 class="text-muted"><i class="fa fa-server" aria-hidden="true"></i> <span><b>Node:</b> {{build.node}}</span></h5>
-        </div>
-      </div>
-    </div>
+  <div class="alert alert-danger" ng-show="error != undefined && error != ''">
+    <strong>ERROR:</strong> {{error}}
   </div>
 
-  <!-- Pipeline -->
-  <div class="row">
-    <div class="col-md-9">
-      <div class="panel panel-default">
-        <div class="panel-heading">Pipeline Status</div>
-        <div class="panel-body" style="overflow: hidden;">
-          <div class="stages">
-            <div class="stage">Setup</div>
-            <div class="stage">Build</div>
-            <div class="stage">Test</div>
-            <div class="stage">Deploy</div>
-            <div class="stage">Finished</div>
+  <div ng-show="error == undefined || error == ''">
+    <!-- Build Details -->
+    <div class="panel panel-default">
+      <div class="panel-body" ng-class="build.passed ? 'passed' : 'failed'" style="padding-top: 0px; padding-bottom: 10px; padding-left: 30px;">
+        <div class="row">
+          <div class="col-md-6">
+            <h5 class="commit">
+              <i class="fa" aria-hidden="true" ng-class="build.passed ? 'fa-check' : 'fa-remove'"></i>
+              <span>{{build.commit.message}}</span>
+            </h5>
+            <h5 class="text-muted"><i class="fa fa-user-o" aria-hidden="true"></i> <span><b>Author:</b> {{build.commit.author}}</span></h5>
+            <h5 class="text-muted"><i class="fa fa-circle-o-notch" aria-hidden="true"></i><span><b>Commit:</b> #{{build.commit.ref}}</span></h5>         
           </div>
-          <div class="myBox">
-            <div class="boxItem ignored"><i class="fa fa-circle" aria-hidden="true"></i></div>
-            <div class="boxItem passed"><i class="fa fa-check" aria-hidden="true"></i></div>
-            <div class="boxItem passed"><i class="fa fa-check" aria-hidden="true"></i></div>
-            <div class="boxItem failed"><i class="fa fa-remove" aria-hidden="true"></i></div>
-            <div class="boxItem ignored"><i class="fa fa-circle" aria-hidden="true"></i></div>
-          </div><br/>
-          <div class="myBox">
-            <div class="boxItem passed" style="visibility:hidden;"><i class="fa fa-check" aria-hidden="true"></i></div>
-            <div class="boxItem passed edge-left edge-right"><i class="fa fa-check" aria-hidden="true"></i></div>
-            <div class="boxItem passed" style="visibility:hidden;"><i class="fa fa-check" aria-hidden="true"></i></div>
-            <div class="boxItem passed edge-left edge-right"><i class="fa fa-check" aria-hidden="true"></i></div>
-            <div class="boxItem ignored" style="visibility:hidden;"><i class="fa fa-circle" aria-hidden="true"></i></div>
-          </div>
-          <br />
-          <div class="myBox">
-            <div class="boxItem passed" style="visibility:hidden;"><i class="fa fa-check" aria-hidden="true"></i></div>
-            <div class="boxItem passed edge-left edge-right long"><i class="fa fa-check" aria-hidden="true"></i></div>
-            <div class="boxItem passed" style="visibility:hidden;"><i class="fa fa-check" aria-hidden="true"></i></div>
-            <div class="boxItem passed" style="visibility:hidden;"><i class="fa fa-check" aria-hidden="true"></i></div>
-            <div class="boxItem ignored" style="visibility:hidden;"><i class="fa fa-circle" aria-hidden="true"></i></div>
+
+          <div class="col-md-3" style="padding-top: 0px;">
+            <h5 class="text-muted"><i class="fa fa-calendar" aria-hidden="true"></i><span><b>Time:</b> 2017/07/18 15:29</span></h5>
+            <h5 class="text-muted"><i class="fa fa-hourglass-half" aria-hidden="true"></i> <span><b>Duration:</b> {{build.duration}}</span></h5>
+            <h5 class="text-muted"><i class="fa fa-server" aria-hidden="true"></i> <span><b>Node:</b> {{build.node}}</span></h5>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Actions -->
-    <div class="col-md-3">
-      <div class="panel panel-default">
-        <div class="panel-heading">Actions</div>
-        <div class="panel-body">
-          <button type="button" class="btn btn-default btn-block"><i class="fa fa-refresh" aria-hidden="true"></i> Rerun Build</button>
-          <button type="button" class="btn btn-default btn-block"><i class="fa fa-download" aria-hidden="true"></i> Get Artifacts</button>
+    <!-- Pipeline -->
+    <div class="row">
+      <div class="col-md-9">
+        <div class="panel panel-default">
+          <div class="panel-heading">Pipeline Status</div>
+          <div class="panel-body" style="overflow: hidden;">
+            <div ng-if="build.stages == undefined ||build.stages.length == 0">
+              <h5>No stages defined, create one in the <a href="#!/project/{{project.id}}/pipeline">Pipeline</a> tab.</h5>
+            </div>
+
+            <!-- stage names -->
+            <div class="stages" ng-if="build.stages.length">
+              <div class="stage">Setup</div>
+              <div class="stage" ng-repeat="stage in build.stages">{{stage.name}}</div>
+              <div class="stage">Teardown</div>
+            </div>
+
+            <!-- status of the stage -->
+            <div class="myBox" ng-if="build.stages.length">
+              <div class="boxItem ignored"><i class="fa fa-circle" aria-hidden="true"></i></div>
+              <div class="boxItem" ng-class="stage.status" ng-repeat="stage in build.stages">
+                <i class="fa fa-question" aria-hidden="true" ng-if="stage.status == 'ignored'"></i>
+                <i class="fa fa-remove" aria-hidden="true" ng-if="stage.status == 'failed'"></i>
+                <i class="fa fa-check" aria-hidden="true" ng-if="stage.status == 'passed'"></i>
+              </div>
+              <div class="boxItem ignored"><i class="fa fa-circle" aria-hidden="true"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="col-md-3">
+        <div class="panel panel-default">
+          <div class="panel-heading">Actions</div>
+          <div class="panel-body">
+            <button type="button" class="btn btn-default btn-block"><i class="fa fa-refresh" aria-hidden="true"></i> Rerun Build</button>
+            <button type="button" class="btn btn-default btn-block"><i class="fa fa-download" aria-hidden="true"></i> Get Artifacts</button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Logs -->
-  <div class="row">
-    <div class="col-md-12">
-      <div class="panel panel-default">
-        <div class="panel-heading">Build Log</div>
-        <div class="panel-body" style="background-color: #404040; color: #f1f1f1; font-family: Monaco,monospace;">
-          <span style="color: #FFFF91;">$: apt-get install go</span><br />
-          <span style="color: #FFFF91;">$: go version</span><br />
-          go version go1.7.6 linux/amd64<br />
+    <!-- Logs -->
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel panel-default">
+          <div class="panel-heading">Build Log</div>
+          <div class="panel-body" style="background-color: #404040; color: #f1f1f1; font-family: Monaco,monospace;">
+            <span style="color: #FFFF91;">$: apt-get install go</span><br />
+            <span style="color: #FFFF91;">$: go version</span><br />
+            go version go1.7.6 linux/amd64<br />
+          </div>
         </div>
       </div>
     </div>
