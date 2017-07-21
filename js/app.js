@@ -93,7 +93,10 @@ app.factory('builds', function() {
         	name: "Test",
         	status: "passed"
         },{
-        	name: "Deploy",
+        	name: "Staging",
+        	status: "passed"
+        },{
+        	name: "Production",
         	status: "passed"
         }]
 	},

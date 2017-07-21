@@ -3,11 +3,12 @@
 	<h1>
     <b>{{project.name}}</b>
     <i class="fa fa-angle-double-right" aria-hidden="true"></i>
-    <span ng-if="tab == 'build'">Build Details</span>
+    <span ng-if="tab == 'build'">Build</span>
     <span ng-if="tab == 'history'">Build History</span>
     <span ng-if="tab == 'pipeline'">Pipeline</span>
     <span ng-if="tab == 'env'">Environment</span>
     <span ng-if="tab == 'settings'">Settings</span>
+    
     <span ng-if="build != undefined && build != 'latest'">(#{{build}})</span>
   </h1>
 

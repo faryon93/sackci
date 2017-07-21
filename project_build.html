@@ -38,20 +38,20 @@
 
             <!-- stage names -->
             <div class="stages" ng-if="build.stages.length">
-              <div class="stage">Setup</div>
+              <!--<div class="stage">Setup</div>-->
               <div class="stage" ng-repeat="stage in build.stages">{{stage.name}}</div>
-              <div class="stage">Teardown</div>
+              <!--<div class="stage">Teardown</div>-->
             </div>
 
             <!-- status of the stage -->
             <div class="myBox" ng-if="build.stages.length">
-              <div class="boxItem ignored"><i class="fa fa-circle" aria-hidden="true"></i></div>
+              <!--<div class="boxItem ignored"><i class="fa fa-circle" aria-hidden="true"></i></div>-->
               <div class="boxItem" ng-class="stage.status" ng-repeat="stage in build.stages">
                 <i class="fa fa-question" aria-hidden="true" ng-if="stage.status == 'ignored'"></i>
                 <i class="fa fa-remove" aria-hidden="true" ng-if="stage.status == 'failed'"></i>
                 <i class="fa fa-check" aria-hidden="true" ng-if="stage.status == 'passed'"></i>
               </div>
-              <div class="boxItem ignored"><i class="fa fa-circle" aria-hidden="true"></i></div>
+              <!--<div class="boxItem ignored"><i class="fa fa-circle" aria-hidden="true"></i></div>-->
             </div>
           </div>
         </div>
