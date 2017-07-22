@@ -37,10 +37,10 @@ app.controller("projectlist", function($scope, $location, projects) {
 });
 
 app.controller("project", function($scope, $location, $routeParams, projects) {
-    // default tab is the settings tab
+    // default tab is the history tab
     $scope.tab = $routeParams.tab;
     if ($scope.tab == undefined)
-        $scope.tab = "settings";
+        $scope.tab = "history";
 
     // no project specified -> display empty page
     // TODO: display empty page
@@ -81,6 +81,10 @@ app.controller("projectHistory", function($scope, $routeParams, builds) {
 });
 
 app.controller("projectEnv", function($scope, env) {
+    $scope.question = function(item, show) {
+        item.question = show;
+    }
+
     $scope.$watch('loaded', function(loaded){
         if (!loaded)
             return;

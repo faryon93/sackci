@@ -12,11 +12,14 @@
 	<tbody>
 	  <tr ng-repeat="env in project.env">
 	    <td>{{env.key}}</td>
-	    <td ng-if="!env.encrypted">{{env.value}}</td>
-	    <td ng-if="env.encrypted">*************</td>
+	    <td>{{env.value}}</td>
 	    <td class="col-md-2">
-	      <button type="button" class="btn btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</button>
-	      <button ng-if="env.encrypted" type="button" class="btn btn-info"><i class="fa fa-key" aria-hidden="true"></i> Decrypt</button>
+	      <button type="button" class="btn btn-danger" ng-click="question(env, true)" ng-if="!env.question"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</button>
+
+	      <!-- confirmation -->
+	      <strong ng-if="env.question">Sure?</strong>
+	      <button type="button" class="btn btn-default" ng-click="question(env, false)" ng-if="env.question" ><i class="fa fa-check" aria-hidden="true"></i> Yes</button>
+	      <button type="button" class="btn btn-default" ng-click="question(env, false)" ng-if="env.question"><i class="fa fa-remove" aria-hidden="true"></i> No</button>
 	    </td>
 	  </tr>
 	  <!--<tr>
