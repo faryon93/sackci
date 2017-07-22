@@ -14,191 +14,169 @@ app.config(function($routeProvider, $locationProvider) {
     .when("/project/:id/:tab", {
         templateUrl : "project.html"
     })
-    .when("/project/:id/build/:build", {
+    .when("/project/:id/:tab/:build", {
         templateUrl : "project.html"
     });
 });
 
-app.directive('capitalize', function() {
-	return {
-	  require: 'ngModel',
-	  link: function(scope, element, attrs, modelCtrl) {
-	    var capitalize = function(inputValue) {
-	      if (inputValue == undefined) inputValue = '';
-	      var capitalized = inputValue.toUpperCase();
-	      if (capitalized !== inputValue) {
-	        modelCtrl.$setViewValue(capitalized);
-	        modelCtrl.$render();
-	      }
-	      return capitalized;
-	    }
 
-	    modelCtrl.$parsers.push(capitalize);
-	    capitalize(scope[attrs.ngModel]);
-	  }
-	};
-});
 
+// ------------------------------------------------------------------------------------------------
 app.controller("navigation", function($scope, $location) {
-	$scope.isActive = function (viewLocation) { 
+    $scope.isActive = function (viewLocation) { 
         return $location.path().startsWith(viewLocation);
     };
 });
 
 app.controller("projectlist", function($scope, $location, projects) {
-	$scope.projects = projects.get()
+    // load project list from backend
+    $scope.loading = true;
+    $scope.projects = projects.query(function() {
+        $scope.loading = false;
+    });
 });
 
 app.controller("project", function($scope, $location, $routeParams, projects) {
-	$scope.project = projects.find($routeParams.id == undefined ? 0 : $routeParams.id);
-	$scope.tab = $routeParams.tab;
-	if ($scope.tab == undefined)
-		$scope.tab = "build";
-	$scope.build = $routeParams.build;
+    // default tab is the settings tab
+    $scope.tab = $routeParams.tab;
+    if ($scope.tab == undefined)
+        $scope.tab = "settings";
+
+    // no project specified -> display empty page
+    // TODO: display empty page
+    if ($routeParams.id == undefined)
+        return;
+
+    $scope.build = $routeParams.build;
+
+    // load the project details from the backend
+    $scope.loaded = false;
+    $scope.project = projects.get({id: $routeParams.id}, function() {
+        $scope.loaded = true;
+    });
 });
 
-app.controller("projectenv", function($scope) {
+app.controller("projectBuild", function($scope, $routeParams, builds) {
+    $scope.$watch('loaded', function(loaded){
+        if (!loaded)
+            return;
+
+        // redirect to latest ->
+        var buildId = $routeParams.build;
+        if (buildId == undefined)
+            buildId = $scope.project.build;
+
+        $scope.build = builds.get({project: $scope.project.id, id: buildId});
+    });
 
 });
 
-app.controller("build_details", function($scope, $routeParams, builds) {
-	var buildId = 1;
-	if ($routeParams.build != undefined)
-		buildId = $routeParams.build;
+app.controller("projectHistory", function($scope, $routeParams, builds) {
+    $scope.$watch('loaded', function(loaded){
+        if (!loaded)
+            return;
 
-	$scope.build = builds.find($scope.project.id, buildId);
-	if ($scope.build == undefined)
-		$scope.error = "build #" + buildId + " does not exist";
+        $scope.builds = builds.query({project: $scope.project.id});
+    });
 });
 
-app.controller("build_history", function($scope, $routeParams, builds) {
-	$scope.builds = builds.get($scope.project.id);
+app.controller("projectEnv", function($scope, env) {
+    $scope.$watch('loaded', function(loaded){
+        if (!loaded)
+            return;
+
+        $scope.project.env = env.query({project: $scope.project.id});
+    });
 });
 
-app.factory('builds', function() {
-	var builds = [{
-		id: 1,
-		passed: true,
-		commit: {
-			message: "fixed: missing 'provider' option in sample config",
-			author: "Maximilian Pachl",
-			ref: "9df89cb",
-		},
-		duration: "12min 34sec",
-		node: "a89v9ef2d3c",
-        stages: [{
-        	name: "Build",
-        	status: "passed"
-        },{
-        	name: "Test",
-        	status: "passed"
-        },{
-        	name: "Staging",
-        	status: "passed"
-        },{
-        	name: "Production",
-        	status: "passed"
-        }]
-	},
-	{
-		id: 2,
-		passed: false,
-		commit: {
-			message: "added \"Security Considerations\" to README",
-			author: "Maximilian Pachl",
-			ref: "171cb56",
-		},
-		duration: "1min 57sec",
-		node: "a89v9ef2d3c",
-        stages: [{
-        	name: "Build",
-        	status: "passed"
-        },{
-        	name: "Test",
-        	status: "failed"
-        },{
-        	name: "Deploy",
-        	status: "ignored"
-        }]
-	},
-	{
-		id: 3,
-		passed: false,
-		commit: {
-			message: "check influx connectivity on application startup",
-			author: "Maximilian Pachl",
-			ref: "586f301",
-		},
-		duration: "58sec",
-		node: "a89v9ef2d3c",
-        stages: [{
-        	name: "Build",
-        	status: "failed"
-        },{
-        	name: "Test",
-        	status: "ignored"
-        },{
-        	name: "Deploy",
-        	status: "ignored"
-        }]
-	}];
+// ------------------------------------------------------------------------------------------------
+app.factory('projects', function($resource) {
+    return $resource("/api/v1/project/:id");
+});
 
-	var service = {};
-    service.find = function(project, id) {
-        return builds[id - 1];
-    };
+app.factory('builds', function($resource){
+   return $resource('/api/v1/project/:project/build/:id', {project:'@project', id: '@id'})
+});
 
-    service.get = function(project) {
-    	return builds;
+app.factory('env', function($resource){
+   return $resource('/api/v1/project/:project/env/:id', {project:'@project', id: '@id'})
+});
+
+
+// ------------------------------------------------------------------------------------------------
+app.filter("timeago", function () {
+    //time: the time
+    //local: compared to what time? default: now
+    //raw: wheter you want in a format of "5 minutes ago", or "5 minutes"
+    return function (time, local, raw) {
+        if (!time) return "never";
+
+        if (!local) {
+            (local = Date.now())
+        }
+
+        if (angular.isDate(time)) {
+            time = time.getTime();
+        } else if (typeof time === "string") {
+            time = new Date(time).getTime();
+        }
+
+        if (angular.isDate(local)) {
+            local = local.getTime();
+        }else if (typeof local === "string") {
+            local = new Date(local).getTime();
+        }
+
+        if (typeof time !== 'number' || typeof local !== 'number') {
+            return;
+        }
+
+        var
+            offset = Math.abs((local - time) / 1000),
+            span = [],
+            MINUTE = 60,
+            HOUR = 3600,
+            DAY = 86400,
+            WEEK = 604800,
+            MONTH = 2629744,
+            YEAR = 31556926,
+            DECADE = 315569260;
+
+        if (offset <= MINUTE)              span = [ '', raw ? 'now' : 'less than a minute' ];
+        else if (offset < (MINUTE * 60))   span = [ Math.round(Math.abs(offset / MINUTE)), 'min' ];
+        else if (offset < (HOUR * 24))     span = [ Math.round(Math.abs(offset / HOUR)), 'hr' ];
+        else if (offset < (DAY * 7))       span = [ Math.round(Math.abs(offset / DAY)), 'day' ];
+        else if (offset < (WEEK * 52))     span = [ Math.round(Math.abs(offset / WEEK)), 'week' ];
+        else if (offset < (YEAR * 10))     span = [ Math.round(Math.abs(offset / YEAR)), 'year' ];
+        else if (offset < (DECADE * 100))  span = [ Math.round(Math.abs(offset / DECADE)), 'decade' ];
+        else                               span = [ '', 'a long time' ];
+
+        span[1] += (span[0] === 0 || span[0] > 1) ? 's' : '';
+        span = span.join(' ');
+
+        if (raw === true) {
+            return span;
+        }
+        return (time <= local) ? span + ' ago' : 'in ' + span;
     }
-    
-    // other stubbed methods
-    return service;
 });
 
-app.factory('projects', function() {
-	var projects = [{
-        id: 0,
-        name: "org.kde.breeze",
-        build: 11,
-        execution_time: "9 days ago",
-        duration: "1 minute",
-        passed: true,
-        env: [],
-    },
-    {
-        id: 1,
-        name: "tcdeploy",
-        build: 5,
-        execution_time: "5 hours ago",
-        duration: "12 seconds",
-        passed: true,
-        env: [],
-    },
-    {
-        id: 2,
-        name: "Xorbit 0.8 Legacy",
-        build: 432,
-        execution_time: "29 minutes ago",
-        duration: "7 minutes",
-        passed: false,
-        env: [
-        	{key: "XORBIT_BUILD_TIME", value: "$now()", encrypted: false},
-        	{key: "XORBIT_DB_HOST", value: "172.16.1.59", encrypted: false},
-        	{key: "XORBIT_DB_USER", value: "root", encrypted: false},
-        	{key: "XORBIT_DB_PASSWORD", value: "", encrypted: true}
-        ]
-    }];
+app.directive('capitalize', function() {
+    return {
+      require: 'ngModel',
+      link: function(scope, element, attrs, modelCtrl) {
+        var capitalize = function(inputValue) {
+          if (inputValue == undefined) inputValue = '';
+          var capitalized = inputValue.toUpperCase();
+          if (capitalized !== inputValue) {
+            modelCtrl.$setViewValue(capitalized);
+            modelCtrl.$render();
+          }
+          return capitalized;
+        }
 
-	var service = {};
-    service.get = function() {
-        return projects;
+        modelCtrl.$parsers.push(capitalize);
+        capitalize(scope[attrs.ngModel]);
+      }
     };
-    service.find = function(id) {
-    	p = projects[id];
-    	return p;
-    };
-    
-    // other stubbed methods
-    return service;
 });

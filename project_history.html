@@ -1,4 +1,4 @@
-<div ng-controller="build_history">
+<div ng-controller="projectHistory">
   <div class="panel panel-default" ng-repeat="build in builds">
     <div class="panel-body" ng-class="build.passed ? 'passed' : 'failed'" style="padding-top: 0px; padding-bottom: 10px; padding-left: 30px;">
       <div class="row">
@@ -12,7 +12,7 @@
         </div>
 
         <div class="col-md-3" style="padding-top: 0px;">
-          <h5 class="text-muted"><i class="fa fa-calendar" aria-hidden="true"></i><span><b>Time:</b> 2017/07/18 15:29</span></h5>
+          <h5 class="text-muted"><i class="fa fa-calendar" aria-hidden="true"></i><span><b>Time:</b> <span ng-bind="build.time | date:'yyyy-MM-dd HH:mm'"></span></span></h5>
           <h5 class="text-muted"><i class="fa fa-hourglass-half" aria-hidden="true"></i> <span><b>Duration:</b> {{build.duration}}</span></h5>
           <h5 class="text-muted"><i class="fa fa-server" aria-hidden="true"></i> <span><b>Node:</b> {{build.node}}</span></h5>
         </div>

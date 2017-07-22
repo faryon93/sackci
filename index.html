@@ -50,31 +50,38 @@
 
     <div class="container-fluid fill">
 		  <div class="row fill">
-        <!-- Sidebar: project list -->
+        <!-- sidebar: project list -->
         <div class="col-md-2 projectlist" ng-controller="projectlist">
+
           <!-- filter -->
           <form class="filter">
-              <div class="input-group">
-                <span class="input-group-addon">Project</span>
-                <input type="text" class="form-control" placeholder="filter projects" ng-model="search.name">
-              </div>
-            </form>
-            <hr />
+            <div class="input-group">
+              <span class="input-group-addon">Project</span>
+              <input type="text" class="form-control" placeholder="filter projects" ng-model="search.name">
+            </div>
+          </form>
+          <hr />
 
-            <!-- the list itself -->
-            <ul id="projects">
-              <li ng-repeat="project in projects | filter:search">
-                <h5 ng-class="project.passed ? 'passed' : 'failed'">
-                  <i class="fa" ng-class="project.passed ? 'fa-check' : 'fa-remove'" aria-hidden="true"></i>
-                  <span><a href="#!/project/{{project.id}}">{{project.name}}</a></span>
-                  <a href="#!/project/{{project.id}}/build/{{project.build}}">(#{{project.build}})</a>
-                </h5>
-                <h5 class="text-muted details">
-                  <i class="fa fa-calendar" aria-hidden="true"></i><span>{{project.execution_time}}</span>
-                  <i class="fa fa-clock-o" aria-hidden="true"></i><span>{{project.duration}}</span>
-                </h5>
-              </li>
-            </ul>
+          <!-- loading indicator -->
+          <div class="loading" ng-show="loading">
+            <div class="loader"></div>
+            <h4>Loading Project Feed...</h4>
+          </div>
+
+          <!-- the list itself -->
+          <ul id="projects" ng-show="!loading">
+            <li ng-repeat="project in projects | filter:search">
+              <h5 ng-class="project.passed ? 'passed' : 'failed'">
+                <i class="fa" ng-class="project.passed ? 'fa-check' : 'fa-remove'" aria-hidden="true"></i>
+                <span><a href="#!/project/{{project.id}}">{{project.name}}</a></span>
+                <a href="#!/project/{{project.id}}/build/{{project.build}}">(#{{project.build}})</a>
+              </h5>
+              <h5 class="text-muted details">
+                <i class="fa fa-calendar" aria-hidden="true"></i><span ng-bind="project.execution_time | timeago"></span>
+                <i class="fa fa-clock-o" aria-hidden="true"></i><span>{{project.duration}}</span>
+              </h5>
+            </li>
+          </ul>
         </div>
 
         <!-- content view -->

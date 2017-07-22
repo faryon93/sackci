@@ -1,4 +1,4 @@
-<div class="project-view" ng-controller="project">
+<div class="project-view" ng-controller="project" ng-show="loaded">
   <!-- header -->
 	<h1>
     <b>{{project.name}}</b>
@@ -32,5 +32,6 @@
     <div class="tab-pane active" ng-if="tab == 'build'" ng-include="'project_build.html'"></div>
     <div class="tab-pane active" ng-if="tab == 'history'" ng-include="'project_history.html'"></div>
 		<div class="tab-pane active" ng-if="tab == 'env'" ng-include="'project_env.html'"></div>
+    <div class="tab-pane active" ng-if="tab == 'settings'" ng-include="'project_settings.html'"></div>
 	</div>
 </div>

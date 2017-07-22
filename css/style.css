@@ -16,19 +16,17 @@ body {
 
 
 /********************************************************************
- * content view
- ********************************************************************/ 
-
-div.content-view
-{
-	min-height:100%;
-	border: 1px solid #ddd;
-	border-width: 0 0 0 1px;
-}
-
-/********************************************************************
  * project list
  ********************************************************************/ 
+
+@media (min-width: 992px) {
+	div.projectlist
+	{
+		min-height: 100%;
+		border: 1px solid #ddd;
+		border-width: 0 1px 0 0;
+	}
+}
 
 div.projectlist > form.filter
 {
@@ -72,6 +70,12 @@ div.projectlist h5.details > i:not(:first-child)
 #projects > li > .failed a
 {
 	color:#db4545;
+}
+
+div.projectlist > .loading
+{
+	margin-top: 15px;
+	text-align: center;
 }
 
 
@@ -139,8 +143,9 @@ div.panel-body.failed h5.commit a
     border: 16px solid #f3f3f3; /* Light grey */
     border-top: 16px solid #3498db; /* Blue */
     border-radius: 50%;
-    width: 120px;
-    height: 120px;
+    width: 80px;
+    height: 80px;
+    margin: auto;
     animation: spin 2s linear infinite;
 }
 
