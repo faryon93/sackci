@@ -33,7 +33,7 @@
           <div class="panel-heading">Pipeline Status</div>
           <div class="panel-body" style="overflow: hidden;">
             <div ng-if="build.stages == undefined ||build.stages.length == 0">
-              <h5>No stages defined, create one in the <a href="#!/project/{{project.id}}/pipeline">Pipeline</a> tab.</h5>
+              <h5>No pipeline defined, create one in the <a href="#!/project/{{project.id}}/pipeline">Pipeline</a> tab.</h5>
             </div>
 
             <!-- stage names -->
@@ -75,12 +75,12 @@
         <div class="panel panel-default">
           <div class="panel-heading">Log: {{stage.name}}</div>
           <div class="panel-body log">
+            <div class="empty" ng-if="!stage.log.length">No log output captured for selected stage!</div>
+
             <div class="line" ng-repeat="log in stage.log">
               <span class="linenr">{{$index + 1}}</span>
               <span class="message" ng-bind-html="log | ansicolor"></span>
             </div>
-            <!--<span style="color: #FFFF91;">$: go version</span><br />
-            go version go1.7.6 linux/amd64<br />-->
           </div>
         </div>
       </div>
