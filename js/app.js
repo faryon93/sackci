@@ -1,5 +1,5 @@
+// ------------------------------------------------------------------------------------------------
 var app = angular.module('app', ["ngRoute", "ngResource"]);
-
 app.config(function($routeProvider, $locationProvider) {
     $routeProvider
     .when("/", {
@@ -18,7 +18,6 @@ app.config(function($routeProvider, $locationProvider) {
         templateUrl : "project.html"
     });
 });
-
 
 
 // ------------------------------------------------------------------------------------------------
@@ -57,40 +56,30 @@ app.controller("project", function($scope, $location, $routeParams, projects) {
 });
 
 app.controller("projectBuild", function($scope, $routeParams, builds) {
-    $scope.$watch('loaded', function(loaded){
-        if (!loaded)
-            return;
+    // redirect to latest ->
+    var buildId = $routeParams.build;
+    if (buildId == undefined)
+        buildId = "latest";
 
-        // redirect to latest ->
-        var buildId = $routeParams.build;
-        if (buildId == undefined)
-            buildId = $scope.project.build;
-
-        $scope.build = builds.get({project: $scope.project.id, id: buildId});
-    });
-
+    $scope.build = builds.get({project: $routeParams.id, id: buildId});
 });
 
 app.controller("projectHistory", function($scope, $routeParams, builds) {
-    $scope.$watch('loaded', function(loaded){
-        if (!loaded)
-            return;
-
-        $scope.builds = builds.query({project: $scope.project.id});
-    });
+    $scope.builds = builds.query({project: $routeParams.id});
 });
 
-app.controller("projectEnv", function($scope, env) {
+app.controller("projectEnv", function($scope, $routeParams, env) {
     $scope.question = function(item, show) {
         item.question = show;
-    }
+    };
 
-    $scope.$watch('loaded', function(loaded){
-        if (!loaded)
-            return;
+    $scope.refresh = function() {
+        // load environment information from the backend
+        $scope.envs = env.query({project: $routeParams.id});
+    };
 
-        $scope.project.env = env.query({project: $scope.project.id});
-    });
+    // the initial refresh
+    $scope.refresh();
 });
 
 // ------------------------------------------------------------------------------------------------
