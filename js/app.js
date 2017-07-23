@@ -61,7 +61,13 @@ app.controller("projectBuild", function($scope, $routeParams, builds) {
     if (buildId == undefined)
         buildId = "latest";
 
-    $scope.build = builds.get({project: $routeParams.id, id: buildId});
+    $scope.build = builds.get(
+        {project: $routeParams.id, id: buildId},
+        function(){ },
+        function(error) {
+            $scope.error = error.data;
+        }
+    );
 });
 
 app.controller("projectHistory", function($scope, $routeParams, builds) {
