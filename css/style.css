@@ -72,6 +72,12 @@ div.projectlist h5.details > i:not(:first-child)
 	color:#db4545;
 }
 
+#projects > li > .running,
+#projects > li > .running a
+{
+	color:#ffbb33;
+}
+
 div.projectlist > .loading
 {
 	margin-top: 15px;
@@ -117,6 +123,27 @@ div.panel-body.failed
 	background: linear-gradient(to right,#db4545 0,#db4545 10px,#fff 10px,#fff 100%) no-repeat;
 }
 
+div.panel-body.running
+{
+	background: linear-gradient(45deg, transparent,
+                      			transparent 25%, #ffbb33 25%,
+                      			#ffbb33 50%, transparent 50%,
+                      			transparent 75%, #ffbb33 75%,
+                      			#ffbb33);
+    background-size: 10px 10px;
+    background-repeat: repeat-y;
+    animation: running-animation 6s linear infinite;
+}
+
+@keyframes running-animation {
+	0% {
+		background-position: 0% 0px
+	}
+	100% {
+		background-position: 0% 200px
+	}
+}
+
 div.panel-body h5.commit
 {
 	font-weight: bold;
@@ -132,6 +159,12 @@ div.panel-body.failed h5.commit,
 div.panel-body.failed h5.commit a
 {
 	color: #db4545;
+}
+
+div.panel-body.running h5.commit,
+div.panel-body.running h5.commit a
+{
+	color: #ffbb33;
 }
 
 
@@ -186,6 +219,7 @@ div.build-details div.log > div.empty
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
 
 /********************************************************************
  * ansi colors

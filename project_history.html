@@ -1,10 +1,12 @@
 <div ng-controller="projectHistory">
   <div class="panel panel-default" ng-repeat="build in builds">
-    <div class="panel-body" ng-class="build.passed ? 'passed' : 'failed'" style="padding-top: 0px; padding-bottom: 10px; padding-left: 30px;">
+    <div class="panel-body" ng-class="build.status" style="padding-top: 0px; padding-bottom: 10px; padding-left: 30px;">
       <div class="row">
         <div class="col-md-6">
           <h5 class="commit">
-            <i class="fa" aria-hidden="true" ng-class="build.passed ? 'fa-check' : 'fa-remove'"></i>
+            <i class="fa fa-check" aria-hidden="true" ng-if="build.status == 'passed'"></i>
+            <i class="fa fa-remove" aria-hidden="true" ng-if="build.status == 'failed'"></i>
+            <i class="fa fa-exchange" aria-hidden="true" ng-if="build.status == 'running'"></i>
             <span><a href="#!/project/{{project.id}}/build/{{build.id}}">{{build.commit.message}}</a></span>
           </h5>
           <h5 class="text-muted"><i class="fa fa-user-o" aria-hidden="true"></i> <span><b>Author:</b> {{build.commit.author}}</span></h5>
