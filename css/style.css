@@ -139,12 +139,29 @@ div.panel-body.failed h5.commit a
  * build details
  ********************************************************************/ 
 
- div.build-details div.log
- {
- 	background-color: #404040;
- 	color: #f1f1f1;
- 	font-family: Monaco, monospace;
- }
+div.build-details div.log
+{
+	background-color: #222;
+	color: #f1f1f1;
+	font-family: Monaco, monospace;
+	padding-left: 0;
+	padding-right: 0;
+}
+
+div.build-details div.log > div.line:hover
+{
+	background-color: #444;
+}
+
+div.build-details div.log > div.line > span.linenr
+{
+	color: #666;
+	padding-left: 15px;
+	margin-right: 5px;
+	text-align: right;
+	width: 30px;
+	display: inline-block;
+}
 
 
 /********************************************************************
@@ -164,4 +181,32 @@ div.panel-body.failed h5.commit a
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/********************************************************************
+ * ansi colors
+ ********************************************************************/ 
+
+.ansi.red {
+	color: #FF6C60;
+}
+
+.ansi.green {
+	color: #B1FD79;
+}
+
+.ansi.yellow {
+	color: #FFFF91;
+}
+
+.ansi.blue{
+	color: #96CBFE;
+}
+
+.ansi.magenta {
+	color: #FF73FD;
+}
+
+.ansi.cyan {
+	color: cyan;
 }

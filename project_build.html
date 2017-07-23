@@ -75,8 +75,10 @@
         <div class="panel panel-default">
           <div class="panel-heading">Log: {{stage.name}}</div>
           <div class="panel-body log">
-            <span ng-repeat="log in stage.log">{{log}}<br /></span>
-
+            <div class="line" ng-repeat="log in stage.log">
+              <span class="linenr">{{$index + 1}}</span>
+              <span class="message" ng-bind-html="log | ansicolor"></span>
+            </div>
             <!--<span style="color: #FFFF91;">$: go version</span><br />
             go version go1.7.6 linux/amd64<br />-->
           </div>
