@@ -46,7 +46,7 @@
             <!-- status of the stage -->
             <div class="myBox" ng-if="build.stages.length">
               <!--<div class="boxItem ignored"><i class="fa fa-circle" aria-hidden="true"></i></div>-->
-              <div class="boxItem" ng-class="stage.status" ng-repeat="stage in build.stages">
+              <div class="boxItem" ng-class="stage.status" ng-repeat="stage in build.stages" ng-click="select(stage)">
                 <i class="fa fa-question" aria-hidden="true" ng-if="stage.status == 'ignored'"></i>
                 <i class="fa fa-remove" aria-hidden="true" ng-if="stage.status == 'failed'"></i>
                 <i class="fa fa-check" aria-hidden="true" ng-if="stage.status == 'passed'"></i>
@@ -73,11 +73,12 @@
     <div class="row">
       <div class="col-md-12">
         <div class="panel panel-default">
-          <div class="panel-heading">Build Log</div>
-          <div class="panel-body" style="background-color: #404040; color: #f1f1f1; font-family: Monaco,monospace;">
-            <span style="color: #FFFF91;">$: apt-get install go</span><br />
-            <span style="color: #FFFF91;">$: go version</span><br />
-            go version go1.7.6 linux/amd64<br />
+          <div class="panel-heading">Log: {{stage.name}}</div>
+          <div class="panel-body log">
+            <span ng-repeat="log in stage.log">{{log}}<br /></span>
+
+            <!--<span style="color: #FFFF91;">$: go version</span><br />
+            go version go1.7.6 linux/amd64<br />-->
           </div>
         </div>
       </div>

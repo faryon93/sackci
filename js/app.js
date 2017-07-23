@@ -56,6 +56,10 @@ app.controller("project", function($scope, $location, $routeParams, projects) {
 });
 
 app.controller("projectBuild", function($scope, $routeParams, builds) {
+    $scope.select = function(stage) {
+        $scope.stage = stage;
+    };
+
     // redirect to latest ->
     var buildId = $routeParams.build;
     if (buildId == undefined)
@@ -63,7 +67,9 @@ app.controller("projectBuild", function($scope, $routeParams, builds) {
 
     $scope.build = builds.get(
         {project: $routeParams.id, id: buildId},
-        function(){ },
+        function(response){
+            $scope.stage = response.stages[0];
+        },
         function(error) {
             $scope.error = error.data;
         }

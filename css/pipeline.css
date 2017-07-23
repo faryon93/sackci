@@ -31,6 +31,8 @@ div.boxItem {
 
   border-radius: 50%;
   z-index: 0;
+
+  cursor: pointer;
 }
 
 .boxItem:before,
