@@ -10,16 +10,16 @@
 	  </tr>
 	</thead>
 	<tbody>
-	  <tr ng-repeat="(key, value) in envs">
+	  <tr ng-repeat="(key, value) in envs" ng-init="confirm = false">
 	    <td>{{key}}</td>
 	    <td>{{value}}</td>
 	    <td class="col-md-2">
-	      <button type="button" class="btn btn-danger" ng-click="question(env, true)" ng-if="!env.question"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</button>
+	      <button type="button" class="btn btn-danger" ng-click="confirm = true" ng-show="!confirm"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</button>
 
 	      <!-- confirmation -->
-	      <strong ng-if="env.question">Sure?</strong>
-	      <button type="button" class="btn btn-default" ng-click="question(env, false)" ng-if="env.question" ><i class="fa fa-check" aria-hidden="true"></i> Yes</button>
-	      <button type="button" class="btn btn-default" ng-click="question(env, false)" ng-if="env.question"><i class="fa fa-remove" aria-hidden="true"></i> No</button>
+	      <strong ng-show="confirm">Sure?</strong>
+	      <button type="button" class="btn btn-default" ng-click="confirm = false" ng-show="confirm" ><i class="fa fa-check" aria-hidden="true"></i> Yes</button>
+	      <button type="button" class="btn btn-default" ng-click="confirm = false" ng-show="confirm"><i class="fa fa-remove" aria-hidden="true"></i> No</button>
 	    </td>
 	  </tr>
 	  <!--<tr>

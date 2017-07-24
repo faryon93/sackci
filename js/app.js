@@ -80,14 +80,14 @@ app.controller("projectHistory", function($scope, $routeParams, history) {
 });
 
 app.controller("projectEnv", function($scope, $routeParams, env) {
-    $scope.question = function(item, show) {
-        item.question = show;
-    };
-
     $scope.refresh = function() {
         // load environment information from the backend
         $scope.envs = env.get({id: $routeParams.id});
     };
+
+    $scope.showConfirm = function(show) {
+        $scope.confirm = show;
+    }
 
     // the initial refresh
     $scope.refresh();
