@@ -10,9 +10,9 @@
 	  </tr>
 	</thead>
 	<tbody>
-	  <tr ng-repeat="env in envs">
-	    <td>{{env.key}}</td>
-	    <td>{{env.value}}</td>
+	  <tr ng-repeat="(key, value) in envs">
+	    <td>{{key}}</td>
+	    <td>{{value}}</td>
 	    <td class="col-md-2">
 	      <button type="button" class="btn btn-danger" ng-click="question(env, true)" ng-if="!env.question"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</button>
 

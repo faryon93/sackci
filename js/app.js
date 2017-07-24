@@ -65,8 +65,7 @@ app.controller("projectBuild", function($scope, $routeParams, builds) {
     if (buildId == undefined)
         buildId = "latest";
 
-    $scope.build = builds.get(
-        {project: $routeParams.id, id: buildId},
+    $scope.build = builds.get({id: buildId},
         function(response){
             $scope.stage = response.stages[0];
         },
@@ -76,8 +75,8 @@ app.controller("projectBuild", function($scope, $routeParams, builds) {
     );
 });
 
-app.controller("projectHistory", function($scope, $routeParams, builds) {
-    $scope.builds = builds.query({project: $routeParams.id});
+app.controller("projectHistory", function($scope, $routeParams, history) {
+    $scope.builds = history.query({project: $routeParams.id});
 });
 
 app.controller("projectEnv", function($scope, $routeParams, env) {
@@ -87,7 +86,7 @@ app.controller("projectEnv", function($scope, $routeParams, env) {
 
     $scope.refresh = function() {
         // load environment information from the backend
-        $scope.envs = env.query({project: $routeParams.id});
+        $scope.envs = env.get({id: $routeParams.id});
     };
 
     // the initial refresh
@@ -100,11 +99,15 @@ app.factory('projects', function($resource) {
 });
 
 app.factory('builds', function($resource){
-   return $resource('/api/v1/project/:project/build/:id', {project:'@project', id: '@id'})
+   return $resource('/api/v1/project/build/:id');
+});
+
+app.factory('history', function($resource){
+   return $resource('/api/v1/project/:project/history/:id', {project:'@project', id: '@id'});
 });
 
 app.factory('env', function($resource){
-   return $resource('/api/v1/project/:project/env/:id', {project:'@project', id: '@id'})
+   return $resource('/api/v1/project/:id/env/');
 });
 
 
@@ -200,8 +203,6 @@ app.filter("ansicolor", ['$sce', function($sce) {
 
     return function(val)
     {
-
-        console.log(val);
         if (val == undefined)
             val = '';
 
