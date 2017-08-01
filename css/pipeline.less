@@ -1,0 +1,115 @@
+div.pipeline
+{
+	// stage labels
+	.stages
+	{
+		text-align: center;
+		white-space: nowrap;
+
+		.stage
+		{
+			display: inline-block;
+			font-size: 15pt;
+			font-weight: bold;
+			margin-bottom: 10px;
+			width: 165px;
+		}
+	}
+
+	// stage step: common definitions
+	.step
+	{
+		display: inline-block;
+		
+		position:relative;
+		width: 40px;
+		height: 40px;
+		margin-right: 5em;
+		z-index: 0;
+
+		border-radius: 50%;
+
+		color: white;
+		cursor: pointer;
+
+		font-size: 25px;
+		line-height: 40px;
+		text-align: center;
+	}
+
+	.step:before,
+	.step:after
+	{
+		content: '';
+		width: 5em;	/* size of your margin */
+		border-bottom: 5px solid;
+		position: absolute;
+		top: 45%;
+		color: gray;
+	}
+
+	.step:after
+	{
+		left:100%;
+	}
+
+	.step:before
+	{
+		right:100%;
+	}
+
+	.step:first-of-type:before,
+	.step:last-of-type:after
+	{
+		display:none;
+	}
+
+	.step:last-of-type
+	{
+		margin-right: 0;
+	}
+
+	.step.edge-left:before
+	{
+		border-left: 5px solid;
+		height: 65px;
+		top: -42px;
+		width: 2em;
+
+		border-radius: 0 0 0 15px;
+	}
+
+	.step.edge-right:after
+	{
+		border-right: 5px solid;
+		height: 65px;
+		top: -42px;
+		width: 2em;
+
+		border-radius: 0 0 15px 0;
+	}
+
+	// stage steps: types
+	.step.passed
+	{
+		background-color: #39aa56;
+	}
+
+	.step.failed
+	{
+		background-color: #db4545;
+	}
+
+	.step.ignored
+	{
+		background-color: gray;
+		font-size: 25px;
+	}
+
+	// step layer: common defintions
+	.layer
+	{
+		text-align: center;
+		white-space: nowrap;
+	}
+}

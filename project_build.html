@@ -29,31 +29,29 @@
     </div>
 
     <!-- Pipeline -->
-    <div class="row">
+    <div class="row pipeline">
       <div class="col-md-9">
         <div class="panel panel-default">
           <div class="panel-heading">Pipeline Status</div>
           <div class="panel-body" style="overflow: hidden;">
-            <div ng-if="build.stages == undefined ||build.stages.length == 0">
+
+            <!-- empty message -->
+            <div ng-if="build.stages == undefined || build.stages.length == 0">
               <h5>No pipeline defined, create one in the <a href="#!/project/{{project.id}}/pipeline">Pipeline</a> tab.</h5>
             </div>
 
             <!-- stage names -->
             <div class="stages" ng-if="build.stages.length">
-              <!--<div class="stage">Setup</div>-->
               <div class="stage" ng-repeat="stage in build.stages">{{stage.name}}</div>
-              <!--<div class="stage">Teardown</div>-->
             </div>
 
-            <!-- status of the stage -->
-            <div class="myBox" ng-if="build.stages.length">
-              <!--<div class="boxItem ignored"><i class="fa fa-circle" aria-hidden="true"></i></div>-->
-              <div class="boxItem" ng-class="stage.status" ng-repeat="stage in build.stages" ng-click="select(stage)">
+            <!-- status of the stages -->
+            <div class="layer" ng-if="build.stages.length">
+              <div class="step" ng-class="stage.status" ng-repeat="stage in build.stages" ng-click="select(stage)">
                 <i class="fa fa-question" aria-hidden="true" ng-if="stage.status == 'ignored'"></i>
                 <i class="fa fa-remove" aria-hidden="true" ng-if="stage.status == 'failed'"></i>
                 <i class="fa fa-check" aria-hidden="true" ng-if="stage.status == 'passed'"></i>
               </div>
-              <!--<div class="boxItem ignored"><i class="fa fa-circle" aria-hidden="true"></i></div>-->
             </div>
           </div>
         </div>
@@ -77,7 +75,7 @@
         <div class="panel panel-default">
           <div class="panel-heading">Log: {{stage.name}}</div>
           <div class="panel-body log">
-            <div class="empty" ng-if="!stage.log.length">No log output captured for selected stage!</div>
+            <div class="empty" ng-if="!stage.log.length">No log output captured for selected step.</div>
 
             <div class="line" ng-repeat="log in stage.log">
               <span class="linenr">{{$index + 1}}</span>
