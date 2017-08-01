@@ -7,7 +7,7 @@
             <i class="fa fa-check" aria-hidden="true" ng-if="build.status == 'passed'"></i>
             <i class="fa fa-remove" aria-hidden="true" ng-if="build.status == 'failed'"></i>
             <i class="fa fa-exchange" aria-hidden="true" ng-if="build.status == 'running'"></i>
-            <span><a href="#!/project/{{project.id}}/build/{{build.id}}">{{build.commit.message}}</a></span>
+            <span><a href="/project/{{project.id}}/build/{{build.id}}">{{build.commit.message}}</a></span>
           </h5>
           <h5 class="text-muted"><i class="fa fa-user-o" aria-hidden="true"></i> <span><b>Author:</b> {{build.commit.author}}</span></h5>
           <h5 class="text-muted"><i class="fa fa-circle-o-notch" aria-hidden="true"></i><span><b>Commit:</b> #{{build.commit.ref}}</span></h5>         

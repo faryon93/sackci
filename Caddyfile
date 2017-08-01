@@ -1,3 +1,13 @@
-localhost:2015
-tls off
-proxy /api/v1 127.0.0.1:8181
+localhost:2015 {
+	tls off
+	log stdout
+	gzip
+
+	proxy /api/v1 127.0.0.1:8181
+
+	rewrite / {
+		ext /
+		if {path} not_starts_with /api
+    	to {path} {path}/ /
+	}
+}

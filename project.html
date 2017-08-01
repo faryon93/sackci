@@ -15,16 +15,16 @@
   <!-- tabs -->
   <ul class="nav nav-tabs">
     <li ng-class="{active: tab == 'build'}">
-      <a ng-href="#!/project/{{project.id}}/build/{{build}}">
+      <a ng-href="/project/{{project.id}}/build/{{build}}">
         Build: 
         <span ng-if="build != undefined && build != 'latest'">#{{build}}</span>
         <span ng-if="build == undefined || build == 'latest'">latest</span>
       </a>
     </li>
-  	<li ng-class="{active: tab == 'history'}"><a href="#!/project/{{project.id}}/history">Build History</a></li>
-  	<li ng-class="{active: tab == 'pipeline'}"><a href="#!/project/{{project.id}}/pipeline">Pipeline</a></li>
-    <li ng-class="{active: tab == 'env'}"><a href="#!/project/{{project.id}}/env">Environment</a></li>
-  	<li ng-class="{active: tab == 'settings'}"><a href="#!/project/{{project.id}}/settings">Settings</a></li>
+  	<li ng-class="{active: tab == 'history'}"><a href="/project/{{project.id}}/history">Build History</a></li>
+  	<li ng-class="{active: tab == 'pipeline'}"><a href="/project/{{project.id}}/pipeline">Pipeline</a></li>
+    <li ng-class="{active: tab == 'env'}"><a href="/project/{{project.id}}/env">Environment</a></li>
+  	<li ng-class="{active: tab == 'settings'}"><a href="/project/{{project.id}}/settings">Settings</a></li>
   </ul>
 
   <!-- tab content -->

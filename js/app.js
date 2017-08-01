@@ -2,21 +2,23 @@
 var app = angular.module('app', ["ngRoute", "ngResource"]);
 app.config(function($routeProvider, $locationProvider) {
     $routeProvider
-    .when("/", {
-        templateUrl : "project.html"
-    })
-    .when("/admin", {
-        templateUrl : "admin.html"
-    })
-    .when("/project/:id", {
-        templateUrl : "project.html"
-    })
-    .when("/project/:id/:tab", {
-        templateUrl : "project.html"
-    })
-    .when("/project/:id/:tab/:build", {
-        templateUrl : "project.html"
-    });
+        .when("/", {
+            templateUrl : "project.html"
+        })
+        .when("/admin", {
+            templateUrl : "admin.html"
+        })
+        .when("/project/:id", {
+            templateUrl : "project.html"
+        })
+        .when("/project/:id/:tab", {
+            templateUrl : "project.html"
+        })
+        .when("/project/:id/:tab/:build", {
+            templateUrl : "project.html"
+        });
+
+    $locationProvider.html5Mode(true);
 });
 
 
