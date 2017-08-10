@@ -29,15 +29,23 @@ app.controller("navigation", function($scope, $location) {
     };
 });
 
-app.controller("projectlist", function($scope, $location, projects) {
+app.controller("projectlist", function($scope, $location, projects, feed) {
     // load project list from backend
     $scope.loading = true;
     $scope.projects = projects.query(function() {
         $scope.loading = false;
+
+        // we are interested in all project status changes
+        feed.register("project_changed", $scope, function(evt) {
+            angular.forEach($scope.projects, function(project) {
+                if (project.id == evt.project)
+                    project.status = evt.status;
+            });
+        });       
     });
 });
 
-app.controller("project", function($scope, $location, $routeParams, projects) {
+app.controller("project", function($scope, $location, $routeParams, projects, feed) {
     // default tab is the history tab
     $scope.tab = $routeParams.tab;
     if ($scope.tab == undefined)
@@ -95,6 +103,7 @@ app.controller("projectEnv", function($scope, $routeParams, env) {
     $scope.refresh();
 });
 
+
 // ------------------------------------------------------------------------------------------------
 app.factory('projects', function($resource) {
     return $resource("/api/v1/project/:id");
@@ -110,6 +119,31 @@ app.factory('history', function($resource){
 
 app.factory('env', function($resource){
    return $resource('/api/v1/project/:id/env/');
+});
+
+
+// ------------------------------------------------------------------------------------------------
+app.factory('feed', function($rootScope) {
+    var sse = new EventSource('/api/v1/feed');
+    console.log("feed created")
+
+    return {
+        register: function(eventName, scope, callback) {
+            // register the event listener
+            var fn = function(evt) {
+                $rootScope.$apply(function () {
+                    callback.apply(sse, [JSON.parse(evt.data)]);
+                });
+            };
+            sse.addEventListener(eventName, fn);
+
+            // remove the event listener, wenn the calling scope
+            // is destroyed in order to unregister from the event source
+            scope.$on('$destroy', function() {
+                sse.removeEventListener(eventName, fn);
+            });
+        }
+    };
 });
 
 
