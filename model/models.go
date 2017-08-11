@@ -83,4 +83,3 @@ type Stage struct {
     Status string `json:"status"`
     Log []string `json:"log"`
 }
-

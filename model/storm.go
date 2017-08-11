@@ -60,10 +60,3 @@ func Close() (error) {
 func Get() (*storm.DB) {
     return db
 }
-
-
-
-
-
-
-
