@@ -89,67 +89,6 @@ func Register(router *mux.Router, path string, mod interface{}) (error) {
     return nil
 }
 
-// Fetch just one item of the model by its id.
-func One(router *mux.Router, path string, mod interface{}) (error) {
-    // make sure only slices and structs are registred
-    if reflect.TypeOf(mod).Kind() != reflect.Struct {
-        return errors.New("model must be struct")
-    }
-
-    handler := func(w http.ResponseWriter, r *http.Request) {
-        element := reflect.New(reflect.TypeOf(mod))
-
-        // parse the url parameters for the id
-        id, err := strconv.Atoi(mux.Vars(r)["id"])
-        if err != nil {
-            http.Error(w, "invalid id", http.StatusNotAcceptable)
-            return
-        }
-
-        // search the database for the field
-        err = model.Get().One("Id", id, element.Interface())
-        if err != nil {
-            http.Error(w, err.Error(), http.StatusInternalServerError)
-            return
-        }
-
-        // send as json response
-        Jsonify(w, element.Interface())
-    }
-
-    // register the corresponding routes in the router
-    router.Methods("GET").Path(path).HandlerFunc(handler)
-
-    return nil
-}
-
-// Fetches all items of the model.
-func All(router *mux.Router, path string, mod interface{}) (error) {
-    // make sure only slices and structs are registred
-    if reflect.TypeOf(mod).Kind() != reflect.Slice {
-        return errors.New("model must be slice")
-    }
-
-    handler := func(w http.ResponseWriter, r *http.Request) {
-        element := reflect.New(reflect.TypeOf(mod))
-
-        // query the database for all elements of the given model
-        err := model.Get().All(element.Interface())
-        if err != nil {
-            http.Error(w, err.Error(), http.StatusInternalServerError)
-            return
-        }
-
-        // send as json response
-        Jsonify(w, element.Interface())
-    }
-
-    // register the corresponding routes in the router
-    router.Methods("GET").Path(path).HandlerFunc(handler)
-
-    return nil
-}
-
 // Queries a model by a field.
 func QueryAll(router *mux.Router, path string, field string, mod interface{}) (error) {
     modelType := reflect.SliceOf(reflect.TypeOf(mod))
