@@ -43,7 +43,7 @@ import (
 // --------------------------------------------------------------------------------------
 
 func main() {
-    log.Info("main", "starting sackci v0.1 #32h9d042v")
+    log.Info("main", "starting", GetAppVersion())
 
     // setup go environment
     runtime.GOMAXPROCS(runtime.NumCPU())
