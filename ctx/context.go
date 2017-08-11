@@ -1,4 +1,4 @@
-package state
+package ctx
 // sackci
 // Copyright (C) 2017 Maximilian Pachl
 
@@ -30,7 +30,7 @@ import (
 //  types
 // --------------------------------------------------------------------------------------
 
-type State struct {
+type Context struct {
     Feed *sse.Group
 }
 
@@ -40,7 +40,7 @@ type State struct {
 // --------------------------------------------------------------------------------------
 
 var (
-    state State
+    context Context
 )
 
 
@@ -49,7 +49,7 @@ var (
 // --------------------------------------------------------------------------------------
 
 func Init() {
-    state = State{
+    context = Context{
         Feed: sse.NewFeed(),
     }
 
@@ -62,7 +62,7 @@ func Init() {
             } else {
                 status = "failed"
             }
-            state.Feed.Publish(&test{1, status})
+            context.Feed.Publish(&test{1, status})
 
             time.Sleep(2 * time.Second)
         }
@@ -74,8 +74,8 @@ func Init() {
 //  public functions
 // --------------------------------------------------------------------------------------
 
-func Get() (*State) {
-    return &state
+func Get() (*Context) {
+    return &context
 }
 
 

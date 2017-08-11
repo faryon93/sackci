@@ -32,9 +32,8 @@ import (
     "github.com/gorilla/mux"
 
     "github.com/faryon93/sackci/model"
-    "github.com/faryon93/sackci/rest"
     "github.com/faryon93/sackci/sse"
-    "github.com/faryon93/sackci/state"
+    "github.com/faryon93/sackci/ctx"
 )
 
 
@@ -57,25 +56,19 @@ func main() {
     defer model.Close()
     log.Println("successfully opened bolt database")
 
-    // initialize the global application state
-    state.Init()
+    // initialize the global application context
+    ctx.Init()
 
     // create http server
-    // pathes/handlers are registrated in routes.go::routes()
+    // and setup the routes with corresponding handler functions
     log.Println("http server is listening on 0.0.0.0:8181")
     router := mux.NewRouter().StrictSlash(true)
+    routes.Setup(router)
 
     // Server-Sent Event endpoints
     router.Methods("GET").Path("/api/v1/feed").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        sse.Handler(state.Get().Feed, w, r)
+        sse.Handler(ctx.Get().Feed, w, r)
     })
-
-    // REST endpoints
-    router.Methods("GET").Path("/api/v1/project").HandlerFunc(rest.ProjectList)
-    router.Methods("GET").Path("/api/v1/project/{id}").HandlerFunc(rest.ProjectGet)
-    router.Methods("GET").Path("/api/v1/project/{project}/history").HandlerFunc(rest.GetBuildHistory)
-    router.Methods("GET").Path("/api/v1/project/{project}/env").HandlerFunc(rest.EnvGet)
-    router.Methods("GET").Path("/api/v1/project/build/{id}").HandlerFunc(rest.GetBuild)
 
     // execute http server asynchronously
     srv := &http.Server{Addr: "127.0.0.1:8181", Handler: router}
@@ -92,8 +85,8 @@ func main() {
     log.Println("received signal, shutting down application...")
 
     // gracefully shutdown the http server
-    ctx, _ := context.WithTimeout(context.Background(), 1 * time.Second)
-    srv.Shutdown(ctx)
+    httpCtx, _ := context.WithTimeout(context.Background(), 1 * time.Second)
+    srv.Shutdown(httpCtx)
 
     log.Println("exited normally")
 }
