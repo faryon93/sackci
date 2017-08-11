@@ -54,7 +54,6 @@ func main() {
         log.Println("failed to open database:", err.Error())
         return
     }
-    defer model.Close()
     log.Println("successfully opened bolt database")
 
     // initialize the global application context
@@ -62,35 +61,37 @@ func main() {
 
     // create http server
     // and setup the routes with corresponding handler functions
-    log.Println("http server is listening on 0.0.0.0:8181")
     router := mux.NewRouter().StrictSlash(true)
 
-    // REST endpoints
+    // register REST and SSE endpoints
     rest.Register(router, "/api/v1/project", model.Project{})
     rest.QueryAll(router, "/api/v1/project/{project}/env", "Project", model.Env{})
-
-    // Server-Sent Event endpoints
     sse.Register(router, "/api/v1/feed", ctx.Get().Feed)
 
     // execute http server asynchronously
     srv := &http.Server{Addr: "127.0.0.1:8181", Handler: router}
     go func() {
+        log.Println("http server is listening on 0.0.0.0:8181")
         err := srv.ListenAndServe()
-        if err != nil {
-            // TODO: do not display message when server is closing
+        if err != nil && err != http.ErrServerClosed {
             log.Println("failed to serv http:", err.Error())
+            return
         }
+
+        log.Println("http server is now closed")
     }()
 
     // wait for a signal to shutdown the application
     wait(os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-    log.Println("received signal, shutting down application...")
+    log.Println("initiating application shutdown (SIGINT / SIGTERM)")
 
     // gracefully shutdown the http server
     httpCtx, _ := context.WithTimeout(context.Background(), 1 * time.Second)
     srv.Shutdown(httpCtx)
 
-    log.Println("exited normally")
+    // close the database
+    model.Close()
+    log.Println("closed bolt database handle")
 }
 
 // --------------------------------------------------------------------------------------
