@@ -60,7 +60,7 @@ func NewGroup(name string) (*Group) {
 
 func Handler(group *Group, w http.ResponseWriter, r *http.Request) {
     // upgrade the connection to an SSE connection
-    err := Upgrade(w)
+    err := upgrade(w)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
@@ -72,14 +72,14 @@ func Handler(group *Group, w http.ResponseWriter, r *http.Request) {
     // and make sure the channel gets closed
     // when the client disconnects
     ch := group.Register()
-    RegisterCloseHandler(w, func() {
+    closeHandler(w, func() {
         group.Unregister(ch)
     })
 
     // write all new items form the feed to the client
     // this blocks until the client disconnects
     for action := range ch {
-        err := WriteEvent(w, action)
+        err := writeEvent(w, action)
         if err != nil {
             log.Error(group.Name, "failed to write feed to client:", err.Error())
             continue

@@ -32,9 +32,25 @@ import (
 //  public functions
 // --------------------------------------------------------------------------------------
 
+// Registers an SSE stream with the given router and Group.
+func Register(router *mux.Router, path string, group *Group) {
+    // the handler function
+    fn := func(w http.ResponseWriter, r *http.Request) {
+        Handler(group, w, r)
+    }
+
+    // register the handler in the router
+    router.Methods("GET").Path(path).HandlerFunc(fn)
+}
+
+
+// --------------------------------------------------------------------------------------
+//  private functions
+// --------------------------------------------------------------------------------------
+
 // Upgrades the connection to an SSE connection.
 // A proper Content-Type is set and kee-alive is actived.
-func Upgrade(w http.ResponseWriter) (error) {
+func upgrade(w http.ResponseWriter) (error) {
     // if streaming is possible -> setup apropriat headers
     _, ok := w.(http.Flusher)
     if !ok {
@@ -51,7 +67,7 @@ func Upgrade(w http.ResponseWriter) (error) {
 
 // Registers a handler function that is called when the client
 // closes the connection.
-func RegisterCloseHandler(w http.ResponseWriter, f func()) {
+func closeHandler(w http.ResponseWriter, f func()) {
     notify := w.(http.CloseNotifier).CloseNotify()
     go func() {
         // wait until the close notification arrives
@@ -60,8 +76,8 @@ func RegisterCloseHandler(w http.ResponseWriter, f func()) {
     }()
 }
 
-// Write a string to the SSE stream.
-func Write(w http.ResponseWriter, message string) (error) {
+// write a string to the SSE stream.
+func write(w http.ResponseWriter, message string) (error) {
     _, err := w.Write([]byte(message + "\n"))
     if err != nil {
         return err
@@ -74,24 +90,14 @@ func Write(w http.ResponseWriter, message string) (error) {
 }
 
 // Writes an event to the SSE stream.
-func WriteEvent(w http.ResponseWriter, event Event) (error) {
+func writeEvent(w http.ResponseWriter, event Event) (error) {
     // encode the event in json representation
     b, err := json.Marshal(event)
     if err != nil {
         return err
     }
 
-    return Write(w, "event: " + event.Event() + "\n" +
+    return write(w, "event: " + event.Event() + "\n" +
                     "data: " + string(b) + "\n")
 }
 
-// Registers an SSE stream with the given router and Group.
-func Register(router *mux.Router, path string, group *Group) {
-    // the handler function
-    fn := func(w http.ResponseWriter, r *http.Request) {
-        Handler(group, w, r)
-    }
-
-    // register the handler in the router
-    router.Methods("GET").Path(path).HandlerFunc(fn)
-}

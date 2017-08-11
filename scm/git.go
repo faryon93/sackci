@@ -61,13 +61,15 @@ func GitWatch(url string, branch string) {
         for _, ref := range refs {
             name := strings.Split(ref.Name().String(), "/")
 
-            if ref.IsBranch() && name[2] == branch {
+            // check if the current element is our watched branch
+            if ref.IsBranch() && len(name) >= 3 && name[2] == branch {
                 log.Info("git", "branch reference:", ref.Hash().String())
                 found = true
                 break
             }
         }
 
+        // oops the branch does not exist in remote repo -> stop to check for it
         if !found {
             log.Error("git", "repository has no branch \"" + branch + "\"")
             return
@@ -77,6 +79,12 @@ func GitWatch(url string, branch string) {
     }
 }
 
+
+// --------------------------------------------------------------------------------------
+//  private functions
+// --------------------------------------------------------------------------------------
+
+// Constructs a new git connection.
 func git(url string) (transport.UploadPackSession, error) {
     endpoint, err := transport.NewEndpoint(url)
     if err != nil {
