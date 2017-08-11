@@ -20,7 +20,6 @@ package main
 // --------------------------------------------------------------------------------------
 
 import (
-    "log"
     "net/http"
     "os"
     "os/signal"
@@ -35,6 +34,7 @@ import (
     "github.com/faryon93/sackci/sse"
     "github.com/faryon93/sackci/ctx"
     "github.com/faryon93/sackci/rest"
+    "github.com/faryon93/sackci/log"
 )
 
 
@@ -43,7 +43,7 @@ import (
 // --------------------------------------------------------------------------------------
 
 func main() {
-    log.Println("starting sackci v0.1 #32h9d042v")
+    log.Info("main", "starting sackci v0.1 #32h9d042v")
 
     // setup go environment
     runtime.GOMAXPROCS(runtime.NumCPU())
@@ -51,10 +51,14 @@ func main() {
     // open database
     err := model.Open("E:/tmp/sackci")
     if err != nil {
-        log.Println("failed to open database:", err.Error())
+        log.Error("bolt", "failed to open database:", err.Error())
         return
     }
-    log.Println("successfully opened bolt database")
+    defer func() {
+        model.Close()
+        log.Info("bolt", "closed bolt database handle")
+    }()
+    log.Info("bolt", "successfully opened bolt database")
 
     // initialize the global application context
     ctx.Init()
@@ -71,28 +75,25 @@ func main() {
     // execute http server asynchronously
     srv := &http.Server{Addr: "127.0.0.1:8181", Handler: router}
     go func() {
-        log.Println("http server is listening on 0.0.0.0:8181")
+        log.Info("http", "http server is listening on 0.0.0.0:8181")
         err := srv.ListenAndServe()
         if err != nil && err != http.ErrServerClosed {
-            log.Println("failed to serv http:", err.Error())
+            log.Error("http", "failed to serv http:", err.Error())
             return
         }
 
-        log.Println("http server is now closed")
+        log.Info("http", "http server is now closed")
     }()
 
     // wait for a signal to shutdown the application
     wait(os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-    log.Println("initiating application shutdown (SIGINT / SIGTERM)")
+    log.Info("main", "initiating application shutdown (SIGINT / SIGTERM)")
 
     // gracefully shutdown the http server
-    httpCtx, _ := context.WithTimeout(context.Background(), 1 * time.Second)
+    httpCtx, _ := context.WithTimeout(context.Background(), 1*time.Second)
     srv.Shutdown(httpCtx)
-
-    // close the database
-    model.Close()
-    log.Println("closed bolt database handle")
 }
+
 
 // --------------------------------------------------------------------------------------
 //  helper functions

@@ -21,8 +21,9 @@ package sse
 
 import (
     "net/http"
-    "log"
     "sync"
+
+    "github.com/faryon93/sackci/log"
 )
 
 
@@ -31,6 +32,7 @@ import (
 // --------------------------------------------------------------------------------------
 
 type Group struct {
+    Name string
     Mutex sync.Mutex
     Channels map[chan Event]bool
 }
@@ -44,8 +46,9 @@ type Event interface {
 //  constructors
 // --------------------------------------------------------------------------------------
 
-func NewFeed() (*Group) {
+func NewGroup(name string) (*Group) {
     return &Group{
+        Name: name,
         Channels: make(map[chan Event]bool),
     }
 }
@@ -63,7 +66,7 @@ func Handler(group *Group, w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    log.Println("client", r.RemoteAddr, "opened feed connection")
+    log.Info(group.Name, "client", r.RemoteAddr, "opened sse connection")
 
     // register for the update feed
     // and make sure the channel gets closed
@@ -78,12 +81,12 @@ func Handler(group *Group, w http.ResponseWriter, r *http.Request) {
     for action := range ch {
         err := WriteEvent(w, action)
         if err != nil {
-            log.Println("failed to write feed to client:", err.Error())
+            log.Error(group.Name, "failed to write feed to client:", err.Error())
             continue
         }
     }
 
-    log.Println("client", r.RemoteAddr, "closed feed connection")
+    log.Info(group.Name, "client", r.RemoteAddr, "closed feed connection")
 }
 
 

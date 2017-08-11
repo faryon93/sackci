@@ -40,7 +40,7 @@ var (
 
 func Init() {
     // initialize the context variables
-    Feed = sse.NewFeed()
+    Feed = sse.NewGroup("feed")
 
     // event stream for testing purpose
     go func() {
