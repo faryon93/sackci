@@ -23,6 +23,8 @@ import (
     "net/http"
     "encoding/json"
     "errors"
+
+    "github.com/gorilla/mux"
 )
 
 
@@ -81,4 +83,15 @@ func WriteEvent(w http.ResponseWriter, event Event) (error) {
 
     return Write(w, "event: " + event.Event() + "\n" +
                     "data: " + string(b) + "\n")
+}
+
+// Registers an SSE stream with the given router and Group.
+func Register(router *mux.Router, path string, group *Group) {
+    // the handler function
+    fn := func(w http.ResponseWriter, r *http.Request) {
+        Handler(group, w, r)
+    }
+
+    // register the handler in the router
+    router.Methods("GET").Path(path).HandlerFunc(fn)
 }

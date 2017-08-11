@@ -34,6 +34,7 @@ import (
     "github.com/faryon93/sackci/model"
     "github.com/faryon93/sackci/sse"
     "github.com/faryon93/sackci/ctx"
+    "github.com/faryon93/sackci/rest"
 )
 
 
@@ -63,12 +64,13 @@ func main() {
     // and setup the routes with corresponding handler functions
     log.Println("http server is listening on 0.0.0.0:8181")
     router := mux.NewRouter().StrictSlash(true)
-    routes.Setup(router)
+
+    // REST endpoints
+    rest.Register(router, "/api/v1/project", model.Project{})
+    rest.QueryAll(router, "/api/v1/project/{project}/env", "Project", model.Env{})
 
     // Server-Sent Event endpoints
-    router.Methods("GET").Path("/api/v1/feed").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        sse.Handler(ctx.Get().Feed, w, r)
-    })
+    sse.Register(router, "/api/v1/feed", ctx.Get().Feed)
 
     // execute http server asynchronously
     srv := &http.Server{Addr: "127.0.0.1:8181", Handler: router}

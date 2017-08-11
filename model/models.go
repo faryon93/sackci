@@ -1,11 +1,4 @@
 package model
-
-import (
-    "time"
-    "github.com/boltdb/bolt"
-    "encoding/json"
-)
-
 // sackci
 // Copyright (C) 2017 Maximilian Pachl
 
@@ -21,6 +14,15 @@ import (
 
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+// --------------------------------------------------------------------------------------
+//  imports
+// --------------------------------------------------------------------------------------
+
+import (
+    "time"
+)
+
 
 // --------------------------------------------------------------------------------------
 //  constants
@@ -44,6 +46,22 @@ const (
 //  types
 // --------------------------------------------------------------------------------------
 
+type Project struct {
+    Id          uint64          `json:"id" storm:"id,increment"`
+    Name        string          `json:"name"`
+    BuildStatus string          `json:"status"`
+    BuildId     int             `json:"build"`
+    Time        time.Time       `json:"execution_time"`
+    Duration    time.Duration   `json:"duration"`
+}
+
+type Env struct {
+    Id      int    `json:"-" storm:"id,increment"`
+    Project int    `json:"-" storm:"index"`
+    Key     string `json:"key"`
+    Value   string `json:"value"`
+}
+
 type Build struct {
     Id uint64 `json:"id"`
     Status string `json:"status"`
@@ -66,50 +84,3 @@ type Stage struct {
     Log []string `json:"log"`
 }
 
-
-// --------------------------------------------------------------------------------------
-//  public members
-// --------------------------------------------------------------------------------------
-
-func (b *Build) SetId(id uint64) {
-    b.Id = id
-}
-
-
-// --------------------------------------------------------------------------------------
-//  public functions
-// --------------------------------------------------------------------------------------
-
-func GetProjectHistory(project uint64) ([]Build, error) {
-    builds := make([]Build, 0)
-
-    // find all build indicies
-    var buildIndex []uint64
-    err := Get(BUILDS_INDEX_BUCKET, project, &buildIndex)
-    if err != nil {
-        return builds, err
-    }
-
-    return builds, db.View(func(tx *bolt.Tx) error {
-        b := tx.Bucket([]byte(BUILDS_BUCKET))
-
-        for _, buildId := range buildIndex {
-            buf := b.Get(itob(buildId))
-            if buf == nil {
-                continue
-            }
-
-            var build Build
-            err := json.Unmarshal(buf, &build)
-            if err != nil {
-                return err
-            }
-
-            builds = append(builds, build)
-        }
-
-        return nil
-    })
-
-    return builds, nil
-}

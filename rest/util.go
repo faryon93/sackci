@@ -1,4 +1,4 @@
-package model
+package rest
 // sackci
 // Copyright (C) 2017 Maximilian Pachl
 
@@ -16,26 +16,29 @@ package model
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // --------------------------------------------------------------------------------------
-//  constants
+//  imports
 // --------------------------------------------------------------------------------------
 
-const (
-    ENV_BUCKET = "env"
+import (
+    "net/http"
+    "encoding/json"
 )
 
 
 // --------------------------------------------------------------------------------------
-//  types
+//  public functions
 // --------------------------------------------------------------------------------------
 
-func GetProjectEnv(project uint64) (map[string]string, error) {
-    env := make(map[string]string, 0)
-    return env, Get(ENV_BUCKET, project, &env)
-}
+// Writes the JSON representation of v to the supplied http.ResposeWriter.
+// If an error occours while marshalling the object the http response
+// will be an internal server error.
+func Jsonify(w http.ResponseWriter, v interface{}) {
+    js, err := json.Marshal(v)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
 
-func InsertProjectEnv(project uint64, key string, value string) (error) {
-    env, _ := GetProjectEnv(project)
-    env[key] = value
-
-    return InsertId(ENV_BUCKET, project, env)
+    w.Header().Set("Content-Type", "application/json")
+    w.Write(js)
 }

@@ -1,4 +1,4 @@
-package rest
+package model
 // sackci
 // Copyright (C) 2017 Maximilian Pachl
 
@@ -20,25 +20,50 @@ package rest
 // --------------------------------------------------------------------------------------
 
 import (
-    "net/http"
-    "strconv"
-    "github.com/gorilla/mux"
-    "github.com/faryon93/sackci/model"
+    "log"
+    "github.com/asdine/storm"
 )
 
 
 // --------------------------------------------------------------------------------------
-//  http handlers
+//  global variables
 // --------------------------------------------------------------------------------------
 
-func EnvGet(w http.ResponseWriter, r *http.Request) {
-    project, err :=  strconv.Atoi(mux.Vars(r)["project"])
+// tiedot database handle
+var db *storm.DB
+
+
+// --------------------------------------------------------------------------------------
+//  public functions
+// --------------------------------------------------------------------------------------
+
+// Opens the bolt database.
+func Open(path string) (error) {
+    var err error
+
+    // open the database directory an keep the handle for later
+    db, err = storm.Open(path)
     if err != nil {
-        http.Error(w, "invalid project id", http.StatusNotAcceptable)
-        return
+        log.Println("failed to open database:", err.Error())
+        return err
     }
 
-    // ignore the errors
-    env,_ := model.GetProjectEnv(uint64(project))
-    Jsonify(w, env)
+    return nil
 }
+
+// Closes the bolt database.
+func Close() (error) {
+    return db.Close()
+}
+
+// Returns the database handle.
+func Get() (*storm.DB) {
+    return db
+}
+
+
+
+
+
+
+
