@@ -25,22 +25,12 @@ import (
     "github.com/faryon93/sackci/sse"
 )
 
-
-// --------------------------------------------------------------------------------------
-//  types
-// --------------------------------------------------------------------------------------
-
-type Context struct {
-    Feed *sse.Group
-}
-
-
 // --------------------------------------------------------------------------------------
 //  global variables
 // --------------------------------------------------------------------------------------
 
 var (
-    context Context
+    Feed *sse.Group
 )
 
 
@@ -49,10 +39,10 @@ var (
 // --------------------------------------------------------------------------------------
 
 func Init() {
-    context = Context{
-        Feed: sse.NewFeed(),
-    }
+    // initialize the context variables
+    Feed = sse.NewFeed()
 
+    // event stream for testing purpose
     go func() {
         status := "failed"
 
@@ -62,20 +52,11 @@ func Init() {
             } else {
                 status = "failed"
             }
-            context.Feed.Publish(&test{1, status})
+            Feed.Publish(&test{1, status})
 
             time.Sleep(2 * time.Second)
         }
     }()
-}
-
-
-// --------------------------------------------------------------------------------------
-//  public functions
-// --------------------------------------------------------------------------------------
-
-func Get() (*Context) {
-    return &context
 }
 
 
