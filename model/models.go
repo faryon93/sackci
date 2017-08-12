@@ -63,23 +63,26 @@ type Env struct {
 }
 
 type Build struct {
-    Id uint64 `json:"id"`
-    Status string `json:"status"`
-    Commit Commit `json:"commit"`
-    Time time.Time `json:"time"`
-    Duration string `json:"duration"`
-    Node string `json:"node"`
-    Stages []Stage `json:"stages"`
+    Id          uint64      `json:"id" storm:"id,increment"`
+    Project     uint64      `json:"-" strom:"index"`
+
+    Num         uint64          `json:"num" strom:"index"`
+    Status      string          `json:"status"`
+    Commit      Commit          `json:"commit"`
+    Time        time.Time       `json:"time"`
+    Duration    time.Duration   `json:"duration"`
+    Node        string          `json:"node"`
+    Stages      []Stage         `json:"stages"`
 }
 
 type Commit struct {
     Message string `json:"message"`
-    Author string `json:"author"`
-    Ref string `json:"ref"`
+    Author  string `json:"author"`
+    Ref     string `json:"ref"`
 }
 
 type Stage struct {
-    Name string `json:"name"`
-    Status string `json:"status"`
-    Log []string `json:"log"`
+    Name    string      `json:"name"`
+    Status  string      `json:"status"`
+    Log     []string    `json:"log"`
 }

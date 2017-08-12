@@ -21,7 +21,9 @@ package model
 
 import (
     "log"
+
     "github.com/asdine/storm"
+    "github.com/asdine/storm/codec/gob"
 )
 
 
@@ -42,7 +44,7 @@ func Open(path string) (error) {
     var err error
 
     // open the database directory an keep the handle for later
-    db, err = storm.Open(path)
+    db, err = storm.Open(path, storm.Codec(gob.Codec))
     if err != nil {
         log.Println("failed to open database:", err.Error())
         return err

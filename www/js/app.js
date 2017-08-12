@@ -286,3 +286,9 @@ app.filter('duration', function(){
         return result;
     }
 });
+
+app.filter('reverse', function() {
+    return function(items) {
+        return items.slice().reverse();
+    };
+});

@@ -70,6 +70,7 @@ func main() {
     // register REST and SSE endpoints
     rest.Register(router, "/api/v1/project", model.Project{})
     rest.QueryAll(router, "/api/v1/project/{project}/env", "Project", model.Env{})
+    rest.QueryAll(router, "/api/v1/project/{project}/history", "Project", model.Build{})
     sse.Register(router, "/api/v1/feed", ctx.Feed)
 
     // execute http server asynchronously
