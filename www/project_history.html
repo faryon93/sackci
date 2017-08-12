@@ -1,4 +1,10 @@
 <div ng-controller="projectHistory">
+  <!-- error indicator -->
+  <div class="alert alert-danger" ng-show="error != undefined && error != ''">
+    <strong>ERROR:</strong> {{error}}
+  </div>
+
+  <!-- build histroy list -->
   <div class="panel panel-default" ng-repeat="build in builds">
     <div class="panel-body" ng-class="build.status" style="padding-top: 0px; padding-bottom: 10px; padding-left: 30px;">
       <div class="row">

@@ -86,7 +86,11 @@ app.controller("projectBuild", function($scope, $routeParams, builds) {
 });
 
 app.controller("projectHistory", function($scope, $routeParams, history) {
-    $scope.builds = history.query({project: $routeParams.id});
+    $scope.builds = history.query({project: $routeParams.id},
+        function(response) {},
+        function(error) {
+            $scope.error = error.data;
+        });
 });
 
 app.controller("projectEnv", function($scope, $routeParams, env) {
