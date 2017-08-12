@@ -39,6 +39,15 @@ import (
 
 
 // --------------------------------------------------------------------------------------
+//  constants
+// --------------------------------------------------------------------------------------
+
+const (
+    HTTP_API_BASE = "/api/v1"
+)
+
+
+// --------------------------------------------------------------------------------------
 //  application entry
 // --------------------------------------------------------------------------------------
 
@@ -65,15 +74,15 @@ func main() {
 
     // create http server
     // and setup the routes with corresponding handler functions
-    router := mux.NewRouter().StrictSlash(true)
+    router := mux.NewRouter().StrictSlash(true).Path(HTTP_API_BASE).Subrouter()
 
     // register REST and SSE endpoints
-    rest.All(router, "/api/v1/project", model.Project{})
-    rest.One(router, "/api/v1/project/{id}", model.Project{})
-    rest.One(router, "/api/v1/build/{id}", model.Build{})
-    rest.QueryAll(router, "/api/v1/project/{project}/env","Project", model.Env{})
-    rest.QueryAll(router, "/api/v1/project/{project}/history", "Project", model.Build{})
-    sse.Register(router, "/api/v1/feed", ctx.Feed)
+    rest.All(router, "/project", model.Project{})
+    rest.One(router, "/project/{id}", model.Project{})
+    rest.One(router, "/build/{id}", model.Build{})
+    rest.QueryAll(router, "/project/{project}/env","Project", model.Env{})
+    rest.QueryAll(router, "/project/{project}/history", "Project", model.Build{})
+    sse.Register(router, "/feed", ctx.Feed)
 
     // execute http server asynchronously
     srv := &http.Server{Addr: "127.0.0.1:8181", Handler: router}

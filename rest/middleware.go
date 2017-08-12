@@ -127,6 +127,8 @@ func One(router *mux.Router, path string, mod interface{}) (error) {
 }
 
 // Queries a model by a field.
+// The provided field is matched with its lowercase representation in
+// the url parameters.
 func QueryAll(router *mux.Router, path string, field string, mod interface{}) (error) {
     modelType := reflect.SliceOf(reflect.TypeOf(mod))
 
