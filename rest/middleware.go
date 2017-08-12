@@ -65,16 +65,8 @@ func All(router *mux.Router, path string, mod interface{}) (error) {
             return
         }
 
-        // filter the output
-        options := sheriff.Options{Groups: []string{GROUP_ALL}}
-        filtered, err := sheriff.Marshal(&options, element.Interface())
-        if err != nil {
-            http.Error(w, err.Error(), http.StatusInternalServerError)
-            return
-        }
-
-        // send as json response
-        Jsonify(w, filtered)
+        // send the filtered response
+        filter(w, element.Interface(), GROUP_ALL)
     }
 
     // register the various handler functions
@@ -103,21 +95,17 @@ func One(router *mux.Router, path string, mod interface{}) (error) {
 
         // search the database for the field
         err = model.Get().One("Id", id, element.Interface())
-        if err != nil {
+        if err == storm.ErrNotFound {
+            http.Error(w, err.Error(), http.StatusNotFound)
+            return
+
+        } else if err != nil {
             http.Error(w, err.Error(), http.StatusInternalServerError)
             return
         }
 
-        // filter the output
-        options := sheriff.Options{Groups: []string{GROUP_ONE}}
-        filtered, err := sheriff.Marshal(&options, element.Interface())
-        if err != nil {
-            http.Error(w, err.Error(), http.StatusInternalServerError)
-            return
-        }
-
-        // send as json response
-        Jsonify(w, filtered)
+        // send the filtered response
+        filter(w, element.Interface(), GROUP_ONE)
     }
 
     // register the various handler functions
@@ -127,8 +115,8 @@ func One(router *mux.Router, path string, mod interface{}) (error) {
 }
 
 // Queries a model by a field.
-// The provided field is matched with its lowercase representation in
-// the url parameters.
+// The provided field is matched with its lowercase
+// representation in the url parameters.
 func QueryAll(router *mux.Router, path string, field string, mod interface{}) (error) {
     modelType := reflect.SliceOf(reflect.TypeOf(mod))
 
@@ -159,20 +147,29 @@ func QueryAll(router *mux.Router, path string, field string, mod interface{}) (e
             return
         }
 
-        // filter the output
-        options := sheriff.Options{Groups: []string{GROUP_QUERYALL}}
-        filtered, err := sheriff.Marshal(&options, element.Interface())
-        if err != nil {
-            http.Error(w, err.Error(), http.StatusInternalServerError)
-            return
-        }
-
-        // send as json response
-        Jsonify(w, filtered)
+        // send the filtered response
+        filter(w, element.Interface(), GROUP_QUERYALL)
     }
 
     // register the corresponding routes in the router
     router.Methods("GET").Path(path).HandlerFunc(handler)
 
     return nil
+}
+
+// --------------------------------------------------------------------------------------
+//  private functions
+// --------------------------------------------------------------------------------------
+
+func filter(w http.ResponseWriter, v interface{}, groups ...string) {
+    // filter the output
+    options := sheriff.Options{Groups: groups}
+    filtered, err := sheriff.Marshal(&options, v)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    // send as json response
+    Jsonify(w, filtered)
 }
