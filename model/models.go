@@ -47,42 +47,42 @@ const (
 // --------------------------------------------------------------------------------------
 
 type Project struct {
-    Id          uint64          `json:"id" storm:"id,increment"`
-    Name        string          `json:"name"`
-    BuildStatus string          `json:"status"`
-    BuildId     int             `json:"build"`
-    Time        time.Time       `json:"execution_time"`
-    Duration    time.Duration   `json:"duration"`
+    Id          uint64          `json:"id" storm:"id,increment" groups:"all,one"`
+    Name        string          `json:"name" groups:"all,one"`
+    BuildStatus string          `json:"status" groups:"all,one"`
+    BuildId     int             `json:"build" groups:"all,one"`
+    Time        time.Time       `json:"execution_time" groups:"all,one"`
+    Duration    time.Duration   `json:"duration" groups:"all,one"`
 }
 
 type Env struct {
     Id      int    `json:"-" storm:"id,increment"`
     Project int    `json:"-" storm:"index"`
-    Key     string `json:"key"`
-    Value   string `json:"value"`
+    Key     string `json:"key" groups:"queryall"`
+    Value   string `json:"value" groups:"queryall"`
 }
 
 type Build struct {
-    Id          uint64      `json:"id" storm:"id,increment"`
+    Id          uint64      `json:"id" storm:"id,increment" groups:"queryall,one"`
     Project     uint64      `json:"-" strom:"index"`
 
-    Num         uint64          `json:"num" strom:"index"`
-    Status      string          `json:"status"`
-    Commit      Commit          `json:"commit"`
-    Time        time.Time       `json:"time"`
-    Duration    time.Duration   `json:"duration"`
-    Node        string          `json:"node"`
-    Stages      []Stage         `json:"stages"`
+    Num         uint64          `json:"num" strom:"index" groups:"queryall,one"`
+    Status      string          `json:"status" groups:"queryall,one"`
+    Commit      Commit          `json:"commit" groups:"queryall,one"`
+    Time        time.Time       `json:"time" groups:"queryall,one"`
+    Duration    time.Duration   `json:"duration" groups:"queryall,one"`
+    Node        string          `json:"node" groups:"queryall,one"`
+    Stages      []Stage         `json:"stages" groups:"one"`
 }
 
 type Commit struct {
-    Message string `json:"message"`
-    Author  string `json:"author"`
-    Ref     string `json:"ref"`
+    Message string `json:"message" groups:"queryall,one"`
+    Author  string `json:"author" groups:"queryall,one"`
+    Ref     string `json:"ref" groups:"queryall,one"`
 }
 
 type Stage struct {
-    Name    string      `json:"name"`
-    Status  string      `json:"status"`
-    Log     []string    `json:"log"`
+    Name    string      `json:"name" groups:"one"`
+    Status  string      `json:"status" groups:"one"`
+    Log     []string    `json:"log" groups:"one"`
 }

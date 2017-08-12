@@ -25,11 +25,21 @@ import (
     "strconv"
     "errors"
     "strings"
-
     "github.com/gorilla/mux"
     "github.com/asdine/storm"
+    "github.com/liip/sheriff"
 
     "github.com/faryon93/sackci/model"
+)
+
+// --------------------------------------------------------------------------------------
+//  constants
+// --------------------------------------------------------------------------------------
+
+const (
+    GROUP_QUERYALL = "queryall"
+    GROUP_ALL      = "all"
+    GROUP_ONE      = "one"
 )
 
 
@@ -62,8 +72,16 @@ func Register(router *mux.Router, path string, mod interface{}) (error) {
             return
         }
 
+        // filter the output
+        options := sheriff.Options{Groups: []string{GROUP_ONE}}
+        filtered, err := sheriff.Marshal(&options, element.Interface())
+        if err != nil {
+            http.Error(w, err.Error(), http.StatusInternalServerError)
+            return
+        }
+
         // send as json response
-        Jsonify(w, element.Interface())
+        Jsonify(w, filtered)
     }
 
     // fetches all items of the model
@@ -78,8 +96,16 @@ func Register(router *mux.Router, path string, mod interface{}) (error) {
             return
         }
 
+        // filter the output
+        options := sheriff.Options{Groups: []string{GROUP_ALL}}
+        filtered, err := sheriff.Marshal(&options, element.Interface())
+        if err != nil {
+            http.Error(w, err.Error(), http.StatusInternalServerError)
+            return
+        }
+
         // send as json response
-        Jsonify(w, element.Interface())
+        Jsonify(w, filtered)
     }
 
     // register the various handler functions
@@ -120,8 +146,16 @@ func QueryAll(router *mux.Router, path string, field string, mod interface{}) (e
             return
         }
 
+        // filter the output
+        options := sheriff.Options{Groups: []string{GROUP_QUERYALL}}
+        filtered, err := sheriff.Marshal(&options, element.Interface())
+        if err != nil {
+            http.Error(w, err.Error(), http.StatusInternalServerError)
+            return
+        }
+
         // send as json response
-        Jsonify(w, element.Interface())
+        Jsonify(w, filtered)
     }
 
     // register the corresponding routes in the router
