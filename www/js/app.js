@@ -92,7 +92,7 @@ app.controller("projectHistory", function($scope, $routeParams, history) {
 app.controller("projectEnv", function($scope, $routeParams, env) {
     $scope.refresh = function() {
         // load environment information from the backend
-        $scope.envs = env.get({id: $routeParams.id});
+        $scope.envs = env.query({id: $routeParams.id});
     };
 
     $scope.showConfirm = function(show) {
@@ -118,7 +118,7 @@ app.factory('history', function($resource){
 });
 
 app.factory('env', function($resource){
-   return $resource('/api/v1/project/:id/env/');
+   return $resource('/api/v1/project/:id/env');
 });
 
 
