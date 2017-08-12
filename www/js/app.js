@@ -114,7 +114,7 @@ app.factory('projects', function($resource) {
 });
 
 app.factory('builds', function($resource){
-   return $resource('/api/v1/project/build/:id');
+   return $resource('/api/v1/build/:id');
 });
 
 app.factory('history', function($resource){
