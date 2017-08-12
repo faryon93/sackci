@@ -81,7 +81,7 @@
               </h5>
               <h5 class="text-muted details">
                 <i class="fa fa-calendar" aria-hidden="true"></i><span ng-bind="project.execution_time | timeago"></span>
-                <i class="fa fa-clock-o" aria-hidden="true"></i><span>{{project.duration}}</span>
+                <i class="fa fa-clock-o" aria-hidden="true"></i><span ng-bind="project.duration | duration"></span>
               </h5>
             </li>
           </ul>

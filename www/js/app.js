@@ -38,7 +38,7 @@ app.controller("projectlist", function($scope, $location, projects, feed) {
         // we are interested in all project status changes
         feed.register("project_changed", $scope, function(evt) {
             angular.forEach($scope.projects, function(project) {
-                if (project.id == evt.project)
+                if (project.id === evt.project)
                     project.status = evt.status;
             });
         });       
@@ -48,12 +48,12 @@ app.controller("projectlist", function($scope, $location, projects, feed) {
 app.controller("project", function($scope, $location, $routeParams, projects, feed) {
     // default tab is the history tab
     $scope.tab = $routeParams.tab;
-    if ($scope.tab == undefined)
+    if ($scope.tab === undefined)
         $scope.tab = "history";
 
     // no project specified -> display empty page
     // TODO: display empty page
-    if ($routeParams.id == undefined)
+    if ($routeParams.id === undefined)
         return;
 
     $scope.build = $routeParams.build;
@@ -72,7 +72,7 @@ app.controller("projectBuild", function($scope, $routeParams, builds) {
 
     // redirect to latest ->
     var buildId = $routeParams.build;
-    if (buildId == undefined)
+    if (buildId === undefined)
         buildId = "latest";
 
     $scope.build = builds.get({id: buildId},
@@ -97,7 +97,7 @@ app.controller("projectEnv", function($scope, $routeParams, env) {
 
     $scope.showConfirm = function(show) {
         $scope.confirm = show;
-    }
+    };
 
     // the initial refresh
     $scope.refresh();
@@ -125,7 +125,7 @@ app.factory('env', function($resource){
 // ------------------------------------------------------------------------------------------------
 app.factory('feed', function($rootScope) {
     var sse = new EventSource('/api/v1/feed');
-    console.log("feed created")
+    console.log("feed created");
 
     return {
         register: function(eventName, scope, callback) {
@@ -210,14 +210,17 @@ app.directive('capitalize', function() {
       require: 'ngModel',
       link: function(scope, element, attrs, modelCtrl) {
         var capitalize = function(inputValue) {
-          if (inputValue == undefined) inputValue = '';
+          if (inputValue === undefined)
+              inputValue = '';
+
           var capitalized = inputValue.toUpperCase();
           if (capitalized !== inputValue) {
-            modelCtrl.$setViewValue(capitalized);
-            modelCtrl.$render();
+              modelCtrl.$setViewValue(capitalized);
+              modelCtrl.$render();
           }
+
           return capitalized;
-        }
+        };
 
         modelCtrl.$parsers.push(capitalize);
         capitalize(scope[attrs.ngModel]);
@@ -226,7 +229,7 @@ app.directive('capitalize', function() {
 });
 
 app.filter("ansicolor", ['$sce', function($sce) {
-    foregroundColors = {
+    var foregroundColors = {
       '30': 'black',
       '31': 'red',
       '32': 'green',
@@ -239,7 +242,7 @@ app.filter("ansicolor", ['$sce', function($sce) {
 
     return function(val)
     {
-        if (val == undefined)
+        if (val === undefined)
             val = '';
 
         Object.keys(foregroundColors).forEach(function (ansi) {
@@ -260,3 +263,22 @@ app.filter("ansicolor", ['$sce', function($sce) {
         return $sce.trustAsHtml(val);
     };
 }]);
+
+app.filter('duration', function(){
+    return function(input){
+        // the time is supplied in microseconds
+        input = input / 1000.0 / 1000.0 / 1000.0;
+
+        var minutes = parseInt(input/60, 10);
+        var seconds = input%60;
+
+        var result = "";
+        if (minutes > 0)
+            result += minutes + "min ";
+
+        if (seconds > 0)
+            result += seconds + "sec";
+
+        return result;
+    }
+});
