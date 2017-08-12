@@ -44,13 +44,13 @@ func Init() {
 
     // event stream for testing purpose
     go func() {
-        status := "failed"
+        status := "passed"
 
         for {
-            if status == "failed" {
+            if status == "passed" {
                 status = "running"
             } else {
-                status = "failed"
+                status = "passed"
             }
             Feed.Publish(&test{1, status})
 

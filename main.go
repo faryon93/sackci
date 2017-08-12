@@ -68,8 +68,9 @@ func main() {
     router := mux.NewRouter().StrictSlash(true)
 
     // register REST and SSE endpoints
-    rest.Register(router, "/api/v1/project", model.Project{})
-    rest.Register(router, "/api/v1/build", model.Build{})
+    rest.All(router, "/api/v1/project", model.Project{})
+    rest.One(router, "/api/v1/project/{id}", model.Project{})
+    rest.One(router, "/api/v1/build/{id}", model.Build{})
     rest.QueryAll(router, "/api/v1/project/{project}/env","Project", model.Env{})
     rest.QueryAll(router, "/api/v1/project/{project}/history", "Project", model.Build{})
     sse.Register(router, "/api/v1/feed", ctx.Feed)

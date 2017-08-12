@@ -47,8 +47,44 @@ const (
 //  public functions
 // --------------------------------------------------------------------------------------
 
+func All(router *mux.Router, path string, mod interface{}) (error) {
+    // make sure only slices and structs are registred
+    if reflect.TypeOf(mod).Kind() != reflect.Struct {
+        return errors.New("model must be struct")
+    }
+
+    // fetches all items of the model
+    all := func(w http.ResponseWriter, r *http.Request) {
+        modelType := reflect.SliceOf(reflect.TypeOf(mod))
+        element := reflect.New(modelType)
+
+        // query the database for all elements of the given model
+        err := model.Get().All(element.Interface())
+        if err != nil {
+            http.Error(w, err.Error(), http.StatusInternalServerError)
+            return
+        }
+
+        // filter the output
+        options := sheriff.Options{Groups: []string{GROUP_ALL}}
+        filtered, err := sheriff.Marshal(&options, element.Interface())
+        if err != nil {
+            http.Error(w, err.Error(), http.StatusInternalServerError)
+            return
+        }
+
+        // send as json response
+        Jsonify(w, filtered)
+    }
+
+    // register the various handler functions
+    router.Methods("GET").Path(path).HandlerFunc(all)
+
+    return nil
+}
+
 // Registers a model in the REST interface router
-func Register(router *mux.Router, path string, mod interface{}) (error) {
+func One(router *mux.Router, path string, mod interface{}) (error) {
     // make sure only slices and structs are registred
     if reflect.TypeOf(mod).Kind() != reflect.Struct {
         return errors.New("model must be struct")
@@ -84,33 +120,8 @@ func Register(router *mux.Router, path string, mod interface{}) (error) {
         Jsonify(w, filtered)
     }
 
-    // fetches all items of the model
-    all := func(w http.ResponseWriter, r *http.Request) {
-        modelType := reflect.SliceOf(reflect.TypeOf(mod))
-        element := reflect.New(modelType)
-
-        // query the database for all elements of the given model
-        err := model.Get().All(element.Interface())
-        if err != nil {
-            http.Error(w, err.Error(), http.StatusInternalServerError)
-            return
-        }
-
-        // filter the output
-        options := sheriff.Options{Groups: []string{GROUP_ALL}}
-        filtered, err := sheriff.Marshal(&options, element.Interface())
-        if err != nil {
-            http.Error(w, err.Error(), http.StatusInternalServerError)
-            return
-        }
-
-        // send as json response
-        Jsonify(w, filtered)
-    }
-
     // register the various handler functions
-    router.Methods("GET").Path(path).HandlerFunc(all)
-    router.Methods("GET").Path(path + "/{id}").HandlerFunc(one)
+    router.Methods("GET").Path(path).HandlerFunc(one)
 
     return nil
 }
