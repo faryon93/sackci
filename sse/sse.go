@@ -25,6 +25,8 @@ import (
     "errors"
 
     "github.com/gorilla/mux"
+
+    "github.com/faryon93/sackci/log"
 )
 
 
@@ -36,7 +38,7 @@ import (
 func Register(router *mux.Router, path string, group *Group) {
     // the handler function
     fn := func(w http.ResponseWriter, r *http.Request) {
-        Handler(group, w, r)
+        handler(group, w, r)
     }
 
     // register the handler in the router
@@ -47,6 +49,37 @@ func Register(router *mux.Router, path string, group *Group) {
 // --------------------------------------------------------------------------------------
 //  private functions
 // --------------------------------------------------------------------------------------
+
+func handler(group *Group, w http.ResponseWriter, r *http.Request) {
+    // upgrade the connection to an SSE connection
+    err := upgrade(w)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    log.Info(group.Name, "client", r.RemoteAddr, "opened sse connection")
+
+    // register for the update feed
+    // and make sure the channel gets closed
+    // when the client disconnects
+    ch := group.Register()
+    closeHandler(w, func() {
+        group.Unregister(ch)
+    })
+
+    // write all new items form the feed to the client
+    // this blocks until the client disconnects
+    for action := range ch {
+        err := writeEvent(w, action)
+        if err != nil {
+            log.Error(group.Name, "failed to write event to client:", err.Error())
+            continue
+        }
+    }
+
+    log.Info(group.Name, "client", r.RemoteAddr, "closed sse connection")
+}
 
 // Upgrades the connection to an SSE connection.
 // A proper Content-Type is set and kee-alive is actived.

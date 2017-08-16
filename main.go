@@ -27,6 +27,7 @@ import (
     "context"
     "time"
     "runtime"
+    "math/rand"
 
     "github.com/gorilla/mux"
 
@@ -35,6 +36,8 @@ import (
     "github.com/faryon93/sackci/ctx"
     "github.com/faryon93/sackci/rest"
     "github.com/faryon93/sackci/log"
+    "github.com/faryon93/sackci/config"
+    "github.com/faryon93/sackci/agent"
 )
 
 
@@ -44,6 +47,8 @@ import (
 
 const (
     HTTP_API_BASE = "/api/v1"
+    CONFIG_FILE = "sackci.conf"
+    WORKDIR = "/work"
 )
 
 
@@ -56,9 +61,18 @@ func main() {
 
     // setup go environment
     runtime.GOMAXPROCS(runtime.NumCPU())
+    rand.Seed(time.Now().Unix())
+
+    // load the configuration file
+    conf, err := config.Load(CONFIG_FILE)
+    if err != nil {
+        log.Error("main", "failed to load config:", err.Error())
+        return
+    }
+    ctx.Conf = conf
 
     // open database
-    err := model.Open("E:/tmp/sackci")
+    err = model.Open(ctx.Conf.Database)
     if err != nil {
         log.Error("bolt", "failed to open database:", err.Error())
         return
@@ -71,6 +85,9 @@ func main() {
 
     // initialize the global application context
     ctx.Init()
+    agent.SetWorkdir(WORKDIR)
+    agent.Add(ctx.Conf.Agents...)
+    ctx.Conf.Print()
 
     // create http server
     // and setup the routes with corresponding handler functions
@@ -85,9 +102,9 @@ func main() {
     sse.Register(router, "/feed", ctx.Feed)
 
     // execute http server asynchronously
-    srv := &http.Server{Addr: "127.0.0.1:8181", Handler: router}
+    srv := &http.Server{Addr: ctx.Conf.Listen, Handler: router}
     go func() {
-        log.Info("http", "http server is listening on 0.0.0.0:8181")
+        log.Info("http", "http server is listening on", ctx.Conf.Listen)
         err := srv.ListenAndServe()
         if err != nil && err != http.ErrServerClosed {
             log.Error("http", "failed to serv http:", err.Error())
@@ -96,6 +113,8 @@ func main() {
 
         log.Info("http", "http server is now closed")
     }()
+
+    log.Info("main", APP_NAME, "is now up and running")
 
     // wait for a signal to shutdown the application
     wait(os.Interrupt, syscall.SIGINT, syscall.SIGTERM)

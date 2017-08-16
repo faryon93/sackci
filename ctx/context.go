@@ -23,7 +23,9 @@ import (
     "time"
 
     "github.com/faryon93/sackci/sse"
+    "github.com/faryon93/sackci/config"
 )
+
 
 // --------------------------------------------------------------------------------------
 //  global variables
@@ -31,6 +33,7 @@ import (
 
 var (
     Feed *sse.Group
+    Conf *config.Config
 )
 
 

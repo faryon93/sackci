@@ -20,10 +20,7 @@ package sse
 // --------------------------------------------------------------------------------------
 
 import (
-    "net/http"
     "sync"
-
-    "github.com/faryon93/sackci/log"
 )
 
 
@@ -55,53 +52,17 @@ func NewGroup(name string) (*Group) {
 
 
 // --------------------------------------------------------------------------------------
-//  public functions
-// --------------------------------------------------------------------------------------
-
-func Handler(group *Group, w http.ResponseWriter, r *http.Request) {
-    // upgrade the connection to an SSE connection
-    err := upgrade(w)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
-
-    log.Info(group.Name, "client", r.RemoteAddr, "opened sse connection")
-
-    // register for the update feed
-    // and make sure the channel gets closed
-    // when the client disconnects
-    ch := group.Register()
-    closeHandler(w, func() {
-        group.Unregister(ch)
-    })
-
-    // write all new items form the feed to the client
-    // this blocks until the client disconnects
-    for action := range ch {
-        err := writeEvent(w, action)
-        if err != nil {
-            log.Error(group.Name, "failed to write feed to client:", err.Error())
-            continue
-        }
-    }
-
-    log.Info(group.Name, "client", r.RemoteAddr, "closed feed connection")
-}
-
-
-// --------------------------------------------------------------------------------------
 //  public members
 // --------------------------------------------------------------------------------------
 
 // Publishs an event to the feed.
-func (g *Group) Publish(action Event) {
+func (g *Group) Publish(event Event) {
     g.Mutex.Lock()
     defer g.Mutex.Unlock()
 
     // publish the message to all channels
     for ch := range g.Channels {
-        ch <- action
+        ch <- event
     }
 }
 
