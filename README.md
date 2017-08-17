@@ -1,7 +1,7 @@
 # sackci
 Simple as *uck continuous integration server
 
-![Screenshot of webinterface](doc/webui.png)
+![Screenshot of webinterface](doc/webinterface.png)
 
 ## Features
 - agent-less design (just a docker host is needed)
