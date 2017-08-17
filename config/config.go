@@ -46,6 +46,7 @@ type Project struct {
     Name string `yaml:"name"`
     Scm string `yaml:"scm"`
     Repository string `yaml:"repo"`
+    Branch string `yaml:"branch"`
 }
 
 
