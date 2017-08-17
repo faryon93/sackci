@@ -57,6 +57,7 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
         return
     }
 
+    // construct the build object for saving in the database
     build := model.Build{
         Project: uint64(id),
         Num: 4,
@@ -69,9 +70,10 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
         Time: time.Now(),
         Node: pipeline.Agent.Name,
         Stages: []model.Stage{
-            {Name: "Prolog", Status: model.STAGE_IGNORED, Log: []string{}},
+            {Name: agent.STAGE_SCM_NAME, Status: model.STAGE_IGNORED, Log: []string{}},
         },
     }
+    build.Save()
 
     // asynchrounsly execute the proejct on the provisioned pipeline
     go build.Attach(pipeline.Events)

@@ -41,6 +41,7 @@ const (
     PIPELINEFILE = "Pipelinefile"
 
     STAGE_SCM_ID = 0
+    STAGE_SCM_NAME = "SCM"
 )
 
 
@@ -64,7 +65,7 @@ func (p *Pipeline) Execute(project *model.Project) (error) {
 
     // get a working copy of the repo
     start := time.Now()
-    p.Events.StageBegin("Prolog")
+    p.Events.StageBegin(STAGE_SCM_ID)
     p.Events.StageLog(STAGE_SCM_ID,"starting scm checkout for", project.Repository)
     err := p.Checkout()
     if err != nil {
@@ -86,7 +87,7 @@ func (p *Pipeline) Execute(project *model.Project) (error) {
     }
     p.definition = definition
 
-    // now the prolog stage has sucessfully finished
+    // the SCM stage has sucessfully finished
     p.Events.StageLog(STAGE_SCM_ID, "sucessfully obtained Pipelinefile in", time.Since(start))
     p.Events.StageLog(STAGE_SCM_ID, "found", len(definition.Stages), "stages", "(" + definition.StageString() + ") in Pipelinefile")
     p.PublishPipeline()
@@ -100,7 +101,7 @@ func (p *Pipeline) Execute(project *model.Project) (error) {
         stageId = stageId + 1
 
         // begin the stage
-        p.Events.StageBegin(stage.Name)
+        p.Events.StageBegin(stageId)
         p.Events.StageLog(stageId, "executing stage \"" + stage.Name + "\"", "in image \"" + stage.Image + "\"")
 
         // execute the stage
@@ -123,6 +124,7 @@ func (p *Pipeline) Execute(project *model.Project) (error) {
 
 // Clones a copy of the source repository to the pipelines working dir.
 func (p *Pipeline) Checkout() (error) {
+    // start the special SCM container to clone the repository
     ret, err := p.Container(SCM_IMAGE, p.project.Repository, func(line string) {
         p.Events.StageLog(STAGE_SCM_ID, line)
     })
@@ -130,6 +132,7 @@ func (p *Pipeline) Checkout() (error) {
         return err
     }
 
+    // make sure the clone process exited with a proper exit code
     if ret != 0 {
         return errors.New("error code:" + strconv.Itoa(ret))
     }
@@ -183,11 +186,12 @@ func (p *Pipeline) PublishPipeline() {
         return
     }
 
-    // get all
+    // get all stage names form the Pipeline definition
     stages := make([]string, len(p.definition.Stages))
     for i, stage := range p.definition.Stages {
         stages[i] = stage.Name
     }
 
+    // publish the event
     p.Events.PipelineFound(stages)
 }

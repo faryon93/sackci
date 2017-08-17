@@ -50,6 +50,7 @@ type Commit struct {
 type Stage struct {
     Name    string      `json:"name" groups:"one"`
     Status  string      `json:"status" groups:"one"`
+    Duration time.Duration `json:"duration" groups:"one"`
     Log     []string    `json:"log" groups:"one"`
 }
 
@@ -58,6 +59,7 @@ type Stage struct {
 //  public members
 // --------------------------------------------------------------------------------------
 
+// Inserts or Updates the Build in the database.
 func (b *Build) Save() (error) {
     if b.Id == 0 {
         return Get().Save(b)
@@ -66,19 +68,24 @@ func (b *Build) Save() (error) {
     }
 }
 
+// Consume all events which are feed from the channel src.
+// The database is automatically updated with each event.
 func (b *Build) Attach(src chan events.Event) {
     for event := range src {
+        // The execution of a stage has begun
         if _, ok := event.(events.StageBegin); ok {
             // TODO: set running state
 
+        // A stage has finished executing
         } else if evt, ok := event.(events.StageFinish); ok {
             if evt.Stage >= len(b.Stages) {
                 continue
             }
 
             b.Stages[evt.Stage].Status = evt.Status
-            // TODO: duration
+            b.Stages[evt.Stage].Duration = evt.Duration
 
+        // Append a log line to a stage
         } else if evt, ok := event.(events.StageLog); ok {
             if evt.Stage >= len(b.Stages) {
                 continue
@@ -86,10 +93,12 @@ func (b *Build) Attach(src chan events.Event) {
 
             b.Stages[evt.Stage].Log = append(b.Stages[evt.Stage].Log, evt.Message)
 
+        // The whole pipeline has finished
         } else if evt, ok := event.(events.PipelineFinished); ok {
             b.Status = evt.Status
             b.Duration = evt.Duration
 
+        // The Pipelinefile was found in the prolog step
         } else if evt, ok := event.(events.PipelineFound); ok {
             stages := make([]Stage, len(evt.Stages))
             for i, stage := range evt.Stages {

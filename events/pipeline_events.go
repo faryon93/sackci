@@ -34,7 +34,7 @@ import (
 type EventFeed chan Event
 
 type StageBegin struct {
-    Stage string
+    Stage int
 }
 
 type StageFinish struct {
@@ -62,7 +62,7 @@ type PipelineFound struct {
 //  public members
 // ----------------------------------------------------------------------------------
 
-func (f EventFeed) StageBegin(stage string) {
+func (f EventFeed) StageBegin(stage int) {
     f <- StageBegin{stage}
 }
 
