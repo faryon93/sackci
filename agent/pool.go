@@ -77,7 +77,7 @@ func Add(agents ...Agent) {
         }
 
         // populate the agent with necesarry runtime fields
-        agent.buildCount = 0
+        agent.BuildCount = 0
         agent.docker = client
 
         // add the agent to the agent pool
@@ -96,7 +96,7 @@ func Allocate() (*Agent) {
 
     // increase the counters
     agent.mutex.Lock()
-    agent.buildCount++
+    agent.BuildCount++
     agent.mutex.Unlock()
 
     return agent

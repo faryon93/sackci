@@ -47,15 +47,6 @@ const (
 //  types
 // --------------------------------------------------------------------------------------
 
-type Project struct {
-    Id          uint64          `json:"id" storm:"id,increment" groups:"all,one"`
-    Name        string          `json:"name" groups:"all,one"`
-    BuildStatus string          `json:"status" groups:"all,one"`
-    BuildId     int             `json:"build" groups:"all,one"`
-    Time        time.Time       `json:"execution_time" groups:"all,one"`
-    Duration    time.Duration   `json:"duration" groups:"all,one"`
-}
-
 type Env struct {
     Id      int    `json:"-" storm:"id,increment"`
     Project int    `json:"-" storm:"index"`

@@ -31,13 +31,17 @@ import (
 // ----------------------------------------------------------------------------------
 
 type Agent struct {
-    Name string `yaml:"name"`
-    Endpoint string `yaml:"endpoint"`
-    Concurrent int `yaml:"concurrent"`
+    // from config file
+    Name string `yaml:"name" json:"name"`
+    Endpoint string `yaml:"endpoint" json:"endpoint"`
+    Concurrent int `yaml:"concurrent" json:"concurrent"`
 
+    // public runtime variables
+    BuildCount int `json:"build_count"`
+
+    // private runtime variables
     docker *docker.Client
     mutex sync.Mutex
-    buildCount int
 }
 
 
@@ -47,8 +51,8 @@ type Agent struct {
 
 func (a *Agent) Free() {
     a.mutex.Lock()
-    if a.buildCount > 0 {
-        a.buildCount--
+    if a.BuildCount > 0 {
+        a.BuildCount--
     }
     a.mutex.Unlock()
 }
