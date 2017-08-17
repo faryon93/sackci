@@ -83,7 +83,7 @@
               </h5>
               <h5 class="text-muted details">
                 <i class="fa fa-calendar"></i><span ng-bind="project.execution_time | timeago"></span>
-                <span ng-if="project.duration > 0"><i class="fa fa-clock-o"></i><span ng-bind="project.duration | duration"></span></span>
+                <i class="fa fa-clock-o" ng-if="project.duration > 0"></i><span ng-bind="project.duration | duration" ng-if="project.duration > 0"></span>
               </h5>
             </li>
           </ul>

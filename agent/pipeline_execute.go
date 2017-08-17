@@ -62,6 +62,7 @@ func (p *Pipeline) Execute(project *model.Project) (error) {
     defer p.Destroy()
 
     log.Info(LOG_TAG,"executing build for project \"" + project.Name + "\"")
+    p.Events.PipelineBegin(p.StartTime)
 
     // get a working copy of the repo
     start := time.Now()

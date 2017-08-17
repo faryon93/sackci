@@ -105,7 +105,7 @@ func main() {
         log.Info("http", "http server is now closed")
     }()
 
-    log.Info("main", APP_NAME, "is now up and running")
+    log.Info("main", "everything is now up and running, ready to build!")
 
     // wait for a signal to shutdown the application
     wait(os.Interrupt, syscall.SIGINT, syscall.SIGTERM)

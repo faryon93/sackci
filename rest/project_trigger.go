@@ -67,7 +67,7 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
             Author: "Maximilian Pachl",
             Ref: "j908f34h",
         },
-        Time: time.Now(),
+        Time: pipeline.StartTime,
         Node: pipeline.Agent.Name,
         Stages: []model.Stage{
             {Name: agent.STAGE_SCM_NAME, Status: model.STAGE_IGNORED, Log: []string{}},
@@ -77,6 +77,11 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
 
     // asynchrounsly execute the proejct on the provisioned pipeline
     go build.Attach(pipeline.Events)
+    go func() {
+        for evt := range pipeline.Events {
+
+        }
+    }()
     go pipeline.Execute(project)
 
     Jsonify(w, true)

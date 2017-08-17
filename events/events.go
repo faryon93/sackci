@@ -19,5 +19,7 @@ package events
 //  types
 // ----------------------------------------------------------------------------------
 
+type EventFeed chan Event
 
 type Event interface { }
+

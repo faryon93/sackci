@@ -275,7 +275,7 @@ app.filter('duration', function(){
         input = input / 1000.0 / 1000.0 / 1000.0;
 
         var minutes = parseInt(input/60, 10);
-        var seconds = input%60;
+        var seconds = Math.ceil(input % 60);
 
         var result = "";
         if (minutes > 0)

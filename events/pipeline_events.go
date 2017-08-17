@@ -31,8 +31,6 @@ import (
 //  public members
 // ----------------------------------------------------------------------------------
 
-type EventFeed chan Event
-
 type StageBegin struct {
     Stage int
 }
@@ -46,6 +44,10 @@ type StageFinish struct {
 type StageLog struct {
     Stage int
     Message string
+}
+
+type PipelineBegin struct {
+    Time time.Time
 }
 
 type PipelineFinished struct {
@@ -83,4 +85,8 @@ func (f EventFeed) PipelineFinished(status string, duration time.Duration) {
 
 func (f EventFeed) PipelineFound(stages []string) {
     f <- PipelineFound{stages}
+}
+
+func (f EventFeed) PipelineBegin(time time.Time) {
+    f <- PipelineBegin{time}
 }
