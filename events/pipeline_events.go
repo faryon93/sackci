@@ -86,7 +86,6 @@ func (f EventFeed) ConsoleLog(stage int, v ...interface{}) {
     f <- StageLog{stage, message}
 }
 
-
 func (f EventFeed) PipelineFinished(status string, duration time.Duration) {
     f <- PipelineFinished{status, duration}
 }
