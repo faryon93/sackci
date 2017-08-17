@@ -32,9 +32,7 @@ import (
     "github.com/gorilla/mux"
 
     "github.com/faryon93/sackci/model"
-    "github.com/faryon93/sackci/sse"
     "github.com/faryon93/sackci/ctx"
-    "github.com/faryon93/sackci/rest"
     "github.com/faryon93/sackci/log"
     "github.com/faryon93/sackci/config"
     "github.com/faryon93/sackci/agent"
@@ -92,14 +90,7 @@ func main() {
     // create http server
     // and setup the routes with corresponding handler functions
     router := mux.NewRouter().StrictSlash(true).Path(HTTP_API_BASE).Subrouter()
-
-    // register REST and SSE endpoints
-    rest.All(router, "/project", model.Project{})
-    rest.One(router, "/project/{id}", model.Project{})
-    rest.One(router, "/build/{id}", model.Build{})
-    rest.QueryAll(router, "/project/{project}/env","Project", model.Env{})
-    rest.QueryAll(router, "/project/{project}/history", "Project", model.Build{})
-    sse.Register(router, "/feed", ctx.Feed)
+    routes(router)
 
     // execute http server asynchronously
     srv := &http.Server{Addr: ctx.Conf.Listen, Handler: router}
