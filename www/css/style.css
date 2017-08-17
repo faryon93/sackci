@@ -78,6 +78,12 @@ div.projectlist h5.details > i:not(:first-child)
 	color:#ffbb33;
 }
 
+#projects > li > .waiting,
+#projects > li > .waiting a
+{
+	color: #808080;
+}
+
 div.projectlist > .loading
 {
 	margin-top: 15px;

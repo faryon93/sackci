@@ -73,15 +73,17 @@
           <ul id="projects" ng-show="!loading">
             <li ng-repeat="project in projects | filter:search">
               <h5 ng-class="project.status">
-                <i class="fa fa-check" aria-hidden="true" ng-if="project.status == 'passed'"></i>
-                <i class="fa fa-remove" aria-hidden="true" ng-if="project.status == 'failed'"></i>
-                <i class="fa fa-exchange" aria-hidden="true" ng-if="project.status == 'running'"></i>
+                <i class="fa fa-check" ng-if="project.status == 'passed'"></i>
+                <i class="fa fa-remove" ng-if="project.status == 'failed'"></i>
+                <i class="fa fa-exchange" ng-if="project.status == 'running'"></i>
+                <i class="fa fa-question" ng-if="project.status == 'waiting'"></i>
+
                 <span><a href="/project/{{project.id}}">{{project.name}}</a></span>
-                <a href="/project/{{project.id}}/build/{{project.build}}">(#{{project.build}})</a>
+                <a href="/project/{{project.id}}/build/{{project.build}}" ng-if="project.build > 0">(#{{project.build}})</a>
               </h5>
               <h5 class="text-muted details">
-                <i class="fa fa-calendar" aria-hidden="true"></i><span ng-bind="project.execution_time | timeago"></span>
-                <i class="fa fa-clock-o" aria-hidden="true"></i><span ng-bind="project.duration | duration"></span>
+                <i class="fa fa-calendar"></i><span ng-bind="project.execution_time | timeago"></span>
+                <span ng-if="project.duration > 0"><i class="fa fa-clock-o"></i><span ng-bind="project.duration | duration"></span></span>
               </h5>
             </li>
           </ul>

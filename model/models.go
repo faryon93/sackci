@@ -35,6 +35,7 @@ const (
     BUILD_STATUS_PASSED = "passed"
     BUILD_STATUS_FAILED = "failed"
     BUILD_STATUS_RUNNING = "running"
+    BUILD_STATUS_WAITING = "waiting"
 
     STAGE_FAILED = "failed"
     STAGE_PASSED = "passed"

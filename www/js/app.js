@@ -157,7 +157,8 @@ app.filter("timeago", function () {
     //local: compared to what time? default: now
     //raw: wheter you want in a format of "5 minutes ago", or "5 minutes"
     return function (time, local, raw) {
-        if (!time) return "never";
+        if (!time || time === "0001-01-01T00:00:00Z")
+            return "never";
 
         if (!local) {
             (local = Date.now())
