@@ -231,6 +231,10 @@ div.build-details div.log > div.empty
  * ansi colors
  ********************************************************************/ 
 
+.ansi.bold {
+	font-weight: bold;
+}
+
 .ansi.red {
 	color: #FF6C60;
 }

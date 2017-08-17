@@ -235,6 +235,7 @@ app.directive('capitalize', function() {
 
 app.filter("ansicolor", ['$sce', function($sce) {
     var foregroundColors = {
+      '01': 'bold',
       '30': 'black',
       '31': 'red',
       '32': 'green',
@@ -252,8 +253,10 @@ app.filter("ansicolor", ['$sce', function($sce) {
 
         Object.keys(foregroundColors).forEach(function (ansi) {
             var span = '<span class="ansi ' + foregroundColors[ansi] + '">';
+            var boldSpan = '<span class="ansi bold ' + foregroundColors[ansi] + '">';
             val = val.replace(new RegExp('\033\\[' + ansi + 'm', 'g'), span)
-                     .replace(new RegExp('\033\\[0;' + ansi + 'm', 'g'), span);
+                     .replace(new RegExp('\033\\[0;' + ansi + 'm', 'g'), span)
+                     .replace(new RegExp('\033\\[01;' + ansi + 'm', 'g'), boldSpan);
         });
 
         // bold and italic
