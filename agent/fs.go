@@ -27,7 +27,6 @@ import (
     "os"
     "compress/gzip"
 
-
     "github.com/fsouza/go-dockerclient"
 )
 

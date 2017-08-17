@@ -39,6 +39,8 @@ const (
     SCM_IMAGE = "sackci/git:latest"
     STAGE_IMAGE = "alpine:latest"
     PIPELINEFILE = "Pipelinefile"
+
+    STAGE_SCM_ID = 0
 )
 
 
@@ -62,36 +64,52 @@ func (p *Pipeline) Execute(project *model.Project) (error) {
 
     // get a working copy of the repo
     start := time.Now()
-    log.Info(LOG_TAG,"starting scm checkout for", project.Repository)
+    p.Events.StageBegin(STAGE_SCM_ID)
+    p.Events.StageLog(STAGE_SCM_ID,"starting scm checkout for", project.Repository)
     err := p.Checkout()
     if err != nil {
-        log.Error(LOG_TAG,"scm checkout failed:", err.Error())
+        p.Events.StageLog(STAGE_SCM_ID,"scm checkout failed:", err.Error())
+        p.Events.StageFinish(STAGE_SCM_ID, model.STAGE_FAILED, time.Since(start))
         return err
     }
-    log.Info(LOG_TAG,"scm checkout completed successfully in", time.Since(start))
+    p.Events.StageLog(STAGE_SCM_ID, "scm checkout completed successfully in", time.Since(start))
 
     // get the pipeline definition
     start = time.Now()
     definition, err := p.GetPipelinefile()
     if err != nil {
-        log.Info(LOG_TAG,"failed to get Pipelinefile:", err.Error())
+        p.Events.StageLog(STAGE_SCM_ID, "failed to get Pipelinefile:", err.Error())
+        p.Events.StageFinish(STAGE_SCM_ID, model.STAGE_FAILED, time.Since(start))
+        return err
     }
-    log.Info(LOG_TAG,"sucessfully obtained Pipelinefile in", time.Since(start))
-    log.Info(LOG_TAG,"found", len(definition.Stages), "stages", "(" + definition.StageString() + ") in Pipelinefile")
+
+    // now the prolog stage has sucessfully finished
+    p.Events.StageLog(STAGE_SCM_ID, "sucessfully obtained Pipelinefile in", time.Since(start))
+    p.Events.StageLog(STAGE_SCM_ID, "found", len(definition.Stages), "stages", "(" + definition.StageString() + ") in Pipelinefile")
+    p.Events.StageFinish(STAGE_SCM_ID, model.STAGE_PASSED, time.Since(start))
 
     // execute all configured stages
-    for _, stage := range definition.Stages {
+    for stageId, stage := range definition.Stages {
         start := time.Now()
-        log.Info(LOG_TAG, "executing stage \"" + stage.Name + "\"", "in image \"" + stage.Image + "\"")
+
+        // the "Prolog" stage is added automatically
+        stageId = stageId + 1
+
+        // begin the stage
+        p.Events.StageBegin(stageId)
+        p.Events.StageLog(stageId, "executing stage \"" + stage.Name + "\"", "in image \"" + stage.Image + "\"")
 
         // execute the stage
         err := p.ExecuteStage(&stage)
         if err != nil {
-            log.Error(LOG_TAG, "stage \"" + stage.Name + "\" failed:", err.Error())
+            p.Events.StageLog(stageId, "stage \"" + stage.Name + "\" failed:", err.Error())
+            p.Events.StageFinish(stageId, model.STAGE_FAILED, time.Since(start))
             return err
         }
 
-        log.Info(LOG_TAG, "stage \"" + stage.Name + "\" completed in", time.Since(start))
+        // stage executed successfully
+        p.Events.StageLog(stageId, "stage \"" + stage.Name + "\" completed in", time.Since(start))
+        p.Events.StageFinish(stageId, model.STAGE_PASSED, time.Since(start))
     }
 
     return nil

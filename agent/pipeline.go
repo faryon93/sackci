@@ -55,18 +55,18 @@ type Pipeline struct {
     Volume string
     Containers []string
     StartTime time.Time
+    Events EventFeed
 
     // private variables
     mutex sync.Mutex
     project *model.Project
 }
 
-
 // ----------------------------------------------------------------------------------
-//  public members
+//  public functions
 // ----------------------------------------------------------------------------------
 
-// Creates a new pipeline on this agent.
+// Creates a new pipeline on a free agent.
 func CreatePipeline() (*Pipeline, error) {
     start := time.Now()
 
@@ -85,8 +85,14 @@ func CreatePipeline() (*Pipeline, error) {
         Volume: volume,
         Containers: []string{},
         StartTime: start,
+        Events: make(EventFeed),
     }, nil
 }
+
+
+// ----------------------------------------------------------------------------------
+//  public members
+// ----------------------------------------------------------------------------------
 
 // Executes a command in the given image on this pipeline.
 func (p *Pipeline) Container(image string, cmd string) (int, error) {
@@ -147,4 +153,7 @@ func (p *Pipeline) Destroy() {
 
     // free the agent
     p.Agent.Free()
+
+    // close the event stream
+    close(p.Events)
 }
