@@ -53,6 +53,10 @@ type PipelineFinished struct {
     Duration time.Duration
 }
 
+type PipelineFound struct {
+    Stages []string
+}
+
 
 // ----------------------------------------------------------------------------------
 //  public members
@@ -75,4 +79,8 @@ func (f EventFeed) StageLog(stage int, v ...interface{}) {
 
 func (f EventFeed) PipelineFinished(status string, duration time.Duration) {
     f <- PipelineFinished{status, duration}
+}
+
+func (f EventFeed) PipelineFound(stages []string) {
+    f <- PipelineFound{stages}
 }

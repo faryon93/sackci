@@ -58,25 +58,6 @@ type Stage struct {
 //  public members
 // --------------------------------------------------------------------------------------
 
-func (b *Build) AddStage(stage string) (int) {
-    b.Stages = append(b.Stages, Stage{
-        Name: stage,
-        Status: STAGE_IGNORED,
-        Log: []string{},
-    })
-
-    return len(b.Stages) - 1
-}
-
-func (b *Build) Log(stage int, message string) {
-    if stage >= len(b.Stages) {
-        return
-    }
-
-    b.Stages[stage].Log = append(b.Stages[stage].Log, message)
-    b.Save()
-}
-
 func (b *Build) Save() (error) {
     if b.Id == 0 {
         return Get().Save(b)
@@ -87,12 +68,8 @@ func (b *Build) Save() (error) {
 
 func (b *Build) Attach(src chan events.Event) {
     for event := range src {
-        if evt, ok := event.(events.StageBegin); ok {
-            b.Stages = append(b.Stages, Stage{
-                Name: evt.Stage,
-                Status: STAGE_IGNORED,
-                Log: []string{},
-            })
+        if _, ok := event.(events.StageBegin); ok {
+            // TODO: set running state
 
         } else if evt, ok := event.(events.StageFinish); ok {
             if evt.Stage >= len(b.Stages) {
@@ -112,6 +89,18 @@ func (b *Build) Attach(src chan events.Event) {
         } else if evt, ok := event.(events.PipelineFinished); ok {
             b.Status = evt.Status
             b.Duration = evt.Duration
+
+        } else if evt, ok := event.(events.PipelineFound); ok {
+            stages := make([]Stage, len(evt.Stages))
+            for i, stage := range evt.Stages {
+                stages[i] = Stage{
+                    Name: stage,
+                    Status: STAGE_IGNORED,
+                    Log: []string{},
+                }
+            }
+
+            b.Stages = append(b.Stages, stages...)
         }
 
         b.Save()

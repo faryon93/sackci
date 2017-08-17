@@ -68,7 +68,9 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
         },
         Time: time.Now(),
         Node: pipeline.Agent.Name,
-        Stages: []model.Stage{},
+        Stages: []model.Stage{
+            {Name: "Prolog", Status: model.STAGE_IGNORED, Log: []string{}},
+        },
     }
 
     // asynchrounsly execute the proejct on the provisioned pipeline

@@ -27,6 +27,7 @@ import (
     "github.com/faryon93/sackci/log"
     "github.com/faryon93/sackci/model"
     "github.com/faryon93/sackci/events"
+    "github.com/faryon93/sackci/pipelinefile"
 )
 
 
@@ -62,6 +63,7 @@ type Pipeline struct {
     // private variables
     mutex sync.Mutex
     project *model.Project
+    definition *pipelinefile.Definition
 }
 
 // ----------------------------------------------------------------------------------

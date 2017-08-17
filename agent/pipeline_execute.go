@@ -84,10 +84,12 @@ func (p *Pipeline) Execute(project *model.Project) (error) {
         p.Events.PipelineFinished(model.BUILD_STATUS_FAILED, time.Since(p.StartTime))
         return err
     }
+    p.definition = definition
 
     // now the prolog stage has sucessfully finished
     p.Events.StageLog(STAGE_SCM_ID, "sucessfully obtained Pipelinefile in", time.Since(start))
     p.Events.StageLog(STAGE_SCM_ID, "found", len(definition.Stages), "stages", "(" + definition.StageString() + ") in Pipelinefile")
+    p.PublishPipeline()
     p.Events.StageFinish(STAGE_SCM_ID, model.STAGE_PASSED, time.Since(start))
 
     // execute all configured stages
@@ -172,4 +174,20 @@ func (p *Pipeline) ExecuteStage(stageId int, stage *pipelinefile.Stage) (error) 
     }
 
     return nil
+}
+
+// Publishes all information about the Pipeline definition
+// to the event stream.
+func (p *Pipeline) PublishPipeline() {
+    if p.definition == nil {
+        return
+    }
+
+    // get all
+    stages := make([]string, len(p.definition.Stages))
+    for i, stage := range p.definition.Stages {
+        stages[i] = stage.Name
+    }
+
+    p.Events.PipelineFound(stages)
 }
