@@ -27,6 +27,8 @@ import (
 
     "github.com/faryon93/sackci/ctx"
     "github.com/faryon93/sackci/agent"
+    "github.com/faryon93/sackci/model"
+    "time"
 )
 
 
@@ -55,12 +57,23 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
         return
     }
 
+    build := model.Build{
+        Project: uint64(id),
+        Num: 4,
+        Status: model.BUILD_STATUS_RUNNING,
+        Commit: model.Commit{
+            Message: "test4",
+            Author: "Maximilian Pachl",
+            Ref: "j908f34h",
+        },
+        Time: time.Now(),
+        Node: pipeline.Agent.Name,
+        Stages: []model.Stage{},
+    }
+
     // asynchrounsly execute the proejct on the provisioned pipeline
+    go build.Attach(pipeline.Events)
     go pipeline.Execute(project)
-    go func() {
-        for range pipeline.Events {
-        }
-    }()
 
     Jsonify(w, true)
 }

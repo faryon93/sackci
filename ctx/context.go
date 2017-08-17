@@ -42,36 +42,17 @@ var (
 func Init() {
     // initialize the context variables
     Feed = sse.NewGroup("feed")
+}
 
-    // event stream for testing purpose
-    /*
+
+// --------------------------------------------------------------------------------------
+//  public functions
+// --------------------------------------------------------------------------------------
+
+func RedirectToFeed(src chan sse.Event) {
     go func() {
-        status := "passed"
-
-        for {
-            if status == "passed" {
-                status = "running"
-            } else {
-                status = "passed"
-            }
-            Feed.Publish(&test{1, status})
-
-            time.Sleep(2 * time.Second)
+        for v := range src {
+            Feed.Publish(v)
         }
     }()
-    */
-}
-
-
-// --------------------------------------------------------------------------------------
-//  intermediate types
-// --------------------------------------------------------------------------------------
-
-type test struct {
-    Project int `json:"project"`
-    Status string `json:"status"`
-}
-
-func (t *test) Event() string {
-    return "project_changed"
 }

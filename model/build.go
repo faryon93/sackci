@@ -21,7 +21,7 @@ package model
 
 import (
     "time"
-    "fmt"
+    "github.com/faryon93/sackci/events"
 )
 
 
@@ -68,17 +68,12 @@ func (b *Build) AddStage(stage string) (int) {
     return len(b.Stages) - 1
 }
 
-func (b *Build) Log(stage int, v ...interface{}) {
+func (b *Build) Log(stage int, message string) {
     if stage >= len(b.Stages) {
         return
     }
 
-    b.Stages[stage].Log = append(b.Stages[stage].Log, fmt.Sprint(v...))
-    b.Save()
-}
-
-func (b *Build) SetStageStatus(stage int, status string) {
-    b.Stages[stage].Status = status
+    b.Stages[stage].Log = append(b.Stages[stage].Log, message)
     b.Save()
 }
 
@@ -87,5 +82,38 @@ func (b *Build) Save() (error) {
         return Get().Save(b)
     } else {
         return Get().Update(b)
+    }
+}
+
+func (b *Build) Attach(src chan events.Event) {
+    for event := range src {
+        if evt, ok := event.(events.StageBegin); ok {
+            b.Stages = append(b.Stages, Stage{
+                Name: evt.Stage,
+                Status: STAGE_IGNORED,
+                Log: []string{},
+            })
+
+        } else if evt, ok := event.(events.StageFinish); ok {
+            if evt.Stage >= len(b.Stages) {
+                continue
+            }
+
+            b.Stages[evt.Stage].Status = evt.Status
+            // TODO: duration
+
+        } else if evt, ok := event.(events.StageLog); ok {
+            if evt.Stage >= len(b.Stages) {
+                continue
+            }
+
+            b.Stages[evt.Stage].Log = append(b.Stages[evt.Stage].Log, evt.Message)
+
+        } else if evt, ok := event.(events.PipelineFinished); ok {
+            b.Status = evt.Status
+            b.Duration = evt.Duration
+        }
+
+        b.Save()
     }
 }

@@ -64,12 +64,13 @@ func (p *Pipeline) Execute(project *model.Project) (error) {
 
     // get a working copy of the repo
     start := time.Now()
-    p.Events.StageBegin(STAGE_SCM_ID)
+    p.Events.StageBegin("Prolog")
     p.Events.StageLog(STAGE_SCM_ID,"starting scm checkout for", project.Repository)
     err := p.Checkout()
     if err != nil {
         p.Events.StageLog(STAGE_SCM_ID,"scm checkout failed:", err.Error())
         p.Events.StageFinish(STAGE_SCM_ID, model.STAGE_FAILED, time.Since(start))
+        p.Events.PipelineFinished(model.BUILD_STATUS_FAILED, time.Since(p.StartTime))
         return err
     }
     p.Events.StageLog(STAGE_SCM_ID, "scm checkout completed successfully in", time.Since(start))
@@ -80,6 +81,7 @@ func (p *Pipeline) Execute(project *model.Project) (error) {
     if err != nil {
         p.Events.StageLog(STAGE_SCM_ID, "failed to get Pipelinefile:", err.Error())
         p.Events.StageFinish(STAGE_SCM_ID, model.STAGE_FAILED, time.Since(start))
+        p.Events.PipelineFinished(model.BUILD_STATUS_FAILED, time.Since(p.StartTime))
         return err
     }
 
@@ -96,7 +98,7 @@ func (p *Pipeline) Execute(project *model.Project) (error) {
         stageId = stageId + 1
 
         // begin the stage
-        p.Events.StageBegin(stageId)
+        p.Events.StageBegin(stage.Name)
         p.Events.StageLog(stageId, "executing stage \"" + stage.Name + "\"", "in image \"" + stage.Image + "\"")
 
         // execute the stage
@@ -104,12 +106,14 @@ func (p *Pipeline) Execute(project *model.Project) (error) {
         if err != nil {
             p.Events.StageLog(stageId, "stage \"" + stage.Name + "\" failed:", err.Error())
             p.Events.StageFinish(stageId, model.STAGE_FAILED, time.Since(start))
+            p.Events.PipelineFinished(model.BUILD_STATUS_FAILED, time.Since(p.StartTime))
             return err
         }
 
         // stage executed successfully
         p.Events.StageLog(stageId, "stage \"" + stage.Name + "\" completed in", time.Since(start))
         p.Events.StageFinish(stageId, model.STAGE_PASSED, time.Since(start))
+        p.Events.PipelineFinished(model.BUILD_STATUS_PASSED, time.Since(p.StartTime))
     }
 
     return nil

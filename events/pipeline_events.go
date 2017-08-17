@@ -1,4 +1,4 @@
-package agent
+package events
 // sackci
 // Copyright (C) 2017 Maximilian Pachl
 
@@ -22,20 +22,19 @@ package agent
 import (
     "time"
     "fmt"
-    "github.com/faryon93/sackci/log"
     "strings"
+
+    "github.com/faryon93/sackci/log"
 )
 
 // ----------------------------------------------------------------------------------
-//  types
+//  public members
 // ----------------------------------------------------------------------------------
 
 type EventFeed chan Event
 
-type Event interface { }
-
 type StageBegin struct {
-    Stage int
+    Stage string
 }
 
 type StageFinish struct {
@@ -46,7 +45,12 @@ type StageFinish struct {
 
 type StageLog struct {
     Stage int
-    message string
+    Message string
+}
+
+type PipelineFinished struct {
+    Status string
+    Duration time.Duration
 }
 
 
@@ -54,7 +58,7 @@ type StageLog struct {
 //  public members
 // ----------------------------------------------------------------------------------
 
-func (f EventFeed) StageBegin(stage int) {
+func (f EventFeed) StageBegin(stage string) {
     f <- StageBegin{stage}
 }
 
@@ -67,4 +71,8 @@ func (f EventFeed) StageLog(stage int, v ...interface{}) {
     log.Info("pipeline", message)
 
     f <- StageLog{stage, message}
+}
+
+func (f EventFeed) PipelineFinished(status string, duration time.Duration) {
+    f <- PipelineFinished{status, duration}
 }
