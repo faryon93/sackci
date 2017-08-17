@@ -20,8 +20,6 @@ package ctx
 // --------------------------------------------------------------------------------------
 
 import (
-    "time"
-
     "github.com/faryon93/sackci/sse"
     "github.com/faryon93/sackci/config"
 )
@@ -46,6 +44,7 @@ func Init() {
     Feed = sse.NewGroup("feed")
 
     // event stream for testing purpose
+    /*
     go func() {
         status := "passed"
 
@@ -60,6 +59,7 @@ func Init() {
             time.Sleep(2 * time.Second)
         }
     }()
+    */
 }
 
 

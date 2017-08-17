@@ -99,22 +99,17 @@ func ProjectOne(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // index in the project array
-    if (id - 1) >= len(ctx.Conf.Projects) {
+    // return the runtime object
+    project := ctx.Conf.GetProject(id)
+    if project == nil {
         http.Error(w, "not found", http.StatusNotFound)
         return
     }
 
-    // return the object
-    project := ctx.Conf.Projects[id - 1]
     Jsonify(w, projectListItem{
         Id: id,
         Name: project.Name,
     })
-}
-
-func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
-
 }
 
 

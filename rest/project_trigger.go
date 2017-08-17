@@ -1,4 +1,4 @@
-package model
+package rest
 // sackci
 // Copyright (C) 2017 Maximilian Pachl
 
@@ -16,31 +16,39 @@ package model
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // --------------------------------------------------------------------------------------
-//  constants
+//  imports
 // --------------------------------------------------------------------------------------
 
-const (
-    BUILDS_BUCKET = "builds"
-    BUILDS_INDEX_BUCKET = "builds_index"
+import (
+    "net/http"
+    "strconv"
 
-    BUILD_STATUS_PASSED = "passed"
-    BUILD_STATUS_FAILED = "failed"
-    BUILD_STATUS_RUNNING = "running"
-    BUILD_STATUS_WAITING = "waiting"
+    "github.com/gorilla/mux"
 
-    STAGE_FAILED = "failed"
-    STAGE_PASSED = "passed"
-    STAGE_IGNORED = "ignored"
+    "github.com/faryon93/sackci/ctx"
 )
 
 
 // --------------------------------------------------------------------------------------
-//  types
+//  public functions
 // --------------------------------------------------------------------------------------
 
-type Env struct {
-    Id      int    `json:"-" storm:"id,increment"`
-    Project int    `json:"-" storm:"index"`
-    Key     string `json:"key" groups:"queryall"`
-    Value   string `json:"value" groups:"queryall"`
+func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
+    id, err := strconv.Atoi(mux.Vars(r)["id"])
+    if err != nil {
+        http.Error(w, "invalid project id", http.StatusNotAcceptable)
+        return
+    }
+
+    // return the runtime object
+    project := ctx.Conf.GetProject(id)
+    if project == nil {
+        http.Error(w, "not found", http.StatusNotFound)
+        return
+    }
+
+    // trigger the build manually
+    go project.ExecuteBuild()
+
+    Jsonify(w, true)
 }

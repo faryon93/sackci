@@ -26,6 +26,7 @@ import (
 
     "github.com/faryon93/sackci/agent"
     "github.com/faryon93/sackci/log"
+    "github.com/faryon93/sackci/project"
 )
 
 
@@ -38,15 +39,7 @@ type Config struct {
     Artifacts string `yaml:"artifacts"`
     Database string `yaml:"database"`
     Agents []agent.Agent `yaml:"agents"`
-    Projects []Project `yaml:"projects"`
-}
-
-
-type Project struct {
-    Name string `yaml:"name"`
-    Scm string `yaml:"scm"`
-    Repository string `yaml:"repo"`
-    Branch string `yaml:"branch"`
+    Projects []project.Project `yaml:"projects"`
 }
 
 
@@ -69,6 +62,18 @@ func Load(path string) (*Config, error) {
 //  public members
 // ----------------------------------------------------------------------------------
 
+// Returns a project by its ID.
+func (c *Config) GetProject(id int) (*project.Project) {
+    // check array bounds
+    index := id - 1
+    if index < 0 || index >= len(c.Projects) {
+        return nil
+    }
+
+    return &c.Projects[index]
+}
+
+// Prints some important information of the config
 func (c *Config) Print() {
     for _, project := range c.Projects {
         log.Info("conf", "adding project", project.Name, "(" + project.Repository + ")")

@@ -75,6 +75,7 @@ func Add(agents ...Agent) {
             log.Error("agent", err.Error())
             return
         }
+        client.SetTimeout(2 * time.Hour)
 
         // populate the agent with necesarry runtime fields
         agent.BuildCount = 0
