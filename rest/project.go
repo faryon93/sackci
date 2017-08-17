@@ -26,6 +26,8 @@ import (
     "github.com/faryon93/sackci/ctx"
     "github.com/faryon93/sackci/model"
     "github.com/asdine/storm"
+    "github.com/gorilla/mux"
+    "strconv"
 )
 
 // --------------------------------------------------------------------------------------
@@ -46,6 +48,7 @@ type projectListItem struct {
 //  public functions
 // --------------------------------------------------------------------------------------
 
+// Gets the project short list.
 func ProjectList(w http.ResponseWriter, r *http.Request) {
     projects := ctx.Conf.Projects
 
@@ -86,6 +89,28 @@ func ProjectList(w http.ResponseWriter, r *http.Request) {
     }
 
     Jsonify(w, list)
+}
+
+// Queries on project by its id.
+func ProjectOne(w http.ResponseWriter, r *http.Request) {
+    id, err := strconv.Atoi(mux.Vars(r)["id"])
+    if err != nil {
+        http.Error(w, "invalid project id", http.StatusNotAcceptable)
+        return
+    }
+
+    // index in the project array
+    if (id - 1) >= len(ctx.Conf.Projects) {
+        http.Error(w, "not found", http.StatusNotFound)
+        return
+    }
+
+    // return the object
+    project := ctx.Conf.Projects[id - 1]
+    Jsonify(w, projectListItem{
+        Id: id,
+        Name: project.Name,
+    })
 }
 
 func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
