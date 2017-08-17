@@ -1,4 +1,4 @@
-package project
+package model
 // sackci
 // Copyright (C) 2017 Maximilian Pachl
 
@@ -15,15 +15,13 @@ package project
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import (
-    "github.com/faryon93/sackci/agent"
-    "github.com/faryon93/sackci/model"
-    "time"
-)
+// ----------------------------------------------------------------------------------
+//  types
+// ----------------------------------------------------------------------------------
 
-
-type Context struct {
-    Agent *agent.Agent
-    Build *model.Build
-    StartTime time.Time
+type Project struct {
+    Name string `yaml:"name"`
+    Scm string `yaml:"scm"`
+    Repository string `yaml:"repo"`
+    Branch string `yaml:"branch"`
 }

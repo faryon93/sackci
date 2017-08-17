@@ -1,5 +1,5 @@
-package project
-// sackci
+package pipelinefile
+// dockertest
 // Copyright (C) 2017 Maximilian Pachl
 
 // This program is free software: you can redistribute it and/or modify
@@ -18,3 +18,9 @@ package project
 // ----------------------------------------------------------------------------------
 //  types
 // ----------------------------------------------------------------------------------
+
+type Stage struct {
+    Name string `json:"stage"`
+    Image string `json:"image,omitempty"`
+    Steps []string `json:"steps"`
+}

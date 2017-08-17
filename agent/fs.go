@@ -76,7 +76,7 @@ func (f *TarFilesystem) Get(name string) ([]byte, error) {
 //  public functions
 // ----------------------------------------------------------------------------------
 
-func (a *Agent) GetFile(container string, file string) ([]byte, error) {
+func (a *Agent) ReadFile(container string, file string) ([]byte, error) {
     // construct the TarFilesystem
     fs := TarFilesystem{}
 
@@ -93,7 +93,7 @@ func (a *Agent) GetFile(container string, file string) ([]byte, error) {
 }
 
 // Saves the remote path to a local gzip compressed tar file.
-func (a *Agent) SaveFile(container string, path string, file string) (error) {
+func (a *Agent) SavePath(container string, path string, file string) (error) {
     // create the target file in local filesystem
     fh, err := os.Create(file)
     if err != nil {

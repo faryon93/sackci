@@ -26,6 +26,7 @@ import (
     "github.com/gorilla/mux"
 
     "github.com/faryon93/sackci/ctx"
+    "github.com/faryon93/sackci/agent"
 )
 
 
@@ -47,8 +48,15 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // trigger the build manually
-    go project.ExecuteBuild()
+    // create the pipeline on the build agent
+    pipeline, err := agent.CreatePipeline()
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    // asynchrounsly execute the proejct on the provisioned pipeline
+    go pipeline.Execute(project)
 
     Jsonify(w, true)
 }

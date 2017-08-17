@@ -22,12 +22,13 @@ package rest
 import (
     "net/http"
     "time"
+    "strconv"
+
+    "github.com/asdine/storm"
+    "github.com/gorilla/mux"
 
     "github.com/faryon93/sackci/ctx"
     "github.com/faryon93/sackci/model"
-    "github.com/asdine/storm"
-    "github.com/gorilla/mux"
-    "strconv"
 )
 
 // --------------------------------------------------------------------------------------

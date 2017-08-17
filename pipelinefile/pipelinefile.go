@@ -1,4 +1,4 @@
-package config
+package pipelinefile
 // dockertest
 // Copyright (C) 2017 Maximilian Pachl
 
@@ -20,13 +20,7 @@ package config
 // ----------------------------------------------------------------------------------
 
 import (
-    "io/ioutil"
-
-    "gopkg.in/yaml.v2"
-
-    "github.com/faryon93/sackci/agent"
-    "github.com/faryon93/sackci/log"
-    "github.com/faryon93/sackci/model"
+    "encoding/json"
 )
 
 
@@ -34,12 +28,9 @@ import (
 //  types
 // ----------------------------------------------------------------------------------
 
-type Config struct {
-    Listen string `yaml:"listen"`
-    Artifacts string `yaml:"artifacts"`
-    Database string `yaml:"database"`
-    Agents []agent.Agent `yaml:"agents"`
-    Projects []model.Project `yaml:"projects"`
+type Definition struct {
+    Stages []Stage `json:"pipeline"`
+    Artifacts string `json:"artifacts,omitempty"`
 }
 
 
@@ -47,14 +38,9 @@ type Config struct {
 //  public functions
 // ----------------------------------------------------------------------------------
 
-func Load(path string) (*Config, error) {
-    buf, err := ioutil.ReadFile(path)
-    if err != nil {
-        return nil, err
-    }
-
-    var conf Config
-    return &conf, yaml.Unmarshal(buf, &conf)
+func Parse(file []byte) (*Definition, error) {
+    var buildfile Definition
+    return &buildfile, json.Unmarshal(file, &buildfile)
 }
 
 
@@ -62,22 +48,15 @@ func Load(path string) (*Config, error) {
 //  public members
 // ----------------------------------------------------------------------------------
 
-// Returns a project by its ID.
-func (c *Config) GetProject(id int) (*model.Project) {
-    // check array bounds
-    index := id - 1
-    if index < 0 || index >= len(c.Projects) {
-        return nil
+func (b *Definition) StageString() (string) {
+    stages := ""
+    for i, stage := range b.Stages {
+        stages += stage.Name
+
+        if i < len(b.Stages) - 1 {
+            stages += ", "
+        }
     }
 
-    return &c.Projects[index]
-}
-
-// Prints some important information of the config
-func (c *Config) Print() {
-    for _, project := range c.Projects {
-        log.Info("conf", "adding project", project.Name, "(" + project.Repository + ")")
-    }
-
-    log.Info("conf", "artifact storage location:", c.Artifacts)
+    return stages
 }

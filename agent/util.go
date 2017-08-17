@@ -1,4 +1,4 @@
-package project
+package agent
 // sackci
 // Copyright (C) 2017 Maximilian Pachl
 
@@ -15,13 +15,6 @@ package project
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-// ----------------------------------------------------------------------------------
-//  types
-// ----------------------------------------------------------------------------------
-
-type Project struct {
-    Name string `yaml:"name"`
-    Scm string `yaml:"scm"`
-    Repository string `yaml:"repo"`
-    Branch string `yaml:"branch"`
+func ShortHash(hash string) (string) {
+    return hash[0:12]
 }
