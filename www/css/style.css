@@ -202,10 +202,16 @@ div.build-details div.log > div.line > span.linenr
 	display: inline-block;
 }
 
+div.build-details div.log > div.line > span.message
+{
+	white-space:pre;
+}
+
 div.build-details div.log > div.empty
 {
 	text-align: center;
 }
+
 
 /********************************************************************
  * spin loader

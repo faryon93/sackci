@@ -73,11 +73,19 @@ func (f EventFeed) StageFinish(stage int, status string, duration time.Duration)
 }
 
 func (f EventFeed) StageLog(stage int, v ...interface{}) {
-    message := strings.TrimSpace(fmt.Sprintln(v...))
+    message := "\u001b[0;33m[pipeline] " + strings.TrimSpace(fmt.Sprintln(v...)) + "\u001b[m"
     log.Info("pipeline", message)
 
     f <- StageLog{stage, message}
 }
+
+func (f EventFeed) ConsoleLog(stage int, v ...interface{}) {
+    message := fmt.Sprintln(v...)
+    log.Info("pipeline", strings.TrimSpace(message))
+
+    f <- StageLog{stage, message}
+}
+
 
 func (f EventFeed) PipelineFinished(status string, duration time.Duration) {
     f <- PipelineFinished{status, duration}

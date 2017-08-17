@@ -127,7 +127,7 @@ func (p *Pipeline) Execute(project *model.Project) (error) {
 func (p *Pipeline) Checkout() (error) {
     // start the special SCM container to clone the repository
     ret, err := p.Container(SCM_IMAGE, p.project.Repository, func(line string) {
-        p.Events.StageLog(STAGE_SCM_ID, line)
+        p.Events.ConsoleLog(STAGE_SCM_ID, line)
     })
     if err != nil {
         return err
@@ -167,7 +167,7 @@ func (p *Pipeline) ExecuteStage(stageId int, stage *pipelinefile.Stage) (error) 
 
     // execute the steps inside a container on the build agent
     ret, err := p.Container(image, steps, func(line string) {
-        p.Events.StageLog(stageId, line)
+        p.Events.ConsoleLog(stageId, line)
     })
     if err != nil {
         return err
