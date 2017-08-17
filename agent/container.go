@@ -32,7 +32,7 @@ import (
 // ----------------------------------------------------------------------------------
 
 // Executes a command on the build agent, while using the given volume and image.
-func (a *Agent) Execute(vol string, image string, cmd string) (string, int, error) {
+func (a *Agent) Execute(vol string, image string, cmd string, stdio func(string)) (string, int, error) {
     // create the container in order to start it
     container, err := a.docker.CreateContainer(docker.CreateContainerOptions{
         Config: &docker.Config{
@@ -60,8 +60,8 @@ func (a *Agent) Execute(vol string, image string, cmd string) (string, int, erro
     // gather all console outputs
     err = a.docker.Logs(docker.LogsOptions{
         Container: container.ID,
-        OutputStream: &ConsoleOutput{},
-        ErrorStream: &ConsoleOutput{},
+        OutputStream: &ConsoleOutput{Callback: stdio},
+        ErrorStream: &ConsoleOutput{Callback: stdio},
         Stdout: true,
         Stderr: true,
         Follow: true,

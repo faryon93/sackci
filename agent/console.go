@@ -20,7 +20,7 @@ package agent
 // ----------------------------------------------------------------------------------
 
 import (
-    "fmt"
+    "strings"
 )
 
 
@@ -28,7 +28,13 @@ import (
 //  types
 // ----------------------------------------------------------------------------------
 
-type ConsoleOutput struct {}
+type ConsoleOutput struct {
+    // public members
+    Callback func(string)
+
+    // private members
+    buffer string
+}
 
 
 // ----------------------------------------------------------------------------------
@@ -36,6 +42,20 @@ type ConsoleOutput struct {}
 // ----------------------------------------------------------------------------------
 
 func (w *ConsoleOutput) Write(p []byte) (int, error) {
-    fmt.Print(string(p))
+    w.buffer += string(p)
+    lines := strings.Split(w.buffer, "\n")
+    last := len(lines) - 1
+
+    for i := 0; i < last; i++ {
+        w.Callback(lines[i])
+    }
+
+    if strings.HasSuffix(lines[len(lines) - 1], "\n") {
+        w.Callback(lines[last])
+        w.buffer = ""
+    } else {
+        w.buffer = lines[last]
+    }
     return len(p), nil
 }
+

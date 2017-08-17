@@ -34,6 +34,7 @@ import (
 // ----------------------------------------------------------------------------------
 
 const (
+    EVENT_STREAM_BUFFER = 128
     LOG_TAG = "pipeline"
 )
 
@@ -85,7 +86,7 @@ func CreatePipeline() (*Pipeline, error) {
         Volume: volume,
         Containers: []string{},
         StartTime: start,
-        Events: make(EventFeed),
+        Events: make(EventFeed, EVENT_STREAM_BUFFER),
     }, nil
 }
 
@@ -95,8 +96,8 @@ func CreatePipeline() (*Pipeline, error) {
 // ----------------------------------------------------------------------------------
 
 // Executes a command in the given image on this pipeline.
-func (p *Pipeline) Container(image string, cmd string) (int, error) {
-    container, ret, err := p.Agent.Execute(p.Volume, image, cmd)
+func (p *Pipeline) Container(image string, cmd string, stdio func(string)) (int, error) {
+    container, ret, err := p.Agent.Execute(p.Volume, image, cmd, stdio)
     if container != "" {
         p.mutex.Lock()
         p.Containers = append(p.Containers, container)

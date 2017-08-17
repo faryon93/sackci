@@ -100,7 +100,7 @@ func (p *Pipeline) Execute(project *model.Project) (error) {
         p.Events.StageLog(stageId, "executing stage \"" + stage.Name + "\"", "in image \"" + stage.Image + "\"")
 
         // execute the stage
-        err := p.ExecuteStage(&stage)
+        err := p.ExecuteStage(stageId, &stage)
         if err != nil {
             p.Events.StageLog(stageId, "stage \"" + stage.Name + "\" failed:", err.Error())
             p.Events.StageFinish(stageId, model.STAGE_FAILED, time.Since(start))
@@ -117,7 +117,9 @@ func (p *Pipeline) Execute(project *model.Project) (error) {
 
 // Clones a copy of the source repository to the pipelines working dir.
 func (p *Pipeline) Checkout() (error) {
-    ret, err := p.Container(SCM_IMAGE, p.project.Repository)
+    ret, err := p.Container(SCM_IMAGE, p.project.Repository, func(line string) {
+        p.Events.StageLog(STAGE_SCM_ID, line)
+    })
     if err != nil {
         return err
     }
@@ -142,7 +144,7 @@ func (p *Pipeline) GetPipelinefile() (*pipelinefile.Definition, error) {
 }
 
 // Executes the given stage on this Pipieline.
-func (p *Pipeline) ExecuteStage(stage *pipelinefile.Stage) (error) {
+func (p *Pipeline) ExecuteStage(stageId int, stage *pipelinefile.Stage) (error) {
     // construct the build steps command string
     steps := strings.Join(stage.Steps, " && ")
     steps = "/bin/sh -c '" + steps + "'"
@@ -153,7 +155,10 @@ func (p *Pipeline) ExecuteStage(stage *pipelinefile.Stage) (error) {
         image = stage.Image
     }
 
-    ret, err := p.Container(image, steps)
+    // execute the steps inside a container on the build agent
+    ret, err := p.Container(image, steps, func(line string) {
+        p.Events.StageLog(stageId, line)
+    })
     if err != nil {
         return err
     }
