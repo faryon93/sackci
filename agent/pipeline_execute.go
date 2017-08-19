@@ -69,38 +69,39 @@ func (p *Pipeline) Execute() (error) {
     // whenever we exit this funtion -> destroy the whole pipeline
     defer p.Destroy()
 
+    // begin the build for the project
     log.Info(LOG_TAG,"executing build for project \"" + p.project.Name + "\"")
-    p.Events.PipelineBegin(p.StartTime)
+    p.BeginPipeline(p.StartTime)
 
     // get a working copy of the repo
     start := time.Now()
-    p.Events.StageBegin(STAGE_SCM_ID)
-    p.Events.StageLog(STAGE_SCM_ID,"starting scm checkout for", p.project.Repository)
+    p.BeginStage(STAGE_SCM_ID)
+    p.Log(STAGE_SCM_ID,"starting scm checkout for", p.project.Repository)
     err := p.Clone()
     if err != nil {
-        p.Events.StageLog(STAGE_SCM_ID,"scm checkout failed:", err.Error())
-        p.Events.StageFinish(STAGE_SCM_ID, model.STAGE_FAILED, time.Since(start))
-        p.Events.PipelineFinished(model.BUILD_STATUS_FAILED, time.Since(p.StartTime))
+        p.Log(STAGE_SCM_ID,"scm checkout failed:", err.Error())
+        p.FinishStage(STAGE_SCM_ID, model.STAGE_FAILED, time.Since(start))
+        p.FinishPipeline(model.BUILD_STATUS_FAILED, time.Since(p.StartTime))
         return err
     }
-    p.Events.StageLog(STAGE_SCM_ID, "scm checkout completed successfully in", time.Since(start))
+    p.Log(STAGE_SCM_ID, "scm checkout completed successfully in", time.Since(start))
 
     // get the pipeline definition
     start = time.Now()
     definition, err := p.GetPipelinefile()
     if err != nil {
-        p.Events.StageLog(STAGE_SCM_ID, "failed to get Pipelinefile:", err.Error())
-        p.Events.StageFinish(STAGE_SCM_ID, model.STAGE_FAILED, time.Since(start))
-        p.Events.PipelineFinished(model.BUILD_STATUS_FAILED, time.Since(p.StartTime))
+        p.Log(STAGE_SCM_ID, "failed to get Pipelinefile:", err.Error())
+        p.FinishStage(STAGE_SCM_ID, model.STAGE_FAILED, time.Since(start))
+        p.FinishPipeline(model.BUILD_STATUS_FAILED, time.Since(p.StartTime))
         return err
     }
     p.definition = definition
 
     // the SCM stage has sucessfully finished
-    p.Events.StageLog(STAGE_SCM_ID, "sucessfully obtained Pipelinefile in", time.Since(start))
-    p.Events.StageLog(STAGE_SCM_ID, "found", len(definition.Stages), "stages", "(" + definition.StageString() + ") in Pipelinefile")
+    p.Log(STAGE_SCM_ID, "sucessfully obtained Pipelinefile in", time.Since(start))
+    p.Log(STAGE_SCM_ID, "found", len(definition.Stages), "stages", "(" + definition.StageString() + ") in Pipelinefile")
     p.PublishPipeline()
-    p.Events.StageFinish(STAGE_SCM_ID, model.STAGE_PASSED, time.Since(start))
+    p.FinishStage(STAGE_SCM_ID, model.STAGE_PASSED, time.Since(start))
 
     // execute all configured stages
     for stageId, stage := range definition.Stages {
@@ -109,23 +110,19 @@ func (p *Pipeline) Execute() (error) {
         // the "Prolog" stage is added automatically
         stageId = stageId + 1
 
-        // begin the stage
-        p.Events.StageBegin(stageId)
-        p.Events.StageLog(stageId, "executing stage \"" + stage.Name + "\"", "in image \"" + stage.Image + "\"")
-
         // execute the stage
         err := p.ExecuteStage(stageId, &stage)
         if err != nil {
-            p.Events.StageLog(stageId, "stage \"" + stage.Name + "\" failed:", err.Error())
-            p.Events.StageFinish(stageId, model.STAGE_FAILED, time.Since(start))
-            p.Events.PipelineFinished(model.BUILD_STATUS_FAILED, time.Since(p.StartTime))
+            p.Log(stageId, "stage \"" + stage.Name + "\" failed:", err.Error())
+            p.FinishStage(stageId, model.STAGE_FAILED, time.Since(start))
+            p.FinishPipeline(model.BUILD_STATUS_FAILED, time.Since(p.StartTime))
             return err
         }
 
         // stage executed successfully
-        p.Events.StageLog(stageId, "stage \"" + stage.Name + "\" completed in", time.Since(start))
-        p.Events.StageFinish(stageId, model.STAGE_PASSED, time.Since(start))
-        p.Events.PipelineFinished(model.BUILD_STATUS_PASSED, time.Since(p.StartTime))
+        p.Log(stageId, "stage \"" + stage.Name + "\" completed in", time.Since(start))
+        p.FinishStage(stageId, model.STAGE_PASSED, time.Since(start))
+        p.FinishPipeline(model.BUILD_STATUS_PASSED, time.Since(p.StartTime))
     }
 
     return nil
@@ -145,6 +142,10 @@ func (p *Pipeline) GetPipelinefile() (*pipelinefile.Definition, error) {
 
 // Executes the given stage on this Pipieline.
 func (p *Pipeline) ExecuteStage(stageId int, stage *pipelinefile.Stage) (error) {
+    // begin the stage
+    p.BeginStage(stageId)
+    p.Log(stageId, "executing stage \"" + stage.Name + "\"", "in image \"" + stage.Image + "\"")
+
     // construct the build steps command string
     steps := strings.Join(stage.Steps, " && ")
     steps = "/bin/sh -c '" + steps + "'"
@@ -168,21 +169,4 @@ func (p *Pipeline) ExecuteStage(stageId int, stage *pipelinefile.Stage) (error) 
     }
 
     return nil
-}
-
-// Publishes all information about the Pipeline definition
-// to the event stream.
-func (p *Pipeline) PublishPipeline() {
-    if p.definition == nil {
-        return
-    }
-
-    // get all stage names form the Pipeline definition
-    stages := make([]string, len(p.definition.Stages))
-    for i, stage := range p.definition.Stages {
-        stages[i] = stage.Name
-    }
-
-    // publish the event
-    p.Events.PipelineFound(stages)
 }
