@@ -21,7 +21,27 @@ package model
 
 import (
     "time"
+
     "github.com/faryon93/sackci/events"
+)
+
+
+// --------------------------------------------------------------------------------------
+//  constants
+// --------------------------------------------------------------------------------------
+
+const (
+    // status of the whole build
+    BUILD_WAITING = "waiting"
+    BUILD_RUNNING = "running"
+    BUILD_PASSED = "passed"
+    BUILD_FAILED = "failed"
+
+    // status of a single stage
+    STAGE_IGNORED = "ignored"
+    STAGE_RUNNING = "running"
+    STAGE_FAILED = "failed"
+    STAGE_PASSED = "passed"
 )
 
 
@@ -73,8 +93,12 @@ func (b *Build) Save() (error) {
 func (b *Build) Attach(src chan events.Event) {
     for event := range src {
         // The execution of a stage has begun
-        if _, ok := event.(events.StageBegin); ok {
-            // TODO: set running state
+        if evt, ok := event.(events.StageBegin); ok {
+            if evt.Stage >= len(b.Stages) {
+                continue
+            }
+
+            b.Stages[evt.Stage].Status = STAGE_RUNNING
 
         // A stage has finished executing
         } else if evt, ok := event.(events.StageFinish); ok {

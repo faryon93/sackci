@@ -48,9 +48,10 @@
             <!-- status of the stages -->
             <div class="layer" ng-if="build.stages.length">
               <div class="step" ng-class="stage.status" ng-repeat="stage in build.stages" ng-click="select(stage)">
-                <i class="fa fa-question" aria-hidden="true" ng-if="stage.status == 'ignored'"></i>
-                <i class="fa fa-remove" aria-hidden="true" ng-if="stage.status == 'failed'"></i>
-                <i class="fa fa-check" aria-hidden="true" ng-if="stage.status == 'passed'"></i>
+                <i class="fa fa-question" ng-if="stage.status == 'ignored'"></i>
+                <i class="fa fa-remove" ng-if="stage.status == 'failed'"></i>
+                <i class="fa fa-check" ng-if="stage.status == 'passed'"></i>
+                <i class="fa fa-cog fa-spin" ng-if="stage.status == 'running'"></i>
               </div>
             </div>
           </div>

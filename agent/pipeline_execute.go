@@ -81,7 +81,7 @@ func (p *Pipeline) Execute() (error) {
     if err != nil {
         p.Log(STAGE_SCM_ID,"scm checkout failed:", err.Error())
         p.FinishStage(STAGE_SCM_ID, model.STAGE_FAILED, time.Since(start))
-        p.FinishPipeline(model.BUILD_STATUS_FAILED, time.Since(p.StartTime))
+        p.FinishPipeline(model.BUILD_FAILED, time.Since(p.StartTime))
         return err
     }
     p.Log(STAGE_SCM_ID, "scm checkout completed successfully in", time.Since(start))
@@ -92,7 +92,7 @@ func (p *Pipeline) Execute() (error) {
     if err != nil {
         p.Log(STAGE_SCM_ID, "failed to get Pipelinefile:", err.Error())
         p.FinishStage(STAGE_SCM_ID, model.STAGE_FAILED, time.Since(start))
-        p.FinishPipeline(model.BUILD_STATUS_FAILED, time.Since(p.StartTime))
+        p.FinishPipeline(model.BUILD_FAILED, time.Since(p.StartTime))
         return err
     }
     p.definition = definition
@@ -115,14 +115,14 @@ func (p *Pipeline) Execute() (error) {
         if err != nil {
             p.Log(stageId, "stage \"" + stage.Name + "\" failed:", err.Error())
             p.FinishStage(stageId, model.STAGE_FAILED, time.Since(start))
-            p.FinishPipeline(model.BUILD_STATUS_FAILED, time.Since(p.StartTime))
+            p.FinishPipeline(model.BUILD_FAILED, time.Since(p.StartTime))
             return err
         }
 
         // stage executed successfully
         p.Log(stageId, "stage \"" + stage.Name + "\" completed in", time.Since(start))
         p.FinishStage(stageId, model.STAGE_PASSED, time.Since(start))
-        p.FinishPipeline(model.BUILD_STATUS_PASSED, time.Since(p.StartTime))
+        p.FinishPipeline(model.BUILD_PASSED, time.Since(p.StartTime))
     }
 
     return nil

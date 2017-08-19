@@ -16,25 +16,6 @@ package model
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // --------------------------------------------------------------------------------------
-//  constants
-// --------------------------------------------------------------------------------------
-
-const (
-    BUILDS_BUCKET = "builds"
-    BUILDS_INDEX_BUCKET = "builds_index"
-
-    BUILD_STATUS_PASSED = "passed"
-    BUILD_STATUS_FAILED = "failed"
-    BUILD_STATUS_RUNNING = "running"
-    BUILD_STATUS_WAITING = "waiting"
-
-    STAGE_FAILED = "failed"
-    STAGE_PASSED = "passed"
-    STAGE_IGNORED = "ignored"
-)
-
-
-// --------------------------------------------------------------------------------------
 //  types
 // --------------------------------------------------------------------------------------
 

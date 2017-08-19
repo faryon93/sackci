@@ -82,7 +82,7 @@ func ProjectList(w http.ResponseWriter, r *http.Request) {
 
         // no build has executed yet -> assign the correct status
         } else {
-            item.Status = model.BUILD_STATUS_WAITING
+            item.Status = model.BUILD_WAITING
         }
 
         // add the new item to the list
