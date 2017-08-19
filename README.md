@@ -5,11 +5,12 @@ Simple as *uck continuous integration server
 
 ## Features
 - agent-less design (just a docker host is needed)
-- single database file
+- pipeline configuration stored in project repository
 - configuration in text format (storable in vcs)
 - custom scm via special docker container
-- pipeline configuration stored in project repository
-- REST API and web interface with live data
+- single database file
+- realtime web interface
+- REST interface (used by web ui)
 
 ## Architecture
 The sackci server is the central node which orchestrates the builds on all "agents". On the build agents there is no software required, except a running docker daemon with exposed management api to the network.
@@ -25,6 +26,7 @@ The sackci server communicates with the scm container via command line arguments
 
 ```
 # cloning a repositoy (get a working copy of the sources)
+# last line should be JSON representation of the commit details
 $: docker run -t -i sackci/git:latest clone https://github.com/octocat/Hello-World.git master
 
 # checking for repo changes
@@ -32,7 +34,7 @@ $: docker run -t -i sackci/git:latest clone https://github.com/octocat/Hello-Wor
 # exit code 1: no changes detected
 # exit code 2: branch does not exist
 # The last line of the console output should be the new ref,
-# which is saved for future repo change changes (e.g. old-ref parameter)
+# which is saved for future repo change detection (e.g. old-ref parameter)
 $: docker run -t -i sackci/git:latest compare https://github.com/octocat/Hello-World.git master old-ref
 ```
 
