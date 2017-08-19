@@ -98,7 +98,10 @@ app.controller("projectBuild", function($scope, $routeParams, builds, latest, fe
     // successfull loaded build details
     $scope.loaded = false;
     var success = function(response) {
-        $scope.stage = response.stages[0];
+        response.stages.forEach(function(stage) {
+            if (stage.status !== "ignored")
+                $scope.stage = stage;
+        });
         $scope.loaded = true;
     };
 
