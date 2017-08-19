@@ -77,7 +77,7 @@ app.controller("project", function($scope, $location, $routeParams, projects, tr
     }
 });
 
-app.controller("projectBuild", function($scope, $routeParams, builds) {
+app.controller("projectBuild", function($scope, $routeParams, builds, latest) {
     $scope.select = function(stage) {
         $scope.stage = stage;
     };
@@ -85,16 +85,27 @@ app.controller("projectBuild", function($scope, $routeParams, builds) {
     // redirect to latest ->
     var buildId = $routeParams.build;
     if (buildId === undefined)
-        buildId = "latest";
+    {
+        $scope.build = latest.get({id: $routeParams.id},
+            function(response){
+                $scope.stage = response.stages[0];
+            },
+            function(error) {
+                $scope.error = error.data;
+            }
+        );
 
-    $scope.build = builds.get({id: buildId},
-        function(response){
-            $scope.stage = response.stages[0];
-        },
-        function(error) {
-            $scope.error = error.data;
-        }
-    );
+    // a proper build id is given
+    } else {
+        $scope.build = builds.get({id: buildId},
+            function(response){
+                $scope.stage = response.stages[0];
+            },
+            function(error) {
+                $scope.error = error.data;
+            }
+        );
+    }
 });
 
 app.controller("projectHistory", function($scope, $routeParams, history) {
@@ -127,6 +138,10 @@ app.factory('projects', function($resource) {
 
 app.factory('builds', function($resource){
    return $resource('/api/v1/build/:id');
+});
+
+app.factory('latest', function($resource){
+    return $resource('/api/v1/project/:id/build/latest');
 });
 
 app.factory('history', function($resource){

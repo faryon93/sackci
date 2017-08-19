@@ -38,6 +38,7 @@ func routes(router *mux.Router) {
     router.Methods("GET").Path("/project").HandlerFunc(rest.ProjectList)
     router.Methods("GET").Path("/project/{id}").HandlerFunc(rest.ProjectById)
     router.Methods("GET").Path("/project/{id}/trigger").HandlerFunc(rest.ProjectTrigger)
+    router.Methods("GET").Path("/project/{id}/build/latest").HandlerFunc(rest.ProjectLatestBuild)
 
     // register REST endpoints
     rest.One(router, "/build/{id}", model.Build{})

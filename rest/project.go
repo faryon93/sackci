@@ -113,6 +113,28 @@ func ProjectById(w http.ResponseWriter, r *http.Request) {
     })
 }
 
+// Queries on project by its id.
+func ProjectLatestBuild(w http.ResponseWriter, r *http.Request) {
+    id, err := strconv.Atoi(mux.Vars(r)["id"])
+    if err != nil {
+        http.Error(w, "invalid project id", http.StatusNotAcceptable)
+        return
+    }
+
+    build, err := getLastBuild(id)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    if build == nil {
+        http.Error(w, "no build yet", http.StatusNotFound)
+        return
+    }
+
+    Jsonify(w, build)
+}
+
 
 // --------------------------------------------------------------------------------------
 //  private functions
