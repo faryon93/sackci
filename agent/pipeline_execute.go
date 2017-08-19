@@ -114,8 +114,10 @@ func (p *Pipeline) Execute() (error) {
         // stage executed successfully
         p.Log(stageId, "stage \"" + stage.Name + "\" completed in", time.Since(start))
         p.FinishStage(stageId, model.STAGE_PASSED, time.Since(start))
-        p.FinishPipeline(model.BUILD_PASSED, time.Since(p.StartTime))
     }
+
+    p.FinishPipeline(model.BUILD_PASSED, time.Since(p.StartTime))
+
 
     return nil
 }
@@ -134,10 +136,6 @@ func (p *Pipeline) GetPipelinefile() (*pipelinefile.Definition, error) {
 
 // Executes the given stage on this Pipieline.
 func (p *Pipeline) ExecuteStage(stageId int, stage *pipelinefile.Stage) (error) {
-    // begin the stage
-    p.BeginStage(stageId)
-    p.Log(stageId, "executing stage \"" + stage.Name + "\"", "in image \"" + stage.Image + "\"")
-
     // construct the build steps command string
     steps := strings.Join(stage.Steps, " && ")
     steps = "/bin/sh -c '" + steps + "'"
@@ -147,6 +145,10 @@ func (p *Pipeline) ExecuteStage(stageId int, stage *pipelinefile.Stage) (error) 
     if len(stage.Image) > 0 {
         image = stage.Image
     }
+
+    // begin the stage
+    p.BeginStage(stageId)
+    p.Log(stageId, "executing stage \"" + stage.Name + "\"", "in image \"" + image + "\"")
 
     // execute the steps inside a container on the build agent
     ret, err := p.Container(image, steps, func(line string) {
