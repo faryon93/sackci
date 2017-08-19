@@ -21,6 +21,7 @@ package agent
 
 import (
     "time"
+    "github.com/faryon93/sackci/model"
 )
 
 
@@ -43,6 +44,11 @@ func (p *Pipeline) PublishPipeline() {
 
     // publish the event
     p.Events.PipelineFound(stages)
+}
+
+// Publishes the commit details.
+func (p *Pipeline) CommitFound(commit *model.Commit) {
+    p.Events.CommitFound(commit)
 }
 
 // Appends a log file to a stage.

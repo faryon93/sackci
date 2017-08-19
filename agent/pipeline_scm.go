@@ -22,6 +22,8 @@ package agent
 import (
     "strconv"
     "errors"
+    "github.com/faryon93/sackci/model"
+    "encoding/json"
 )
 
 
@@ -46,23 +48,29 @@ const (
 // ----------------------------------------------------------------------------------
 
 // Clones a copy of the source repository to the pipelines working dir.
-func (p *Pipeline) Clone() (error) {
+func (p *Pipeline) Clone() (*model.Commit, error) {
     args := SCM_CLONE + " " + p.project.Repository + " " + p.project.Branch
+
+    // the last line is the json representation of the commit
+    lastLine := ""
 
     // start the special SCM container to clone the repository
     ret, err := p.Container(SCM_IMAGE, args, func(line string) {
         p.Events.ConsoleLog(STAGE_SCM_ID, line)
+        lastLine = line
     })
     if err != nil {
-        return err
+        return nil,err
     }
 
     // make sure the clone process exited with a proper exit code
     if ret != 0 {
-        return errors.New("error code: " + strconv.Itoa(ret))
+        return nil,errors.New("error code: " + strconv.Itoa(ret))
     }
 
-    return nil
+    // parse the commit information
+    var commit model.Commit
+    return &commit, json.Unmarshal([]byte(lastLine), &commit)
 }
 
 // Checks if a new commit is available.
@@ -72,7 +80,7 @@ func (p *Pipeline) Compare(old string) (bool, string, error) {
     // the last line of the output will be the reference
     ref := ""
 
-    // start the special SCM container to clone the repository
+    // start the special SCM container to detect new changes
     ret, err := p.Container(SCM_IMAGE, args, func(line string) {
         ref = line
     })

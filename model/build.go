@@ -21,8 +21,6 @@ package model
 
 import (
     "time"
-
-    "github.com/faryon93/sackci/events"
 )
 
 
@@ -90,10 +88,12 @@ func (b *Build) Save() (error) {
 
 // Consume all events which are feed from the channel src.
 // The database is automatically updated with each event.
-func (b *Build) Attach(src chan events.Event) {
+func (b *Build) Attach(src chan Event) {
     for event := range src {
+        handeled := true
+
         // The execution of a stage has begun
-        if evt, ok := event.(events.StageBegin); ok {
+        if evt, ok := event.(EvtStageBegin); ok {
             if evt.Stage >= len(b.Stages) {
                 continue
             }
@@ -101,7 +101,7 @@ func (b *Build) Attach(src chan events.Event) {
             b.Stages[evt.Stage].Status = STAGE_RUNNING
 
         // A stage has finished executing
-        } else if evt, ok := event.(events.StageFinish); ok {
+        } else if evt, ok := event.(EvtStageFinish); ok {
             if evt.Stage >= len(b.Stages) {
                 continue
             }
@@ -110,7 +110,7 @@ func (b *Build) Attach(src chan events.Event) {
             b.Stages[evt.Stage].Duration = evt.Duration
 
         // Append a log line to a stage
-        } else if evt, ok := event.(events.StageLog); ok {
+        } else if evt, ok := event.(EvtStageLog); ok {
             if evt.Stage >= len(b.Stages) {
                 continue
             }
@@ -118,12 +118,12 @@ func (b *Build) Attach(src chan events.Event) {
             b.Stages[evt.Stage].Log = append(b.Stages[evt.Stage].Log, evt.Message)
 
         // The whole pipeline has finished
-        } else if evt, ok := event.(events.PipelineFinished); ok {
+        } else if evt, ok := event.(EvtPipelineFinished); ok {
             b.Status = evt.Status
             b.Duration = evt.Duration
 
         // The Pipelinefile was found in the prolog step
-        } else if evt, ok := event.(events.PipelineFound); ok {
+        } else if evt, ok := event.(EvtPipelineFound); ok {
             stages := make([]Stage, len(evt.Stages))
             for i, stage := range evt.Stages {
                 stages[i] = Stage{
@@ -134,8 +134,19 @@ func (b *Build) Attach(src chan events.Event) {
             }
 
             b.Stages = append(b.Stages, stages...)
+
+        // Information about
+        } else if evt, ok := event.(EvtCommitFound); ok {
+            b.Commit = evt.Commit
+
+        // the event is not handeled
+        } else {
+            handeled = false
         }
 
-        b.Save()
+        // if the event was handeled, we should save the update to the database
+        if handeled {
+            b.Save()
+        }
     }
 }

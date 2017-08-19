@@ -25,7 +25,6 @@ import (
     "time"
 
     "github.com/faryon93/sackci/model"
-    "github.com/faryon93/sackci/events"
     "github.com/faryon93/sackci/pipelinefile"
 )
 
@@ -59,7 +58,7 @@ type Pipeline struct {
     Volume string
     Containers []string
     StartTime time.Time
-    Events events.EventFeed
+    Events model.EventFeed
 
     // private variables
     mutex sync.Mutex
@@ -90,7 +89,7 @@ func CreatePipeline() (*Pipeline, error) {
         Volume: volume,
         Containers: []string{},
         StartTime: start,
-        Events: make(events.EventFeed, EVENT_STREAM_BUFFER),
+        Events: make(model.EventFeed, EVENT_STREAM_BUFFER),
     }, nil
 }
 

@@ -54,7 +54,18 @@ func Load(path string) (*Config, error) {
     }
 
     var conf Config
-    return &conf, yaml.Unmarshal(buf, &conf)
+    err = yaml.Unmarshal(buf, &conf)
+    if err != nil {
+        return nil, err
+    }
+
+    // fill in the project ids
+    // TODO: better way of id handling
+    for i := 0; i < len(conf.Projects); i++ {
+        conf.Projects[i].Id = i + 1
+    }
+
+    return &conf, nil
 }
 
 

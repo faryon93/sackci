@@ -27,8 +27,8 @@ import (
 
     "github.com/faryon93/sackci/ctx"
     "github.com/faryon93/sackci/agent"
-    "github.com/faryon93/sackci/model"
     "github.com/faryon93/sackci/log"
+    "github.com/faryon93/sackci/model"
 )
 
 
@@ -60,20 +60,11 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
     pipeline.SetProject(project)
 
     // construct the build object for saving in the database
-    build := model.Build{
-        Project: uint64(id),
-        Num: 4,
-        Status: model.BUILD_RUNNING,
-        Commit: model.Commit{
-            Message: "test4",
-            Author: "Maximilian Pachl",
-            Ref: "j908f34h",
-        },
-        Time: pipeline.StartTime,
-        Node: pipeline.Agent.Name,
-        Stages: []model.Stage{
-            {Name: agent.STAGE_SCM_NAME, Status: model.STAGE_IGNORED, Log: []string{}},
-        },
+    build := project.NewBuild()
+    build.Time = pipeline.StartTime
+    build.Node = pipeline.Agent.Name
+    build.Stages = []model.Stage{
+        {Name: agent.STAGE_SCM_NAME, Status: model.STAGE_IGNORED, Log: []string{}},
     }
     build.Save()
 

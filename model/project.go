@@ -30,10 +30,30 @@ const (
 // ----------------------------------------------------------------------------------
 
 type Project struct {
+    Id int
     Name string `yaml:"name"`
     Scm string `yaml:"scm"`
     Repository string `yaml:"repo"`
     Branch string `yaml:"branch"`
     Trigger string `yaml:"trigger"`
     Interval int `yaml:"interval"`
+}
+
+
+// ----------------------------------------------------------------------------------
+//  public members
+// ----------------------------------------------------------------------------------
+
+// Creates a new Build from this project.
+func (p *Project) NewBuild() (*Build) {
+    return &Build{
+        Project: uint64(p.Id),
+        Num: 4,
+        Status: BUILD_RUNNING,
+        Commit: Commit{
+            Message: "unknown",
+            Author: "unknown",
+            Ref: "unknown",
+        },
+    }
 }

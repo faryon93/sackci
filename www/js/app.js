@@ -296,3 +296,19 @@ app.filter('reverse', function() {
         return items.slice().reverse();
     };
 });
+
+app.filter('unknown', ['$sce', function($sce) {
+    return function(str) {
+        var style = "";
+        if (str === "unknown")
+            style += "font-style: italic;";
+
+        return $sce.trustAsHtml('<span style="' + style + '">' + str + '</span>');
+    };
+}]);
+
+app.filter('short', function() {
+    return function(str) {
+        return str.substr(0, 12);
+    }
+});

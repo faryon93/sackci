@@ -1,4 +1,4 @@
-package events
+package model
 // sackci
 // Copyright (C) 2017 Maximilian Pachl
 
@@ -22,4 +22,3 @@ package events
 type EventFeed chan Event
 
 type Event interface { }
-

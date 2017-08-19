@@ -1,4 +1,5 @@
-package events
+package model
+
 // sackci
 // Copyright (C) 2017 Maximilian Pachl
 
@@ -31,32 +32,36 @@ import (
 //  public members
 // ----------------------------------------------------------------------------------
 
-type StageBegin struct {
+type EvtStageBegin struct {
     Stage int
 }
 
-type StageFinish struct {
+type EvtStageFinish struct {
     Stage int
     Status string
     Duration time.Duration
 }
 
-type StageLog struct {
+type EvtStageLog struct {
     Stage int
     Message string
 }
 
-type PipelineBegin struct {
+type EvtPipelineBegin struct {
     Time time.Time
 }
 
-type PipelineFinished struct {
+type EvtPipelineFinished struct {
     Status string
     Duration time.Duration
 }
 
-type PipelineFound struct {
+type EvtPipelineFound struct {
     Stages []string
+}
+
+type EvtCommitFound struct {
+    Commit Commit
 }
 
 
@@ -65,35 +70,39 @@ type PipelineFound struct {
 // ----------------------------------------------------------------------------------
 
 func (f EventFeed) StageBegin(stage int) {
-    f <- StageBegin{stage}
+    f <- EvtStageBegin{stage}
 }
 
 func (f EventFeed) StageFinish(stage int, status string, duration time.Duration) {
-    f <- StageFinish{stage, status, duration}
+    f <- EvtStageFinish{stage, status, duration}
 }
 
 func (f EventFeed) StageLog(stage int, v ...interface{}) {
     message := "\u001b[0;33m[pipeline] " + strings.TrimSpace(fmt.Sprintln(v...)) + "\u001b[m"
     log.Info("pipeline", message)
 
-    f <- StageLog{stage, message}
+    f <- EvtStageLog{stage, message}
 }
 
 func (f EventFeed) ConsoleLog(stage int, v ...interface{}) {
     message := fmt.Sprintln(v...)
     log.Info("pipeline", strings.TrimSpace(message))
 
-    f <- StageLog{stage, message}
+    f <- EvtStageLog{stage, message}
 }
 
 func (f EventFeed) PipelineFinished(status string, duration time.Duration) {
-    f <- PipelineFinished{status, duration}
+    f <- EvtPipelineFinished{status, duration}
 }
 
 func (f EventFeed) PipelineFound(stages []string) {
-    f <- PipelineFound{stages}
+    f <- EvtPipelineFound{stages}
 }
 
 func (f EventFeed) PipelineBegin(time time.Time) {
-    f <- PipelineBegin{time}
+    f <- EvtPipelineBegin{time}
+}
+
+func (f EventFeed) CommitFound(commit *Commit) {
+    f <- EvtCommitFound{Commit: *commit}
 }

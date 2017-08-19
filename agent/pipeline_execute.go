@@ -68,13 +68,14 @@ func (p *Pipeline) Execute() (error) {
     start := time.Now()
     p.BeginStage(STAGE_SCM_ID)
     p.Log(STAGE_SCM_ID,"starting scm checkout for", p.project.Repository)
-    err := p.Clone()
+    commit, err := p.Clone()
     if err != nil {
         p.Log(STAGE_SCM_ID,"scm checkout failed:", err.Error())
         p.FinishStage(STAGE_SCM_ID, model.STAGE_FAILED, time.Since(start))
         p.FinishPipeline(model.BUILD_FAILED, time.Since(p.StartTime))
         return err
     }
+    p.CommitFound(commit)
     p.Log(STAGE_SCM_ID, "scm checkout completed successfully in", time.Since(start))
 
     // get the pipeline definition
