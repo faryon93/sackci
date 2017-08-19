@@ -27,7 +27,20 @@
   	<li ng-class="{active: tab == 'settings'}"><a href="/project/{{project.id}}/settings">Settings</a></li>
 
     <!-- actions -->
-    <li class="pull-right"><button type="button" class="btn btn-primary" ng-click="trigger()"><i class="fa fa-play"></i> Run</button></li>
+    <li class="pull-right">
+        <button type="button"
+                class="btn btn-primary" ng-class="triggerStatus == 'error' ? 'btn-danger' : 'btn-primary'"
+                ng-click="trigger()"
+                popover-title="Internal Server Error"
+                uib-popover="{{triggerError}}"
+                popover-placement="left"
+                popover-trigger="'none'" popover-is-open="triggerStatus == 'error'" >
+
+            <span ng-if="triggerStatus == undefined"><i class="fa fa-play"></i> Run</span>
+            <span ng-if="triggerStatus == 'waiting'"><i class="fa fa-cog fa-spin"></i> Run</span>
+            <span ng-if="triggerStatus == 'error'"><i class="fa fa-exclamation-triangle"></i> Failed</span>
+        </button>
+    </li>
   </ul>
 
   <!-- tab content -->

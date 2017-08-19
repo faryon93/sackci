@@ -1,5 +1,5 @@
 // ------------------------------------------------------------------------------------------------
-var app = angular.module('app', ["ngRoute", "ngResource"]);
+var app = angular.module('app', ["ngRoute", "ngResource", "ui.bootstrap"]);
 app.config(function($routeProvider, $locationProvider) {
     $routeProvider
         .when("/", {
@@ -64,10 +64,15 @@ app.controller("project", function($scope, $location, $routeParams, projects, tr
         $scope.loaded = true;
     });
 
-    // event handler
+    // event handler: trigger build
     $scope.trigger = function() {
+        $scope.triggerStatus = "waiting";
+
         var response = trigger.get({id: $routeParams.id}, function() {
             $location.path("/project/" + $routeParams.id + "/build/" + response.build_id);
+        }, function (error) {
+            $scope.triggerStatus = "error";
+            $scope.triggerError = error.data;
         });
     }
 });
@@ -201,7 +206,7 @@ app.filter("timeago", function () {
             YEAR = 31556926,
             DECADE = 315569260;
 
-        if (offset <= MINUTE)              span = [ '', raw ? 'now' : 'less than a minute' ];
+        if (offset <= MINUTE)              span = [ '', raw ? 'now' : 'a minute' ];
         else if (offset < (MINUTE * 60))   span = [ Math.round(Math.abs(offset / MINUTE)), 'min' ];
         else if (offset < (HOUR * 24))     span = [ Math.round(Math.abs(offset / HOUR)), 'hr' ];
         else if (offset < (DAY * 7))       span = [ Math.round(Math.abs(offset / DAY)), 'day' ];
