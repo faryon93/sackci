@@ -42,6 +42,13 @@ const (
 
     STAGE_SCM_ID = 0
     STAGE_SCM_NAME = "SCM"
+
+    SCM_CLONE = "clone"
+    SCM_COMPARE = "compare"
+
+    SCM_RET_NEW_REF = 0
+    SCM_RET_NO_CHANGES = 1
+    SCM_RET_INVALID_BRANCH = 2
 )
 
 
@@ -49,26 +56,35 @@ const (
 //  public members
 // ----------------------------------------------------------------------------------
 
-// Executes the give project on this pipeline.
-// This is a oneshot action. The pipeline is toren down on success or error.
-func (p *Pipeline) Execute(project *model.Project) (error) {
+func (p *Pipeline) SetProject(project *model.Project) (error) {
     // assign the project to the pipeline
     if p.project != nil {
         return ErrAlreadyExecuted
     }
+
     p.project = project
+
+    return nil
+}
+
+// Executes the give project on this pipeline.
+// This is a oneshot action. The pipeline is toren down on success or error.
+func (p *Pipeline) Execute() (error) {
+    if p.project == nil {
+        return ErrNoProject
+    }
 
     // whenever we exit this funtion -> destroy the whole pipeline
     defer p.Destroy()
 
-    log.Info(LOG_TAG,"executing build for project \"" + project.Name + "\"")
+    log.Info(LOG_TAG,"executing build for project \"" + p.project.Name + "\"")
     p.Events.PipelineBegin(p.StartTime)
 
     // get a working copy of the repo
     start := time.Now()
     p.Events.StageBegin(STAGE_SCM_ID)
-    p.Events.StageLog(STAGE_SCM_ID,"starting scm checkout for", project.Repository)
-    err := p.Checkout()
+    p.Events.StageLog(STAGE_SCM_ID,"starting scm checkout for", p.project.Repository)
+    err := p.Clone()
     if err != nil {
         p.Events.StageLog(STAGE_SCM_ID,"scm checkout failed:", err.Error())
         p.Events.StageFinish(STAGE_SCM_ID, model.STAGE_FAILED, time.Since(start))
@@ -124,9 +140,11 @@ func (p *Pipeline) Execute(project *model.Project) (error) {
 }
 
 // Clones a copy of the source repository to the pipelines working dir.
-func (p *Pipeline) Checkout() (error) {
+func (p *Pipeline) Clone() (error) {
+    args := SCM_CLONE + " " + p.project.Repository + " " + p.project.Branch
+
     // start the special SCM container to clone the repository
-    ret, err := p.Container(SCM_IMAGE, p.project.Repository, func(line string) {
+    ret, err := p.Container(SCM_IMAGE, args, func(line string) {
         p.Events.ConsoleLog(STAGE_SCM_ID, line)
     })
     if err != nil {
@@ -135,10 +153,40 @@ func (p *Pipeline) Checkout() (error) {
 
     // make sure the clone process exited with a proper exit code
     if ret != 0 {
-        return errors.New("error code:" + strconv.Itoa(ret))
+        return errors.New("error code: " + strconv.Itoa(ret))
     }
 
     return nil
+}
+
+// Checks if a new commit is available.
+func (p *Pipeline) Compare(old string) (bool, string, error) {
+    args := SCM_COMPARE + " " + p.project.Repository + " " + p.project.Branch + " " + old
+
+    // the last line of the output will be the reference
+    ref := ""
+
+    // start the special SCM container to clone the repository
+    ret, err := p.Container(SCM_IMAGE, args, func(line string) {
+        ref = line
+    })
+    if err != nil {
+        return false, "", err
+    }
+
+    // some return codes have a special meaning...
+    if ret == SCM_RET_NEW_REF {
+        return true, ref, nil
+
+    } else if ret == SCM_RET_NO_CHANGES {
+        return false, old, nil
+
+    } else if ret == SCM_RET_INVALID_BRANCH {
+        return false, "", ErrInvalidBranch
+
+    } else {
+        return false, "", errors.New("error code: " + strconv.Itoa(ret))
+    }
 }
 
 // Downloads and parses the pipeline defition from the working copy.

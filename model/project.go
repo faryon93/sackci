@@ -16,6 +16,16 @@ package model
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // ----------------------------------------------------------------------------------
+//  constants
+// ----------------------------------------------------------------------------------
+
+const (
+    TRIGGER_MANUAL = "manual"
+    TRIGGER_POLL   = "poll"
+)
+
+
+// ----------------------------------------------------------------------------------
 //  types
 // ----------------------------------------------------------------------------------
 
@@ -24,4 +34,6 @@ type Project struct {
     Scm string `yaml:"scm"`
     Repository string `yaml:"repo"`
     Branch string `yaml:"branch"`
+    Trigger string `yaml:"trigger"`
+    Interval int `yaml:"interval"`
 }

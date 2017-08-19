@@ -36,6 +36,7 @@ import (
     "github.com/faryon93/sackci/log"
     "github.com/faryon93/sackci/config"
     "github.com/faryon93/sackci/agent"
+    "github.com/faryon93/sackci/scm"
 )
 
 
@@ -85,6 +86,7 @@ func main() {
     ctx.Init()
     agent.SetWorkdir(WORKDIR)
     agent.Add(ctx.Conf.Agents...)
+    scm.Setup()
     ctx.Conf.Print()
 
     // create http server
@@ -110,6 +112,9 @@ func main() {
     // wait for a signal to shutdown the application
     wait(os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
     log.Info("main", "initiating application shutdown (SIGINT / SIGTERM)")
+
+    // destroy scm polling routines
+    scm.Destroy()
 
     // gracefully shutdown the http server
     httpCtx, _ := context.WithTimeout(context.Background(), 1*time.Second)

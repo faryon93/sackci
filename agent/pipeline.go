@@ -45,6 +45,8 @@ var (
     ErrNoContainer = errors.New("no container available")
     ErrNoAgent = errors.New("no agent available")
     ErrAlreadyExecuted = errors.New("pipeline was already executed")
+    ErrInvalidBranch = errors.New("branch does not exist")
+    ErrNoProject = errors.New("no project set")
 )
 
 

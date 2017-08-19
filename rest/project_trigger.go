@@ -57,6 +57,7 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }
+    pipeline.SetProject(project)
 
     // construct the build object for saving in the database
     build := model.Build{
@@ -78,7 +79,7 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
 
     // asynchrounsly execute the proejct on the provisioned pipeline
     go build.Attach(pipeline.Events)
-    go pipeline.Execute(project)
+    go pipeline.Execute()
 
     Jsonify(w, true)
 }
