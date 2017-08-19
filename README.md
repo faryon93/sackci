@@ -30,5 +30,27 @@ $: docker run -t -i sackci/git:latest clone https://github.com/octocat/Hello-Wor
 # more to come...
 ```
 
+## Configuration
+```
+listen: "127.0.0.1:8181"    # address and port for the REST API to listen on
+artifacts: "E:/tmp/"        # storage location of the build artifacts
+database: "E:/tmp/sackci"   # storage location of the database
+
+# build agents
+agents:
+   - name: "agent-01"                       # display name
+     endpoint: "tcp://192.168.2.85:2375"    # docker api endpoint
+     concurrent: 0                          # number of concurrent builds
+
+# projects
+projects:
+   - name: "faryon93/test"                          # display name
+     scm: "git"                                     # SCM provider
+     repo: "https://github.com/faryon93/test.git"   # repository url
+     branch: "master"                               # branch
+     trigger: "poll"                                # build trigger: "manual", "poll"
+     interval: 10                                   # trigger interval in seconds for polling
+```
+
 ## Notice
 This project is far from beeing finished and should not be used in production. Feel free to contribute.
