@@ -82,30 +82,20 @@ app.controller("projectBuild", function($scope, $routeParams, builds, latest) {
         $scope.stage = stage;
     };
 
-    // redirect to latest ->
+    var success = function(response) {
+        $scope.stage = response.stages[0];
+    };
+
+    var error = function(error) {
+        $scope.error = error.data;
+    };
+
+    // if no proper build id is given ask for the latest
     var buildId = $routeParams.build;
     if (buildId === undefined)
-    {
-        $scope.build = latest.get({id: $routeParams.id},
-            function(response){
-                $scope.stage = response.stages[0];
-            },
-            function(error) {
-                $scope.error = error.data;
-            }
-        );
-
-    // a proper build id is given
-    } else {
-        $scope.build = builds.get({id: buildId},
-            function(response){
-                $scope.stage = response.stages[0];
-            },
-            function(error) {
-                $scope.error = error.data;
-            }
-        );
-    }
+        $scope.build = latest.get({id: $routeParams.id}, success, error);
+    else
+        $scope.build = builds.get({id: buildId}, success, error);
 });
 
 app.controller("projectHistory", function($scope, $routeParams, history) {
@@ -140,6 +130,7 @@ app.factory('builds', function($resource){
    return $resource('/api/v1/build/:id');
 });
 
+// TODO: combine mit factory "builds"
 app.factory('latest', function($resource){
     return $resource('/api/v1/project/:id/build/latest');
 });
