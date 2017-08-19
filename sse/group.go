@@ -34,10 +34,6 @@ type Group struct {
     Channels map[chan Event]bool
 }
 
-type Event interface {
-    Event() string
-}
-
 
 // --------------------------------------------------------------------------------------
 //  constructors

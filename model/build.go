@@ -88,65 +88,63 @@ func (b *Build) Save() (error) {
 
 // Consume all events which are feed from the channel src.
 // The database is automatically updated with each event.
-func (b *Build) Attach(src chan Event) {
-    for event := range src {
-        handeled := true
+func (b *Build) Publish(event Event) {
+    handeled := true
 
-        // The execution of a stage has begun
-        if evt, ok := event.(EvtStageBegin); ok {
-            if evt.Stage >= len(b.Stages) {
-                continue
-            }
-
-            b.Stages[evt.Stage].Status = STAGE_RUNNING
-
-        // A stage has finished executing
-        } else if evt, ok := event.(EvtStageFinish); ok {
-            if evt.Stage >= len(b.Stages) {
-                continue
-            }
-
-            b.Stages[evt.Stage].Status = evt.Status
-            b.Stages[evt.Stage].Duration = evt.Duration
-
-        // Append a log line to a stage
-        } else if evt, ok := event.(EvtStageLog); ok {
-            if evt.Stage >= len(b.Stages) {
-                continue
-            }
-
-            b.Stages[evt.Stage].Log = append(b.Stages[evt.Stage].Log, evt.Message)
-
-        // The whole pipeline has finished
-        } else if evt, ok := event.(EvtPipelineFinished); ok {
-            b.Status = evt.Status
-            b.Duration = evt.Duration
-
-        // The Pipelinefile was found in the prolog step
-        } else if evt, ok := event.(EvtPipelineFound); ok {
-            stages := make([]Stage, len(evt.Stages))
-            for i, stage := range evt.Stages {
-                stages[i] = Stage{
-                    Name: stage,
-                    Status: STAGE_IGNORED,
-                    Log: []string{},
-                }
-            }
-
-            b.Stages = append(b.Stages, stages...)
-
-        // Information about
-        } else if evt, ok := event.(EvtCommitFound); ok {
-            b.Commit = evt.Commit
-
-        // the event is not handeled
-        } else {
-            handeled = false
+    // The execution of a stage has begun
+    if evt, ok := event.(*EvtStageBegin); ok {
+        if evt.Stage >= len(b.Stages) {
+            return
         }
 
-        // if the event was handeled, we should save the update to the database
-        if handeled {
-            b.Save()
+        b.Stages[evt.Stage].Status = evt.Status
+
+    // A stage has finished executing
+    } else if evt, ok := event.(*EvtStageFinish); ok {
+        if evt.Stage >= len(b.Stages) {
+            return
         }
+
+        b.Stages[evt.Stage].Status = evt.Status
+        b.Stages[evt.Stage].Duration = evt.Duration
+
+    // Append a log line to a stage
+    } else if evt, ok := event.(*EvtStageLog); ok {
+        if evt.Stage >= len(b.Stages) {
+            return
+        }
+
+        b.Stages[evt.Stage].Log = append(b.Stages[evt.Stage].Log, evt.Message)
+
+    // The whole pipeline has finished
+    } else if evt, ok := event.(*EvtPipelineFinished); ok {
+        b.Status = evt.Status
+        b.Duration = evt.Duration
+
+    // The Pipelinefile was found in the prolog step
+    } else if evt, ok := event.(*EvtPipelineFound); ok {
+        stages := make([]Stage, len(evt.Stages))
+        for i, stage := range evt.Stages {
+            stages[i] = Stage{
+                Name: stage,
+                Status: STAGE_IGNORED,
+                Log: []string{},
+            }
+        }
+
+        b.Stages = append(b.Stages, stages...)
+
+    // Information about
+    } else if evt, ok := event.(*EvtCommitFound); ok {
+        b.Commit = evt.Commit
+
+    // the event is not handeled
+    } else {
+        handeled = false
+    }
+
+    // if the event was handeled, we should save the update to the database
+    if handeled {
+        b.Save()
     }
 }

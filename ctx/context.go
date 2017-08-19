@@ -43,16 +43,3 @@ func Init() {
     // initialize the context variables
     Feed = sse.NewGroup("feed")
 }
-
-
-// --------------------------------------------------------------------------------------
-//  public functions
-// --------------------------------------------------------------------------------------
-
-func RedirectToFeed(src chan sse.Event) {
-    go func() {
-        for v := range src {
-            Feed.Publish(v)
-        }
-    }()
-}

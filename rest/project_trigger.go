@@ -41,6 +41,16 @@ type triggerResponse struct {
     BuildId int `json:"build_id"`
 }
 
+type CtxEvent struct {
+    Event model.Event `json:"event"`
+    Project int `json:"project_id"`
+    Build int `json:"build_id"`
+}
+
+func (e *CtxEvent) EventName() string {
+    return e.Event.Event()
+}
+
 
 // --------------------------------------------------------------------------------------
 //  public functions
@@ -78,10 +88,21 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
     }
     build.Save()
 
-    log.Info("project", "new build id:", build.Id)
+    // redirect and transform all events for the eventstream
+    go func() {
+        for event := range pipeline.Events {
+            build.Publish(event)
+
+            // the event stream needs a context
+            ctx.Feed.Publish(&CtxEvent{
+                event,
+                project.Id,
+                int(build.Id),
+            })
+        }
+    }()
 
     // asynchrounsly execute the proejct on the provisioned pipeline
-    go build.Attach(pipeline.Events)
     go pipeline.Execute()
 
     Jsonify(w, triggerResponse{

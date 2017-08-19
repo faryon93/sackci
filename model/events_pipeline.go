@@ -33,35 +33,64 @@ import (
 // ----------------------------------------------------------------------------------
 
 type EvtStageBegin struct {
-    Stage int
+    Stage int `json:"stage"`
+    Status string `json:"status"`
+}
+
+func (e *EvtStageBegin) Event() string {
+    return "stage_begin"
 }
 
 type EvtStageFinish struct {
-    Stage int
-    Status string
-    Duration time.Duration
+    Stage int `json:"stage"`
+    Status string `json:"status"`
+    Duration time.Duration `json:"duration"`
+}
+
+func (e *EvtStageFinish) Event() string {
+    return "stage_finish"
 }
 
 type EvtStageLog struct {
-    Stage int
-    Message string
+    Stage int `json:"stage"`
+    Message string `json:"message"`
+}
+
+func (e *EvtStageLog) Event() string {
+    return "stage_log"
 }
 
 type EvtPipelineBegin struct {
-    Time time.Time
+    Time time.Time `json:"time"`
+}
+
+func (e *EvtPipelineBegin) Event() string {
+    return "pipeline_begin"
 }
 
 type EvtPipelineFinished struct {
-    Status string
-    Duration time.Duration
+    Status string `json:"status"`
+    Duration time.Duration `json:"duration"`
+}
+
+func (e *EvtPipelineFinished) Event() string {
+    return "pipeline_finish"
 }
 
 type EvtPipelineFound struct {
-    Stages []string
+    Stages []string `json:"stages"`
+}
+
+func (e *EvtPipelineFound) Event() string {
+    return "pipeline_found"
 }
 
 type EvtCommitFound struct {
-    Commit Commit
+    Commit Commit `json:"commit"`
+}
+
+func (e *EvtCommitFound) Event() string {
+    return "commit_found"
 }
 
 
@@ -70,39 +99,39 @@ type EvtCommitFound struct {
 // ----------------------------------------------------------------------------------
 
 func (f EventFeed) StageBegin(stage int) {
-    f <- EvtStageBegin{stage}
+    f <- &EvtStageBegin{stage, STAGE_RUNNING}
 }
 
 func (f EventFeed) StageFinish(stage int, status string, duration time.Duration) {
-    f <- EvtStageFinish{stage, status, duration}
+    f <- &EvtStageFinish{stage, status, duration}
 }
 
 func (f EventFeed) StageLog(stage int, v ...interface{}) {
     message := "\u001b[0;33m[pipeline] " + strings.TrimSpace(fmt.Sprintln(v...)) + "\u001b[m"
     log.Info("pipeline", message)
 
-    f <- EvtStageLog{stage, message}
+    f <- &EvtStageLog{stage, message}
 }
 
 func (f EventFeed) ConsoleLog(stage int, v ...interface{}) {
     message := fmt.Sprintln(v...)
     log.Info("pipeline", strings.TrimSpace(message))
 
-    f <- EvtStageLog{stage, message}
+    f <- &EvtStageLog{stage, message}
 }
 
 func (f EventFeed) PipelineFinished(status string, duration time.Duration) {
-    f <- EvtPipelineFinished{status, duration}
+    f <- &EvtPipelineFinished{status, duration}
 }
 
 func (f EventFeed) PipelineFound(stages []string) {
-    f <- EvtPipelineFound{stages}
+    f <- &EvtPipelineFound{stages}
 }
 
 func (f EventFeed) PipelineBegin(time time.Time) {
-    f <- EvtPipelineBegin{time}
+    f <- &EvtPipelineBegin{time}
 }
 
 func (f EventFeed) CommitFound(commit *Commit) {
-    f <- EvtCommitFound{Commit: *commit}
+    f <- &EvtCommitFound{Commit: *commit}
 }

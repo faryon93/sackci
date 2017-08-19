@@ -36,12 +36,25 @@ app.controller("projectlist", function($scope, $location, projects, feed) {
         $scope.loading = false;
 
         // we are interested in all project status changes
-        feed.register("project_changed", $scope, function(evt) {
+        feed.register("pipeline_begin", $scope, function(evt) {
             angular.forEach($scope.projects, function(project) {
-                if (project.id === evt.project)
-                    project.status = evt.status;
+                if (project.id === evt.project_id)
+                {
+                    project.status = "running";
+                    project.execution_time = evt.event.time;
+                    project.duration = 0;
+                }
             });
-        });       
+        });
+        feed.register("pipeline_finish", $scope, function(evt) {
+            angular.forEach($scope.projects, function(project) {
+                if (project.id === evt.project_id)
+                {
+                    project.status = evt.event.status;
+                    project.duration = evt.event.duration;
+                }
+            });
+        });
     });
 });
 
@@ -77,17 +90,39 @@ app.controller("project", function($scope, $location, $routeParams, projects, tr
     }
 });
 
-app.controller("projectBuild", function($scope, $routeParams, builds, latest) {
-    $scope.select = function(stage) {
+app.controller("projectBuild", function($scope, $routeParams, builds, latest, feed) {
+    $scope.selectStage = function(stage) {
         $scope.stage = stage;
     };
 
+    // successfull loaded build details
+    $scope.loaded = false;
     var success = function(response) {
         $scope.stage = response.stages[0];
+        $scope.loaded = true;
     };
 
+    // error while loading build details
     var error = function(error) {
         $scope.error = error.data;
+    };
+
+    // register for an event from the newsfeed
+    var registerFeed = function(event, callback) {
+        feed.register(event, $scope, function(evt) {
+            // make sure the event is for the selected build
+            // if not, discard the event
+            if (!$scope.loaded ||
+                ($scope.project.id !== evt.project_id &&
+                $routeParams.build === evt.build_id))
+            {
+                return;
+            }
+
+            // call the actual function
+            if (typeof callback === "function" && evt.event !== undefined)
+                callback(evt.event);
+        });
     };
 
     // if no proper build id is given ask for the latest
@@ -96,6 +131,40 @@ app.controller("projectBuild", function($scope, $routeParams, builds, latest) {
         $scope.build = latest.get({id: $routeParams.id}, success, error);
     else
         $scope.build = builds.get({id: buildId}, success, error);
+
+    // register for updates from the news feed
+    registerFeed("commit_found", function(evt) {
+        $scope.build.commit = evt.commit;
+    });
+    registerFeed("pipeline_finish", function(evt) {
+        $scope.build.status = evt.status;
+        $scope.build.duration = evt.duration;
+    });
+    registerFeed("stage_begin", function(evt) {
+        $scope.build.stages[evt.stage].status = evt.status;
+        $scope.stage = $scope.build.stages[evt.stage];
+    });
+
+    registerFeed("pipeline_found", function(evt) {
+        evt.stages.forEach(function(stageName) {
+            // TODO: the server should send the full stage structure
+            $scope.build.stages.push({name: stageName, status: "ignored", duration: 0, log: []});
+        });
+    });
+    registerFeed("stage_log", function(evt) {
+        var stageId = evt.stage;
+        if ($scope.build.stages[stageId] !== undefined)
+            $scope.build.stages[stageId].log.push(evt.message);
+    });
+
+    registerFeed("stage_finish", function(evt) {
+        var stageId = evt.stage;
+        if ($scope.build.stages[stageId] !== undefined)
+        {
+            $scope.build.stages[stageId].status = evt.status;
+            $scope.build.stages[stageId].duration = evt.duration;
+        }
+    });
 });
 
 app.controller("projectHistory", function($scope, $routeParams, history) {
@@ -212,7 +281,12 @@ app.filter("timeago", function () {
             YEAR = 31556926,
             DECADE = 315569260;
 
-        if (offset <= MINUTE)              span = [ '', raw ? 'now' : 'a minute' ];
+        if (offset <= 10)
+        {
+            span = ['', "just now"];
+            raw = true;
+        }
+        else if (offset <= MINUTE)         span = [ '', raw ? 'now' : 'a minute' ];
         else if (offset < (MINUTE * 60))   span = [ Math.round(Math.abs(offset / MINUTE)), 'min' ];
         else if (offset < (HOUR * 24))     span = [ Math.round(Math.abs(offset / HOUR)), 'hr' ];
         else if (offset < (DAY * 7))       span = [ Math.round(Math.abs(offset / DAY)), 'day' ];

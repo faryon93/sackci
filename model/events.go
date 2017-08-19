@@ -21,4 +21,6 @@ package model
 
 type EventFeed chan Event
 
-type Event interface { }
+type Event interface {
+    Event() string
+}

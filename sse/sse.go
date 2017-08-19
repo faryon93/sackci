@@ -29,6 +29,9 @@ import (
     "github.com/faryon93/sackci/log"
 )
 
+type Event interface {
+    EventName() string
+}
 
 // --------------------------------------------------------------------------------------
 //  public functions
@@ -130,7 +133,7 @@ func writeEvent(w http.ResponseWriter, event Event) (error) {
         return err
     }
 
-    return write(w, "event: " + event.Event() + "\n" +
+    return write(w, "event: " + event.EventName() + "\n" +
                     "data: " + string(b) + "\n")
 }
 
