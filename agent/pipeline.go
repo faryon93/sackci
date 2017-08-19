@@ -24,7 +24,6 @@ import (
     "errors"
     "time"
 
-    "github.com/faryon93/sackci/log"
     "github.com/faryon93/sackci/model"
     "github.com/faryon93/sackci/events"
     "github.com/faryon93/sackci/pipelinefile"
@@ -100,66 +99,14 @@ func CreatePipeline() (*Pipeline, error) {
 //  public members
 // ----------------------------------------------------------------------------------
 
-// Executes a command in the given image on this pipeline.
-func (p *Pipeline) Container(image string, cmd string, stdio func(string)) (int, error) {
-    container, ret, err := p.Agent.Execute(p.Volume, image, cmd, stdio)
-    if container != "" {
-        p.mutex.Lock()
-        p.Containers = append(p.Containers, container)
-        p.mutex.Unlock()
+func (p *Pipeline) SetProject(project *model.Project) (error) {
+    // assign the project to the pipeline
+    if p.project != nil {
+        return ErrAlreadyExecuted
     }
 
-    return ret, err
+    p.project = project
+
+    return nil
 }
 
-// Read a file from the pipeline. At least on container has to be executed.
-func (p *Pipeline) ReadFile(path string) ([]byte, error) {
-    // to read a file we need at least on container to
-    // access the volume
-    if len(p.Containers) <= 0 {
-        return nil, ErrNoContainer
-    }
-
-    return p.Agent.ReadFile(p.Containers[0], path)
-}
-
-// Saves a whole path from the pipeline as gzipped tar archive.
-// At least on container has to be executed.
-func (p *Pipeline) SavePath(path string, local string) (error) {
-    // to read a file we need at least on container to
-    // access the volume
-    if len(p.Containers) <= 0 {
-        return ErrNoContainer
-    }
-
-    return p.Agent.SavePath(p.Containers[0], path, local)
-}
-
-// Destroys the whole pipeline
-func (p *Pipeline) Destroy() {
-    p.mutex.Lock()
-    defer p.mutex.Unlock()
-
-    // remove all containers
-    for _, container := range p.Containers {
-        err := p.Agent.RemoveContainer(container)
-        if err != nil {
-            log.Error(LOG_TAG, "failed to remove container:", err.Error())
-            continue
-        }
-        log.Info(LOG_TAG, "removed container", ShortHash(container))
-    }
-
-    // destroy the volume
-    err := p.Agent.RemoveVolume(p.Volume)
-    if err != nil {
-        log.Error(LOG_TAG, "failed to remove volume:", err.Error())
-    }
-    log.Info(LOG_TAG, "removed volume", ShortHash(p.Volume))
-
-    // free the agent
-    p.Agent.Free()
-
-    // close the event stream
-    close(p.Events)
-}

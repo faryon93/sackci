@@ -35,7 +35,7 @@ import (
 //  types
 // ----------------------------------------------------------------------------------
 
-type TarFilesystem struct {
+type tarFilesystem struct {
     buffer []byte
 }
 
@@ -44,12 +44,12 @@ type TarFilesystem struct {
 //  public members
 // ----------------------------------------------------------------------------------
 
-func (f *TarFilesystem) Write(p []byte) (int, error) {
+func (f *tarFilesystem) Write(p []byte) (int, error) {
     f.buffer = append(f.buffer, p...)
     return len(p), nil
 }
 
-func (f *TarFilesystem) Get(name string) ([]byte, error) {
+func (f *tarFilesystem) Get(name string) ([]byte, error) {
     reader := tar.NewReader(bytes.NewReader(f.buffer))
     for {
         header, err := reader.Next()
@@ -76,8 +76,8 @@ func (f *TarFilesystem) Get(name string) ([]byte, error) {
 // ----------------------------------------------------------------------------------
 
 func (a *Agent) ReadFile(container string, file string) ([]byte, error) {
-    // construct the TarFilesystem
-    fs := TarFilesystem{}
+    // construct the tarFilesystem
+    fs := tarFilesystem{}
 
     // Download the file from the container
     err := a.docker.DownloadFromContainer(container, docker.DownloadFromContainerOptions{

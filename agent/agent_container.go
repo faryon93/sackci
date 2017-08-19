@@ -76,6 +76,7 @@ func (a *Agent) Execute(vol string, image string, cmd string, stdio func(string)
     return container.ID, ret, err
 }
 
+// Removes a container with the given ID from the build agent.
 func (a *Agent) RemoveContainer(id string) (error) {
     return a.docker.RemoveContainer(docker.RemoveContainerOptions{ID: id})
 }

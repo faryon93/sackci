@@ -1,4 +1,4 @@
-package agent
+package util
 // sackci
 // Copyright (C) 2017 Maximilian Pachl
 
@@ -15,6 +15,14 @@ package agent
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-func ShortHash(hash string) (string) {
-    return hash[0:12]
+// --------------------------------------------------------------------------------------
+//  public functions
+// --------------------------------------------------------------------------------------
+
+// Gets the minimum of two integers.
+func MinInt(a, b int) int {
+    if a < b {
+        return a
+    }
+    return b
 }
