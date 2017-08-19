@@ -92,17 +92,51 @@ app.controller("project", function($scope, $location, $routeParams, projects, tr
 
 app.controller("projectBuild", function($scope, $routeParams, builds, latest, feed) {
     $scope.selectStage = function(stage) {
-        $scope.stage = stage;
+        if (stage.status !== "ignored")
+            $scope.stage = stage;
     };
 
     // successfull loaded build details
-    $scope.loaded = false;
     var success = function(response) {
+        // per default the stage wich is most recent
+        // and not ignored is displayed when viewing the build
         response.stages.forEach(function(stage) {
             if (stage.status !== "ignored")
                 $scope.stage = stage;
         });
-        $scope.loaded = true;
+
+        // register for updates from the news feed
+        registerFeed("commit_found", function(evt) {
+            $scope.build.commit = evt.commit;
+        });
+        registerFeed("pipeline_finish", function(evt) {
+            $scope.build.status = evt.status;
+            $scope.build.duration = evt.duration;
+        });
+        registerFeed("stage_begin", function(evt) {
+            $scope.build.stages[evt.stage].status = evt.status;
+            $scope.stage = $scope.build.stages[evt.stage];
+        });
+        registerFeed("pipeline_found", function(evt) {
+            evt.stages.forEach(function(stageName) {
+                // TODO: the server should send the full stage structure
+                $scope.build.stages.push({name: stageName, status: "ignored", duration: 0, log: []});
+            });
+        });
+        registerFeed("stage_log", function(evt) {
+            console.log("stage_log: " + $scope.loaded);
+            var stageId = evt.stage;
+            if ($scope.build.stages[stageId] !== undefined)
+                $scope.build.stages[stageId].log.push(evt.message);
+        });
+        registerFeed("stage_finish", function(evt) {
+            var stageId = evt.stage;
+            if ($scope.build.stages[stageId] !== undefined)
+            {
+                $scope.build.stages[stageId].status = evt.status;
+                $scope.build.stages[stageId].duration = evt.duration;
+            }
+        });
     };
 
     // error while loading build details
@@ -115,9 +149,8 @@ app.controller("projectBuild", function($scope, $routeParams, builds, latest, fe
         feed.register(event, $scope, function(evt) {
             // make sure the event is for the selected build
             // if not, discard the event
-            if (!$scope.loaded ||
-                ($scope.project.id !== evt.project_id &&
-                $routeParams.build === evt.build_id))
+            if ($scope.project.id !== evt.project_id &&
+                $routeParams.build === evt.build_id)
             {
                 return;
             }
@@ -134,40 +167,6 @@ app.controller("projectBuild", function($scope, $routeParams, builds, latest, fe
         $scope.build = latest.get({id: $routeParams.id}, success, error);
     else
         $scope.build = builds.get({id: buildId}, success, error);
-
-    // register for updates from the news feed
-    registerFeed("commit_found", function(evt) {
-        $scope.build.commit = evt.commit;
-    });
-    registerFeed("pipeline_finish", function(evt) {
-        $scope.build.status = evt.status;
-        $scope.build.duration = evt.duration;
-    });
-    registerFeed("stage_begin", function(evt) {
-        $scope.build.stages[evt.stage].status = evt.status;
-        $scope.stage = $scope.build.stages[evt.stage];
-    });
-
-    registerFeed("pipeline_found", function(evt) {
-        evt.stages.forEach(function(stageName) {
-            // TODO: the server should send the full stage structure
-            $scope.build.stages.push({name: stageName, status: "ignored", duration: 0, log: []});
-        });
-    });
-    registerFeed("stage_log", function(evt) {
-        var stageId = evt.stage;
-        if ($scope.build.stages[stageId] !== undefined)
-            $scope.build.stages[stageId].log.push(evt.message);
-    });
-
-    registerFeed("stage_finish", function(evt) {
-        var stageId = evt.stage;
-        if ($scope.build.stages[stageId] !== undefined)
-        {
-            $scope.build.stages[stageId].status = evt.status;
-            $scope.build.stages[stageId].duration = evt.duration;
-        }
-    });
 });
 
 app.controller("projectHistory", function($scope, $routeParams, history) {
