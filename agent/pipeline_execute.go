@@ -105,7 +105,7 @@ func (p *Pipeline) Execute() (error) {
         // execute the stage
         err := p.ExecuteStage(stageId, &stage)
         if err != nil {
-            p.Log(stageId, "stage \"" + stage.Name + "\" failed:", err.Error())
+            p.Log(stageId, "stage \"" + stage.Name + "\" failed:", err.Error(), "in", time.Since(start))
             p.FinishStage(stageId, model.STAGE_FAILED, time.Since(start))
             p.FinishPipeline(model.BUILD_FAILED, time.Since(p.StartTime))
             return err
