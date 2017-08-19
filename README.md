@@ -27,7 +27,13 @@ The sackci server communicates with the scm container via command line arguments
 # cloning a repositoy (get a working copy of the sources)
 $: docker run -t -i sackci/git:latest clone https://github.com/octocat/Hello-World.git master
 
-# more to come...
+# checking for repo changes
+# exit code 0: indicates that there are new changes available
+# exit code 1: no changes detected
+# exit code 2: branch does not exist
+# The last line of the console output should be the new ref,
+# which is saved for future repo change changes (e.g. old-ref parameter)
+$: docker run -t -i sackci/git:latest compare https://github.com/octocat/Hello-World.git master old-ref
 ```
 
 ## Configuration

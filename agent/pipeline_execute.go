@@ -43,15 +43,6 @@ const (
     // scm stage definitions
     STAGE_SCM_ID = 0
     STAGE_SCM_NAME = "SCM"
-
-    // scm commands
-    SCM_CLONE = "clone"
-    SCM_COMPARE = "compare"
-
-    // scm compare return codes
-    SCM_RET_NEW_REF = 0
-    SCM_RET_NO_CHANGES = 1
-    SCM_RET_INVALID_BRANCH = 2
 )
 
 
