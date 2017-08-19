@@ -124,7 +124,6 @@ app.controller("projectBuild", function($scope, $routeParams, builds, latest, fe
             });
         });
         registerFeed("stage_log", function(evt) {
-            console.log("stage_log: " + $scope.loaded);
             var stageId = evt.stage;
             if ($scope.build.stages[stageId] !== undefined)
                 $scope.build.stages[stageId].log.push(evt.message);
@@ -221,7 +220,6 @@ app.factory('trigger', function($resource){
 // ------------------------------------------------------------------------------------------------
 app.factory('feed', function($rootScope) {
     var sse = new EventSource('/api/v1/feed');
-    console.log("feed created");
 
     return {
         register: function(eventName, scope, callback) {
