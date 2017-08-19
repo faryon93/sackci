@@ -86,7 +86,12 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
     build.Stages = []model.Stage{
         {Name: agent.STAGE_SCM_NAME, Status: model.STAGE_IGNORED, Log: []string{}},
     }
-    build.Save()
+    err = build.Save()
+    if err != nil {
+        log.Error("project", "failed to save build:", err.Error())
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
 
     // redirect and transform all events for the eventstream
     go func() {
