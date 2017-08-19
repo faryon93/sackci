@@ -33,6 +33,16 @@ import (
 
 
 // --------------------------------------------------------------------------------------
+//  types
+// --------------------------------------------------------------------------------------
+
+type triggerResponse struct {
+    Success bool `json:"success"`
+    BuildId int `json:"build_id"`
+}
+
+
+// --------------------------------------------------------------------------------------
 //  public functions
 // --------------------------------------------------------------------------------------
 
@@ -68,9 +78,14 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
     }
     build.Save()
 
+    log.Info("project", "new build id:", build.Id)
+
     // asynchrounsly execute the proejct on the provisioned pipeline
     go build.Attach(pipeline.Events)
     go pipeline.Execute()
 
-    Jsonify(w, true)
+    Jsonify(w, triggerResponse{
+        Success: true,
+        BuildId: int(build.Id),
+    })
 }

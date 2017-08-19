@@ -25,6 +25,9 @@
   	<li ng-class="{active: tab == 'pipeline'}"><a href="/project/{{project.id}}/pipeline">Pipeline</a></li>
     <li ng-class="{active: tab == 'env'}"><a href="/project/{{project.id}}/env">Environment</a></li>
   	<li ng-class="{active: tab == 'settings'}"><a href="/project/{{project.id}}/settings">Settings</a></li>
+
+    <!-- actions -->
+    <li class="pull-right"><button type="button" class="btn btn-primary" ng-click="trigger()"><i class="fa fa-play"></i> Run</button></li>
   </ul>
 
   <!-- tab content -->

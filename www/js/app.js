@@ -45,7 +45,7 @@ app.controller("projectlist", function($scope, $location, projects, feed) {
     });
 });
 
-app.controller("project", function($scope, $location, $routeParams, projects, feed) {
+app.controller("project", function($scope, $location, $routeParams, projects, trigger) {
     // default tab is the history tab
     $scope.tab = $routeParams.tab;
     if ($scope.tab === undefined)
@@ -63,6 +63,13 @@ app.controller("project", function($scope, $location, $routeParams, projects, fe
     $scope.project = projects.get({id: $routeParams.id}, function() {
         $scope.loaded = true;
     });
+
+    // event handler
+    $scope.trigger = function() {
+        var response = trigger.get({id: $routeParams.id}, function() {
+            $location.path("/project/" + $routeParams.id + "/build/" + response.build_id);
+        });
+    }
 });
 
 app.controller("projectBuild", function($scope, $routeParams, builds) {
@@ -125,6 +132,9 @@ app.factory('env', function($resource){
    return $resource('/api/v1/project/:id/env');
 });
 
+app.factory('trigger', function($resource){
+    return $resource('/api/v1/project/:id/trigger');
+});
 
 // ------------------------------------------------------------------------------------------------
 app.factory('feed', function($rootScope) {
@@ -309,6 +319,9 @@ app.filter('unknown', ['$sce', function($sce) {
 
 app.filter('short', function() {
     return function(str) {
+        if (str === undefined)
+            return "";
+
         return str.substr(0, 12);
     }
 });
