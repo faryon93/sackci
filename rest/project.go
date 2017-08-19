@@ -93,7 +93,7 @@ func ProjectList(w http.ResponseWriter, r *http.Request) {
 }
 
 // Queries on project by its id.
-func ProjectOne(w http.ResponseWriter, r *http.Request) {
+func ProjectById(w http.ResponseWriter, r *http.Request) {
     id, err := strconv.Atoi(mux.Vars(r)["id"])
     if err != nil {
         http.Error(w, "invalid project id", http.StatusNotAcceptable)

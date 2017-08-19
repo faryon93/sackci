@@ -36,7 +36,7 @@ import (
 func routes(router *mux.Router) {
     // register classic RESET endpoints
     router.Methods("GET").Path("/project").HandlerFunc(rest.ProjectList)
-    router.Methods("GET").Path("/project/{id}").HandlerFunc(rest.ProjectOne)
+    router.Methods("GET").Path("/project/{id}").HandlerFunc(rest.ProjectById)
     router.Methods("GET").Path("/project/{id}/trigger").HandlerFunc(rest.ProjectTrigger)
 
     // register REST endpoints

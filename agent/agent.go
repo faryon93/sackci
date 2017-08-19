@@ -27,6 +27,15 @@ import (
 
 
 // ----------------------------------------------------------------------------------
+//  constants
+// ----------------------------------------------------------------------------------
+
+const (
+    STATUS_READY = "ready"
+    STATUS_UNREACHABLE = "unreachable"
+)
+
+// ----------------------------------------------------------------------------------
 //  types
 // ----------------------------------------------------------------------------------
 
@@ -38,6 +47,7 @@ type Agent struct {
 
     // public runtime variables
     BuildCount int `json:"build_count"`
+    Status string `json:"status"`
 
     // private runtime variables
     docker *docker.Client
@@ -48,6 +58,11 @@ type Agent struct {
 // ----------------------------------------------------------------------------------
 //  public members
 // ----------------------------------------------------------------------------------
+
+// Returns if this agent is ready for a new build.
+func (a *Agent) IsReady() (bool) {
+    return a.Status == STATUS_READY
+}
 
 func (a *Agent) Free() {
     a.mutex.Lock()

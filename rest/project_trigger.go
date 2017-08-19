@@ -28,6 +28,7 @@ import (
     "github.com/faryon93/sackci/ctx"
     "github.com/faryon93/sackci/agent"
     "github.com/faryon93/sackci/model"
+    "github.com/faryon93/sackci/log"
 )
 
 
@@ -52,6 +53,7 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
     // create the pipeline on the build agent
     pipeline, err := agent.CreatePipeline()
     if err != nil {
+        log.Error("project", "failed to trigger build:", err.Error())
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }

@@ -21,7 +21,6 @@ package agent
 
 import (
     "sync"
-    "math/rand"
     "time"
 
     "github.com/fsouza/go-dockerclient"
@@ -89,16 +88,29 @@ func Add(agents ...Agent) {
 
 // Return a random build agent.
 func Allocate() (*Agent) {
+    poolMutex.Lock()
+    defer poolMutex.Unlock()
+
     if len(pool) < 1 {
         return nil
     }
 
-    agent := &pool[rand.Intn(len(pool))]
+    // find the next ready agent
+    var agent *Agent = nil
+    for i := 0; i < len(pool); i++ {
+        agent := &pool[i]
+        if agent.IsReady() {
+            break
+        }
+    }
 
     // increase the counters
-    agent.mutex.Lock()
-    agent.BuildCount++
-    agent.mutex.Unlock()
+    // if an agent was found
+    if agent != nil {
+        agent.mutex.Lock()
+        agent.BuildCount++
+        agent.mutex.Unlock()
+    }
 
     return agent
 }
