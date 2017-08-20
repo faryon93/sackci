@@ -20,7 +20,7 @@ All build stages are executed in seperate containers, so there is no need to hav
 ## SCM Integration
 It is possible to integrate any kind of SCM into sackci. Therefore a special docker container is needed. We provide an scm integration container for the following scm systems:
 
-- Git
+- [Git](https://github.com/faryon93/sackci-git)
 
 The sackci server communicates with the scm container via command line arguments and return values. Each container must implement the following commands:
 
