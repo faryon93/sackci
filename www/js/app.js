@@ -182,12 +182,46 @@ app.controller("projectBuild", function($scope, $routeParams, builds, feed) {
     });
 });
 
-app.controller("projectHistory", function($scope, $routeParams, history) {
+app.controller("projectHistory", function($scope, $routeParams, history, feed) {
+    // query for the build history
     $scope.builds = history.query({id: $routeParams.id},
         function(response) {},
         function(error) {
             $scope.error = error.data;
         });
+
+    // register for some events
+    feed.register("pipeline_begin", $scope, function(evt) {
+        angular.forEach($scope.builds, function(build) {
+            if (evt.project_id === parseInt($routeParams.id) &&
+                evt.build_num === build.num)
+            {
+                build.status = evt.event.status;
+                build.time = evt.event.time;
+                build.build_num = evt.build_num;
+                build.duration = 0;
+            }
+        });
+    });
+    feed.register("pipeline_finish", $scope, function(evt) {
+        angular.forEach($scope.builds, function(build) {
+            if (evt.project_id === parseInt($routeParams.id) &&
+                evt.build_num === build.num)
+            {
+                build.status = evt.event.status;
+                build.duration = evt.event.duration;
+            }
+        });
+    });
+    feed.register("commit_found", $scope, function(evt) {
+        angular.forEach($scope.builds, function(build) {
+            if (evt.project_id === parseInt($routeParams.id) &&
+                evt.build_num === build.num)
+            {
+                build.commit = evt.event.commit;
+            }
+        });
+    });
 });
 
 app.controller("projectEnv", function($scope, $routeParams, env) {
