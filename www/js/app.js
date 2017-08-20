@@ -80,6 +80,7 @@ app.controller("project", function($scope, $location, $routeParams, projects, tr
     // event handler: trigger build
     $scope.trigger = function() {
         $scope.triggerStatus = "waiting";
+        $scope.triggerError = "";
 
         var response = trigger.get({id: $routeParams.id}, function() {
             $location.path("/project/" + $routeParams.id + "/build/" + response.build_id);
@@ -87,7 +88,12 @@ app.controller("project", function($scope, $location, $routeParams, projects, tr
             $scope.triggerStatus = "error";
             $scope.triggerError = error.data;
         });
-    }
+    };
+
+    $scope.triggerBlur = function() {
+        $scope.triggerStatus = "";
+        $scope.triggerError = "";
+    };
 });
 
 app.controller("projectBuild", function($scope, $routeParams, builds, latest, feed) {
