@@ -1,0 +1,91 @@
+<h2 style="margin-top: 0;">Project</h2>
+<div class="panel panel-default">
+    <div class="panel-body box">
+        <div class="row">
+            <div class="col-md-12">
+                <strong>Project Name</strong><br />
+                The name of the project is used as a display name. You are able to rename the project at any time.<br /><br />
+            </div>
+        </div>
+        <div class="row no-hr">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <input type="text" class="form-control" />
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="button">Rename</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <strong>Build Trigger</strong><br />
+                Starting a build can be triggered by various sources. Polling the SCM repository for changes is the most used way.
+                Manually triggering the builds from the web interface is possible at any time.<br /><br />
+
+                <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Manual Trigger
+                        <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Manual Trigger</a></li>
+                        <li><a href="#">SCM Polling</a></li>
+                        <li><a href="#">Webhook</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <strong>SCM Repository</strong><br />
+                Each project is linked to an "Source Code Management" respository. It contains the source files which
+                are used to build the artifacts. Besides the source files the pipeline definition is located
+                in the source repository. Please configure all necessary options for the scm repository.<br /><br />
+            </div>
+        </div>
+
+        <div class="row no-hr">
+            <div class="col-md-4">
+                <form>
+                    <div class="form-group">
+                        <label for="repo-url">Repository URL</label>
+                        <input type="email" class="form-control" id="repo-url" placeholder="https://github.com/test.git">
+                    </div>
+                    <div class="form-group">
+                        <label for="repo-branch">Branch</label>
+                        <select class="form-control" id="repo-branch">
+                            <option>master</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2>Danger Zone</h2>
+<div class="panel panel-default danger">
+    <div class="panel-body box">
+        <div class="row">
+            <div class="col-md-10">
+                <strong>Purge Build History</strong><br />
+                This action remoes all builds until now from the database. Associated artifacts are deleted as well.
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-danger pull-right">Purge History</button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-10">
+                <strong>Delete Project</strong><br />
+                Deleting a project results in removing all artifacts, builds and configuration from the database / configuration file.
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-danger pull-right">Delete Project</button>
+            </div>
+        </div>
+
+    </div>
+</div>

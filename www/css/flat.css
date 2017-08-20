@@ -30,3 +30,22 @@
 	background-color: #d9534f;
 	border-color: #d43f3a;
 }
+
+.panel.danger {
+	border: 1px solid #d9534f;
+}
+
+.panel-body.box > .row:not(:first-child)
+{
+	margin-top: 20px;
+	padding-top: 20px;
+	border: 0;
+	border-top: 1px solid #e1e4e8;
+}
+
+.panel-body.box > .row.no-hr:not(:first-child)
+{
+	margin-top: 0;
+	padding-top: 0;
+	border: 0;
+}
