@@ -1,4 +1,4 @@
-package main
+package rest
 // sackci
 // Copyright (C) 2017 Maximilian Pachl
 
@@ -20,32 +20,14 @@ package main
 // --------------------------------------------------------------------------------------
 
 import (
-    "github.com/gorilla/mux"
-
-    "github.com/faryon93/sackci/model"
-    "github.com/faryon93/sackci/sse"
-    "github.com/faryon93/sackci/ctx"
-    "github.com/faryon93/sackci/rest"
+    "errors"
 )
 
 
 // --------------------------------------------------------------------------------------
-//  routes
+//  constants
 // --------------------------------------------------------------------------------------
 
-func routes(router *mux.Router) {
-    // register classic RESET endpoints
-    router.Methods("GET").Path("/project").HandlerFunc(rest.ProjectList)
-    router.Methods("GET").Path("/project/{id}").HandlerFunc(rest.ProjectById)
-    router.Methods("GET").Path("/project/{id}/trigger").HandlerFunc(rest.ProjectTrigger)
-    router.Methods("GET").Path("/project/{id}/build/latest").HandlerFunc(rest.ProjectLatestBuild)
-
-    // register REST endpoints
-    rest.QueryAll(router, "/project/{project}/env","Project", model.Env{})
-    rest.QueryAll(router, "/project/{project}/history", "Project", model.Build{})
-    rest.QueryOne(router, "/project/{project}/build/{num}", model.Build{}, "Project", "Num")
-    rest.Delete(router, "/project/{project}/history", model.Build{}, "Project")
-
-    // register SSE endpoints
-    sse.Register(router, "/feed", ctx.Feed)
-}
+var (
+    ErrMustBeStruct = errors.New("model must be struct")
+)

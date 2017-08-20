@@ -183,7 +183,7 @@ app.controller("projectBuild", function($scope, $routeParams, builds, feed) {
 });
 
 app.controller("projectHistory", function($scope, $routeParams, history) {
-    $scope.builds = history.query({project: $routeParams.id},
+    $scope.builds = history.query({id: $routeParams.id},
         function(response) {},
         function(error) {
             $scope.error = error.data;
@@ -204,6 +204,37 @@ app.controller("projectEnv", function($scope, $routeParams, env) {
     $scope.refresh();
 });
 
+app.controller("settings", function($scope, $routeParams, history) {
+    $scope.purge = {
+        status: "",
+        error: "",
+        confirm: false,
+
+        commit: function(confirmed) {
+            $scope.purge.confirm = !confirmed;
+
+            if (confirmed)
+            {
+                $scope.purge.status = "waiting";
+
+                // remove
+                history.remove({id: $routeParams.id}, function(resp) {
+                    $scope.purge.status = "success";
+                    $scope.purge.error = ""
+                },
+                function (error) {
+                    $scope.purge.status = "error";
+                    $scope.purge.error = error.data;
+                });
+            }
+        },
+
+        cancel: function() {
+            $scope.purge.confirm = false;
+        }
+    };
+});
+
 
 // ------------------------------------------------------------------------------------------------
 app.factory('projects', function($resource) {
@@ -215,7 +246,7 @@ app.factory('builds', function($resource){
 });
 
 app.factory('history', function($resource){
-   return $resource('/api/v1/project/:project/history/:id', {project:'@project', id: '@id'});
+   return $resource('/api/v1/project/:id/history/');
 });
 
 app.factory('env', function($resource){
