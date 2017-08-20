@@ -1,4 +1,4 @@
-package main
+package rest
 // sackci
 // Copyright (C) 2017 Maximilian Pachl
 
@@ -20,32 +20,38 @@ package main
 // --------------------------------------------------------------------------------------
 
 import (
+    "net/http"
+    "time"
+    "strings"
+    "strconv"
+
     "github.com/gorilla/mux"
 
-    "github.com/faryon93/sackci/model"
-    "github.com/faryon93/sackci/sse"
     "github.com/faryon93/sackci/ctx"
-    "github.com/faryon93/sackci/rest"
+    "github.com/faryon93/sackci/model"
 )
 
 
 // --------------------------------------------------------------------------------------
-//  routes
+//  public functions
 // --------------------------------------------------------------------------------------
 
-func routes(router *mux.Router) {
-    // register classic RESET endpoints
-    router.Methods("GET").Path("/project").HandlerFunc(rest.ProjectList)
-    router.Methods("GET").Path("/project/{id}").HandlerFunc(rest.ProjectById)
-    router.Methods("GET").Path("/project/{id}/trigger").HandlerFunc(rest.ProjectTrigger)
-    router.Methods("GET").Path("/project/{id}/build/latest").HandlerFunc(rest.ProjectLatestBuild)
+func BuildPurge(r *http.Request) {
+    // parse the url parameters for the id
+    fieldVal, err := strconv.Atoi(mux.Vars(r)[strings.ToLower("project")])
+    if err != nil {
+        return
+    }
 
-    // register REST endpoints
-    rest.QueryAll(router, "/project/{project}/env","Project", model.Env{})
-    rest.QueryAll(router, "/project/{project}/history", "Project", model.Build{})
-    rest.QueryOne(router, "/project/{project}/build/{num}", model.Build{}, "Project", "Num")
-    rest.Delete(router, "/project/{project}/history", rest.BuildPurge, model.Build{}, "Project")
-
-    // register SSE endpoints
-    sse.Register(router, "/feed", ctx.Feed)
+    // publish the event, which informs about the change
+    // the Build Number of 0 does not exist, so it is clear what happend
+    ctx.Feed.Publish(&CtxEvent{
+        Event: &model.EvtPipelineFinished{
+            Status: model.BUILD_WAITING,
+            Duration: 0,
+        },
+        Project: fieldVal,
+        Build: 0,
+        Timestamp: time.Now().UnixNano(),
+    })
 }

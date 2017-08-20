@@ -39,7 +39,7 @@ import (
 //  public functions
 // --------------------------------------------------------------------------------------
 
-func Delete(router *mux.Router, path string, mod interface{}, fields ...string) (error) {
+func Delete(router *mux.Router, path string, success func(*http.Request), mod interface{}, fields ...string) (error) {
     // make sure only slices and structs are registred
     if reflect.TypeOf(mod).Kind() != reflect.Struct {
         return ErrMustBeStruct
@@ -83,7 +83,11 @@ func Delete(router *mux.Router, path string, mod interface{}, fields ...string) 
         }
 
         log.Info("middleware",r.RequestURI, "took", time.Since(start), "to delete", element.Len(), "items")
+
+        // call the success handler and return a json success
+        success(r)
         Jsonify(w, struct{Success bool `json:"success"` }{true })
+
     }
 
     // register the various handler functions
