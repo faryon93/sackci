@@ -62,6 +62,7 @@ func (e *EvtStageLog) Event() string {
 
 type EvtPipelineBegin struct {
     Time time.Time `json:"time"`
+    Status string `json:"status"`
 }
 
 func (e *EvtPipelineBegin) Event() string {
@@ -127,7 +128,7 @@ func (f EventFeed) PipelineFound(stages []string) {
 }
 
 func (f EventFeed) PipelineBegin(time time.Time) {
-    f <- &EvtPipelineBegin{time}
+    f <- &EvtPipelineBegin{time, BUILD_RUNNING}
 }
 
 func (f EventFeed) CommitFound(commit *Commit) {

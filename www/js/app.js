@@ -40,7 +40,7 @@ app.controller("projectlist", function($scope, $location, projects, feed) {
             angular.forEach($scope.projects, function(project) {
                 if (project.id === evt.project_id)
                 {
-                    project.status = "running";
+                    project.status = evt.event.status;
                     project.execution_time = evt.event.time;
                     project.duration = 0;
                 }
@@ -222,6 +222,7 @@ app.factory('env', function($resource){
 app.factory('trigger', function($resource){
     return $resource('/api/v1/project/:id/trigger');
 });
+
 
 // ------------------------------------------------------------------------------------------------
 app.factory('feed', function($rootScope) {
