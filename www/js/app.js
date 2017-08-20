@@ -123,6 +123,7 @@ app.controller("projectBuild", function($scope, $routeParams, builds, feed) {
     // error while loading build details
     var error = function(error) {
         $scope.error = error.data;
+        $scope.errorCode = error.status;
     };
 
     // register for an event from the newsfeed
