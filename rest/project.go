@@ -24,7 +24,6 @@ import (
     "time"
     "strconv"
 
-    "github.com/asdine/storm"
     "github.com/gorilla/mux"
 
     "github.com/faryon93/sackci/ctx"
@@ -61,7 +60,7 @@ func ProjectList(w http.ResponseWriter, r *http.Request) {
         id := index + 1
 
         // find the latest build for the project
-        build, err := getLastBuild(id)
+        build, err := project.GetLastBuild()
         if err != nil {
             http.Error(w, err.Error(), http.StatusInternalServerError)
             return
@@ -121,7 +120,14 @@ func ProjectLatestBuild(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    build, err := getLastBuild(id)
+    // get the project
+    project := ctx.Conf.GetProject(id)
+    if project == nil {
+        http.Error(w, "project not found", http.StatusNotFound)
+        return
+    }
+
+    build, err := project.GetLastBuild()
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
@@ -133,33 +139,4 @@ func ProjectLatestBuild(w http.ResponseWriter, r *http.Request) {
     }
 
     Jsonify(w, build)
-}
-
-
-// --------------------------------------------------------------------------------------
-//  private functions
-// --------------------------------------------------------------------------------------
-
-func getLastBuild(project int) (*model.Build, error) {
-    bolt := model.Get()
-
-    // fetch the last inserted build for the project
-    var builds []model.Build
-    err := bolt.Find("Project", project, &builds, storm.Limit(1), storm.Reverse())
-    if err == storm.ErrNotFound {
-        return nil, nil
-
-    // an internal error occoured
-    } else if err != nil {
-        return nil, err
-    }
-
-    // the query returned a resulst -> return it
-    if len(builds) > 0 {
-        return &builds[0], nil
-
-    // no build was found
-    } else {
-        return nil, nil
-    }
 }

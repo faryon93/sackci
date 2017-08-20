@@ -42,6 +42,7 @@ app.controller("projectlist", function($scope, $location, projects, feed) {
                 {
                     project.status = evt.event.status;
                     project.execution_time = evt.event.time;
+                    project.build = evt.build_id;
                     project.duration = 0;
                 }
             });

@@ -16,6 +16,15 @@ package model
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // ----------------------------------------------------------------------------------
+//  imports
+// ----------------------------------------------------------------------------------
+
+import (
+    "github.com/asdine/storm"
+)
+
+
+// ----------------------------------------------------------------------------------
 //  constants
 // ----------------------------------------------------------------------------------
 
@@ -56,4 +65,26 @@ func (p *Project) NewBuild() (*Build) {
             Ref: "unknown",
         },
     }
+}
+
+// Gets the latest build of this project.
+func (p *Project) GetLastBuild() (*Build, error) {
+    // fetch the last inserted build for the project
+    var builds []Build
+    err := Get().Find("Project", p.Id, &builds, storm.Limit(1), storm.Reverse())
+    if err == storm.ErrNotFound {
+        return nil, nil
+
+    // an internal error occoured
+    } else if err != nil {
+        return nil, err
+    }
+
+    // no build was found
+    // this case should be handled by err == strom.ErrNotFound
+    if len(builds) <= 0 {
+        return nil, nil
+    }
+
+    return &builds[0], nil
 }
