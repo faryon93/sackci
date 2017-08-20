@@ -23,7 +23,6 @@ import (
     "errors"
     "strconv"
     "time"
-    "strings"
 
     "github.com/faryon93/sackci/model"
     "github.com/faryon93/sackci/pipelinefile"
@@ -137,8 +136,15 @@ func (p *Pipeline) GetPipelinefile() (*pipelinefile.Definition, error) {
 // Executes the given stage on this Pipieline.
 func (p *Pipeline) ExecuteStage(stageId int, stage *pipelinefile.Stage) (error) {
     // construct the build steps command string
-    steps := strings.Join(stage.Steps, " && ")
-    steps = "/bin/sh -c '" + steps + "'"
+    // insert an echo of the command
+    steps := "/bin/sh -c '"
+    for i := 0; i < len(stage.Steps); i++ {
+        steps += "echo $: " + stage.Steps[i] + " && " + stage.Steps[i]
+        if i < len(stage.Steps) - 1 {
+            steps += " && "
+        }
+    }
+    steps += "'"
 
     // default to configured image if neceasarry
     image := STAGE_IMAGE
