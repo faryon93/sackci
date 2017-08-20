@@ -25,6 +25,7 @@ import (
     "strconv"
     "errors"
     "strings"
+    "time"
 
     "github.com/gorilla/mux"
     "github.com/asdine/storm"
@@ -43,6 +44,8 @@ const (
     GROUP_QUERYALL = "queryall"
     GROUP_ALL      = "all"
     GROUP_ONE      = "one"
+
+    HEADER_TIMESTAMP = "X-Timestamp"
 )
 
 
@@ -212,6 +215,9 @@ func filter(w http.ResponseWriter, v interface{}, groups ...string) {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }
+
+    // add a timestamp to each response
+    w.Header().Set(HEADER_TIMESTAMP, strconv.FormatInt(time.Now().UnixNano(), 10))
 
     // send as json response
     Jsonify(w, filtered)

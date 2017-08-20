@@ -29,6 +29,7 @@ import (
     "github.com/faryon93/sackci/agent"
     "github.com/faryon93/sackci/log"
     "github.com/faryon93/sackci/model"
+    "time"
 )
 
 
@@ -45,6 +46,7 @@ type CtxEvent struct {
     Event model.Event `json:"event"`
     Project int `json:"project_id"`
     Build int `json:"build_num"`
+    Timestamp int64 `json:"timestamp"`
 }
 
 func (e *CtxEvent) EventName() string {
@@ -103,6 +105,7 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
                 event,
                 project.Id,
                 build.Num,
+                time.Now().UnixNano(),
             })
         }
     }()
