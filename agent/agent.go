@@ -21,19 +21,11 @@ package agent
 
 import (
     "sync"
+    "time"
 
     "github.com/fsouza/go-dockerclient"
 )
 
-
-// ----------------------------------------------------------------------------------
-//  constants
-// ----------------------------------------------------------------------------------
-
-const (
-    STATUS_READY = "ready"
-    STATUS_UNREACHABLE = "unreachable"
-)
 
 // ----------------------------------------------------------------------------------
 //  types
@@ -47,7 +39,6 @@ type Agent struct {
 
     // public runtime variables
     BuildCount int `json:"build_count"`
-    Status string `json:"status"`
 
     // private runtime variables
     docker *docker.Client
@@ -61,7 +52,11 @@ type Agent struct {
 
 // Returns if this agent is ready for a new build.
 func (a *Agent) IsReady() (bool) {
-    return a.Status == STATUS_READY
+    a.docker.SetTimeout(DOCKER_TIMEOUT)
+    defer a.docker.SetTimeout(2 * time.Hour)
+
+    // check connectivitiy to the build agent
+    return a.docker.Ping() == nil
 }
 
 func (a *Agent) Free() {

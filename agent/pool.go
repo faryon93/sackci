@@ -33,7 +33,7 @@ import (
 // ----------------------------------------------------------------------------------
 
 const (
-    DOCKER_TIMEOUT = 500 * time.Millisecond
+    DOCKER_TIMEOUT = 250 * time.Millisecond
 )
 
 
@@ -66,20 +66,10 @@ func Add(agents ...Agent) {
             log.Error("agent", "failed to create docker client:", err.Error())
             continue
         }
-        client.SetTimeout(DOCKER_TIMEOUT)
-
-        // check connectivitiy to the build agent
-        err = client.Ping()
-        if err != nil {
-            log.Error("agent", err.Error())
-            return
-        }
-        client.SetTimeout(2 * time.Hour)
 
         // populate the agent with necesarry runtime fields
         agent.BuildCount = 0
         agent.docker = client
-        agent.Status = STATUS_READY
 
         // add the agent to the agent pool
         pool = append(pool, agent)
@@ -99,8 +89,9 @@ func Allocate() (*Agent) {
     // find the next ready agent
     var agent *Agent = nil
     for i := 0; i < len(pool); i++ {
-        agent = &pool[i]
-        if agent.IsReady() {
+        a := &pool[i]
+        if a.IsReady() {
+            agent = a
             break
         }
     }
