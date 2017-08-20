@@ -25,12 +25,15 @@ import (
     "strconv"
     "errors"
     "strings"
+
     "github.com/gorilla/mux"
     "github.com/asdine/storm"
+    "github.com/asdine/storm/q"
     "github.com/liip/sheriff"
 
     "github.com/faryon93/sackci/model"
 )
+
 
 // --------------------------------------------------------------------------------------
 //  constants
@@ -153,6 +156,46 @@ func QueryAll(router *mux.Router, path string, field string, mod interface{}) (e
 
     // register the corresponding routes in the router
     router.Methods("GET").Path(path).HandlerFunc(handler)
+
+    return nil
+}
+
+func QueryOne(router *mux.Router, path string, mod interface{}, fields ...string) (error) {
+    // make sure only structs are registred
+    if reflect.TypeOf(mod).Kind() != reflect.Struct {
+        return errors.New("model must be struct")
+    }
+
+    // fetch just one item of the model by its id
+    one := func(w http.ResponseWriter, r *http.Request) {
+        element := reflect.New(reflect.TypeOf(mod))
+
+        // construct the query
+        matchers := []q.Matcher{}
+        for _, field := range fields {
+            // parse the url parameters for the id
+            fieldVal, err := strconv.Atoi(mux.Vars(r)[strings.ToLower(field)])
+            if err != nil {
+                http.Error(w, "invalid value for field \"" + field + "\"", http.StatusNotAcceptable)
+                return
+            }
+
+            matchers = append(matchers, q.Eq(field, fieldVal))
+        }
+
+        // execute the query in database
+        err := model.Get().Select(matchers...).First(element.Interface())
+        if err != nil {
+            http.Error(w, err.Error(), http.StatusInternalServerError)
+            return
+        }
+
+        // send the filtered response
+        filter(w, element.Interface(), GROUP_ONE)
+    }
+
+    // register the various handler functions
+    router.Methods("GET").Path(path).HandlerFunc(one)
 
     return nil
 }

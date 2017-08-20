@@ -50,7 +50,7 @@ func Open(path string) (error) {
         return err
     }
 
-    db.Drop("Build")
+    //db.Drop("Build")
 
     return nil
 }

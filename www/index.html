@@ -80,7 +80,7 @@
                 <i class="fa fa-question" ng-if="project.status == 'waiting'"></i>
 
                 <span><a href="/project/{{project.id}}">{{project.name}}</a></span>
-                <a href="/project/{{project.id}}/build/{{project.build}}" ng-if="project.build > 0">(#{{project.build}})</a>
+                <a href="/project/{{project.id}}/build/{{project.build_num}}" ng-if="project.build_num > 0">(#{{project.build_num}})</a>
               </h5>
               <h5 class="text-muted details">
                 <i class="fa fa-calendar"></i><span ng-bind="project.execution_time | timeago"></span>

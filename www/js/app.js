@@ -42,8 +42,9 @@ app.controller("projectlist", function($scope, $location, projects, feed) {
                 {
                     project.status = evt.event.status;
                     project.execution_time = evt.event.time;
-                    project.build = evt.build_id;
+                    project.build_num = evt.build_num;
                     project.duration = 0;
+                    console.log(evt);
                 }
             });
         });
@@ -97,7 +98,7 @@ app.controller("project", function($scope, $location, $routeParams, projects, tr
     };
 });
 
-app.controller("projectBuild", function($scope, $routeParams, builds, latest, feed) {
+app.controller("projectBuild", function($scope, $routeParams, builds, feed) {
     $scope.selectStage = function(stage) {
         if (stage.status !== "ignored")
             $scope.stage = stage;
@@ -156,7 +157,7 @@ app.controller("projectBuild", function($scope, $routeParams, builds, latest, fe
             // make sure the event is for the selected build
             // if not, discard the event
             if ($scope.project.id !== evt.project_id &&
-                $routeParams.build === evt.build_id)
+                $routeParams.build === evt.build_num)
             {
                 return;
             }
@@ -170,9 +171,8 @@ app.controller("projectBuild", function($scope, $routeParams, builds, latest, fe
     // if no proper build id is given ask for the latest
     var buildId = $routeParams.build;
     if (buildId === undefined)
-        $scope.build = latest.get({id: $routeParams.id}, success, error);
-    else
-        $scope.build = builds.get({id: buildId}, success, error);
+        buildId = "latest";
+    $scope.build = builds.get({project: $routeParams.id, id: buildId}, success, error);
 });
 
 app.controller("projectHistory", function($scope, $routeParams, history) {
@@ -204,12 +204,7 @@ app.factory('projects', function($resource) {
 });
 
 app.factory('builds', function($resource){
-   return $resource('/api/v1/build/:id');
-});
-
-// TODO: combine mit factory "builds"
-app.factory('latest', function($resource){
-    return $resource('/api/v1/project/:id/build/latest');
+   return $resource('/api/v1/project/:project/build/:id', {project:'@project', id: '@id'});
 });
 
 app.factory('history', function($resource){

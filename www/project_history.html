@@ -21,7 +21,7 @@
             <i class="fa fa-check" ng-if="build.status == 'passed'"></i>
             <i class="fa fa-remove" ng-if="build.status == 'failed'"></i>
             <i class="fa fa-exchange" ng-if="build.status == 'running'"></i>
-            <span><a href="/project/{{project.id}}/build/{{build.id}}" ng-bind-html="build.commit.message | unknown"></a></span>
+            <span><a href="/project/{{project.id}}/build/{{build.num}}"><span ng-bind-html="build.commit.message | unknown"></span> (#{{build.num}})</a></span>
           </h5>
           <h5 class="text-muted"><i class="fa fa-user-o"></i> <span><b>Author:</b> <span ng-bind-html="build.commit.author | unknown"></span></span></h5>
           <h5 class="text-muted"><i class="fa fa-circle-o-notch"></i><span><b>Commit:</b> #<span ng-bind="build.commit.ref | short" ></span></span></h5>

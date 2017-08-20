@@ -44,7 +44,7 @@ type triggerResponse struct {
 type CtxEvent struct {
     Event model.Event `json:"event"`
     Project int `json:"project_id"`
-    Build int `json:"build_id"`
+    Build int `json:"build_num"`
 }
 
 func (e *CtxEvent) EventName() string {
@@ -102,7 +102,7 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
             ctx.Feed.Publish(&CtxEvent{
                 event,
                 project.Id,
-                int(build.Id),
+                build.Num,
             })
         }
     }()
@@ -112,6 +112,6 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
 
     Jsonify(w, triggerResponse{
         Success: true,
-        BuildId: int(build.Id),
+        BuildId: build.Num,
     })
 }

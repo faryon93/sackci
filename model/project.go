@@ -21,6 +21,8 @@ package model
 
 import (
     "github.com/asdine/storm"
+
+    "github.com/faryon93/sackci/log"
 )
 
 
@@ -55,9 +57,23 @@ type Project struct {
 
 // Creates a new Build from this project.
 func (p *Project) NewBuild() (*Build) {
+    // in order to assign the next build number
+    // we need to get the latest build for the project
+    build, err := p.GetLastBuild()
+    if err != nil {
+        log.Error("project", "failed to get last build:", err.Error())
+    }
+
+    // assign the next build number
+    // or start with 1 if no build exists
+    num := 1
+    if build != nil {
+        num = build.Num + 1
+    }
+
     return &Build{
         Project: uint64(p.Id),
-        Num: 4,
+        Num: num,
         Status: BUILD_RUNNING,
         Commit: Commit{
             Message: "unknown",

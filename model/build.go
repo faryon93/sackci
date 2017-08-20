@@ -48,9 +48,9 @@ const (
 // --------------------------------------------------------------------------------------
 
 type Build struct {
-    Id          uint64          `json:"id" storm:"id,increment" groups:"queryall,one"`
+    Id          uint64          `json:"-" storm:"id,increment" groups:"queryall,one"`
     Project     uint64          `json:"-" strom:"index"`
-    Num         uint64          `json:"num" strom:"index" groups:"queryall,one"`
+    Num         int             `json:"num" strom:"index" groups:"queryall,one"`
     Status      string          `json:"status" groups:"queryall,one"`
     Commit      Commit          `json:"commit" groups:"queryall,one"`
     Time        time.Time       `json:"time" groups:"queryall,one"`
