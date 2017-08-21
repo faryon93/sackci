@@ -31,7 +31,7 @@ import (
 type Group struct {
     Name string
     Mutex sync.Mutex
-    Channels map[chan Event]bool
+    Channels map[chan interface{}]bool
 }
 
 
@@ -42,7 +42,7 @@ type Group struct {
 func NewGroup(name string) (*Group) {
     return &Group{
         Name: name,
-        Channels: make(map[chan Event]bool),
+        Channels: make(map[chan interface{}]bool),
     }
 }
 
@@ -52,7 +52,7 @@ func NewGroup(name string) (*Group) {
 // --------------------------------------------------------------------------------------
 
 // Publishs an event to the feed.
-func (g *Group) Publish(event Event) {
+func (g *Group) Publish(event interface{}) {
     g.Mutex.Lock()
     defer g.Mutex.Unlock()
 
@@ -63,12 +63,12 @@ func (g *Group) Publish(event Event) {
 }
 
 // Registers a new client to the feed.
-func (g *Group) Register() (chan Event) {
+func (g *Group) Register() (chan interface{}) {
     g.Mutex.Lock()
     defer g.Mutex.Unlock()
 
     // create the new channel and add to channel list
-    ch := make(chan Event)
+    ch := make(chan interface{})
     g.Channels[ch] = true
 
     return ch
@@ -76,7 +76,7 @@ func (g *Group) Register() (chan Event) {
 
 // Unregisters a client from the feed.
 // As a side effect the clients channel gets closed.
-func (g *Group) Unregister(ch chan Event){
+func (g *Group) Unregister(ch chan interface{}){
     g.Mutex.Lock()
     defer g.Mutex.Unlock()
 

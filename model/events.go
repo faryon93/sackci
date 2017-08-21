@@ -1,4 +1,5 @@
 package model
+
 // sackci
 // Copyright (C) 2017 Maximilian Pachl
 
@@ -16,11 +17,61 @@ package model
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // ----------------------------------------------------------------------------------
+//  imports
+// ----------------------------------------------------------------------------------
+
+import (
+    "time"
+)
+
+
+// ----------------------------------------------------------------------------------
 //  types
 // ----------------------------------------------------------------------------------
 
-type EventFeed chan Event
+type EventBase struct {
+    Project int `json:"project_id"`
+    Build int `json:"build_num"`
+    Timestamp int64 `json:"timestamp"`
+}
 
-type Event interface {
-    Event() string
+type EvtStageBegin struct {
+    *EventBase
+    Stage int `json:"stage"`
+    Status string `json:"status"`
+}
+
+type EvtStageFinish struct {
+    *EventBase
+    Stage int `json:"stage"`
+    Status string `json:"status"`
+    Duration time.Duration `json:"duration"`
+}
+
+type EvtStageLog struct {
+    *EventBase
+    Stage int `json:"stage"`
+    Message string `json:"message"`
+}
+
+type EvtPipelineBegin struct {
+    *EventBase
+    Time time.Time `json:"time"`
+    Status string `json:"status"`
+}
+
+type EvtPipelineFinished struct {
+    *EventBase
+    Status string `json:"status"`
+    Duration time.Duration `json:"duration"`
+}
+
+type EvtPipelineFound struct {
+    *EventBase
+    Stages []string `json:"stages"`
+}
+
+type EvtCommitFound struct {
+    *EventBase
+    Commit Commit `json:"commit"`
 }

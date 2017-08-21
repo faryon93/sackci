@@ -23,15 +23,13 @@ import (
     "net/http"
     "encoding/json"
     "errors"
+    "reflect"
 
     "github.com/gorilla/mux"
 
     "github.com/faryon93/sackci/log"
 )
 
-type Event interface {
-    EventName() string
-}
 
 // --------------------------------------------------------------------------------------
 //  public functions
@@ -126,14 +124,14 @@ func write(w http.ResponseWriter, message string) (error) {
 }
 
 // Writes an event to the SSE stream.
-func writeEvent(w http.ResponseWriter, event Event) (error) {
+func writeEvent(w http.ResponseWriter, event interface{}) (error) {
     // encode the event in json representation
     b, err := json.Marshal(event)
     if err != nil {
         return err
     }
 
-    return write(w, "event: " + event.EventName() + "\n" +
+    return write(w, "event: " + reflect.TypeOf(event).Name() + "\n" +
                     "data: " + string(b) + "\n")
 }
 

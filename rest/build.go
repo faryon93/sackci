@@ -45,13 +45,13 @@ func BuildPurge(r *http.Request) {
 
     // publish the event, which informs about the change
     // the Build Number of 0 does not exist, so it is clear what happend
-    ctx.Feed.Publish(&CtxEvent{
-        Event: &model.EvtPipelineFinished{
-            Status: model.BUILD_WAITING,
-            Duration: 0,
+    ctx.Feed.Publish(model.EvtPipelineFinished{
+        EventBase: &model.EventBase{
+            Project: fieldVal,
+            Build: 0,
+            Timestamp: time.Now().UnixNano(),
         },
-        Project: fieldVal,
-        Build: 0,
-        Timestamp: time.Now().UnixNano(),
+        Status: model.BUILD_WAITING,
+        Duration: 0,
     })
 }

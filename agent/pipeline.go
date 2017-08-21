@@ -58,11 +58,12 @@ type Pipeline struct {
     Volume string
     Containers []string
     StartTime time.Time
-    Events model.EventFeed
+    Events chan interface{}
 
     // private variables
     mutex sync.Mutex
     project *model.Project
+    build *model.Build
     definition *pipelinefile.Definition
 }
 
@@ -89,7 +90,7 @@ func CreatePipeline() (*Pipeline, error) {
         Volume: volume,
         Containers: []string{},
         StartTime: start,
-        Events: make(model.EventFeed, EVENT_STREAM_BUFFER),
+        Events: make(chan interface{}, EVENT_STREAM_BUFFER),
     }, nil
 }
 
@@ -98,14 +99,10 @@ func CreatePipeline() (*Pipeline, error) {
 //  public members
 // ----------------------------------------------------------------------------------
 
-func (p *Pipeline) SetProject(project *model.Project) (error) {
-    // assign the project to the pipeline
-    if p.project != nil {
-        return ErrAlreadyExecuted
-    }
-
+func (p *Pipeline) SetProject(project *model.Project) {
     p.project = project
-
-    return nil
 }
 
+func (p *Pipeline) SetBuild(build *model.Build) {
+    p.build = build
+}

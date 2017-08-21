@@ -158,7 +158,7 @@ func (p *Pipeline) ExecuteStage(stageId int, stage *pipelinefile.Stage) (error) 
 
     // execute the steps inside a container on the build agent
     ret, err := p.Container(image, steps, func(line string) {
-        p.Events.ConsoleLog(stageId, line)
+        p.LogTerminal(stageId, line)
     })
     if err != nil {
         return err

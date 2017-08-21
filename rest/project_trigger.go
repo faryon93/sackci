@@ -29,7 +29,6 @@ import (
     "github.com/faryon93/sackci/agent"
     "github.com/faryon93/sackci/log"
     "github.com/faryon93/sackci/model"
-    "time"
 )
 
 
@@ -40,17 +39,6 @@ import (
 type triggerResponse struct {
     Success bool `json:"success"`
     BuildId int `json:"build_id"`
-}
-
-type CtxEvent struct {
-    Event model.Event `json:"event"`
-    Project int `json:"project_id"`
-    Build int `json:"build_num"`
-    Timestamp int64 `json:"timestamp"`
-}
-
-func (e *CtxEvent) EventName() string {
-    return e.Event.Event()
 }
 
 
@@ -94,19 +82,13 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }
+    pipeline.SetBuild(build)
 
     // redirect and transform all events for the eventstream
     go func() {
         for event := range pipeline.Events {
             build.Publish(event)
-
-            // the event stream needs a context
-            ctx.Feed.Publish(&CtxEvent{
-                event,
-                project.Id,
-                build.Num,
-                time.Now().UnixNano(),
-            })
+            ctx.Feed.Publish(event)
         }
     }()
 

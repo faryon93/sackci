@@ -21,7 +21,11 @@ package agent
 
 import (
     "time"
+    "strings"
+    "fmt"
+
     "github.com/faryon93/sackci/model"
+    "github.com/faryon93/sackci/log"
 )
 
 
@@ -43,35 +47,89 @@ func (p *Pipeline) PublishPipeline() {
     }
 
     // publish the event
-    p.Events.PipelineFound(stages)
+    p.Events <- model.EvtPipelineFound{
+        p.getBaseEvent(),stages,
+    }
 }
 
 // Publishes the commit details.
 func (p *Pipeline) CommitFound(commit *model.Commit) {
-    p.Events.CommitFound(commit)
+    p.Events <- model.EvtCommitFound{
+        p.getBaseEvent(), *commit,
+    }
 }
 
-// Appends a log file to a stage.
+// Appends a log line to a stage.
 func (p *Pipeline) Log(stage int, v ...interface{}) {
-    p.Events.StageLog(stage, v...)
+    trimmed := strings.TrimSpace(fmt.Sprintln(v...))
+    message := "\u001b[0;33m[pipeline] " + trimmed + "\u001b[m"
+
+    log.Info("pipeline", trimmed)
+    p.Events <- model.EvtStageLog{
+        p.getBaseEvent(),
+        stage, message,
+    }
+}
+
+// Appends a terminal log line to a stage.
+func (p *Pipeline) LogTerminal(stage int, v ...interface{}) {
+    p.Events <- model.EvtStageLog{
+        p.getBaseEvent(),
+        stage, fmt.Sprintln(v...),
+    }
 }
 
 // Begins the given stage.
 func (p *Pipeline) BeginStage(stage int) {
-    p.Events.StageBegin(stage)
+    p.Events <- model.EvtStageBegin{
+        p.getBaseEvent(),
+        stage, model.STAGE_RUNNING,
+    }
 }
 
 // Finishes the given stage
 func (p *Pipeline) FinishStage(stage int, status string, duration time.Duration) {
-    p.Events.StageFinish(stage, status, duration)
+    p.Events <- model.EvtStageFinish{
+        p.getBaseEvent(),
+        stage, status, duration,
+    }
 }
 
 // Inform about begining a pipeline.
 func (p *Pipeline) BeginPipeline(start time.Time) {
-    p.Events.PipelineBegin(start)
+    p.Events <- model.EvtPipelineBegin{
+        p.getBaseEvent(),
+        start, model.BUILD_RUNNING,
+    }
 }
 
 // Inform about the end of a pipeline.
 func (p *Pipeline) FinishPipeline(status string, duration time.Duration) {
-    p.Events.PipelineFinished(status, duration)
+    p.Events <- model.EvtPipelineFinished{
+        p.getBaseEvent(),
+        status, duration,
+    }
+}
+
+
+// ----------------------------------------------------------------------------------
+//  private members
+// ----------------------------------------------------------------------------------
+
+func (p *Pipeline) getBaseEvent() (*model.EventBase) {
+    project := 0
+    if p.project != nil {
+        project = p.project.Id
+    }
+
+    build := 0
+    if p.build != nil {
+        build = int(p.build.Num)
+    }
+
+    return &model.EventBase{
+        Project: project,
+        Build: build,
+        Timestamp: time.Now().UnixNano(),
+    }
 }

@@ -56,7 +56,7 @@ func (p *Pipeline) Clone() (*model.Commit, error) {
 
     // start the special SCM container to clone the repository
     ret, err := p.Container(SCM_IMAGE, args, func(line string) {
-        p.Events.ConsoleLog(STAGE_SCM_ID, line)
+        p.LogTerminal(STAGE_SCM_ID, line)
         lastLine = line
     })
     if err != nil {

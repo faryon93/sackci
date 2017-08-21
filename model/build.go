@@ -88,11 +88,11 @@ func (b *Build) Save() (error) {
 
 // Consume all events which are feed from the channel src.
 // The database is automatically updated with each event.
-func (b *Build) Publish(event Event) {
+func (b *Build) Publish(event interface{}) {
     handeled := true
 
     // The execution of a stage has begun
-    if evt, ok := event.(*EvtStageBegin); ok {
+    if evt, ok := event.(EvtStageBegin); ok {
         if evt.Stage >= len(b.Stages) {
             return
         }
@@ -100,7 +100,7 @@ func (b *Build) Publish(event Event) {
         b.Stages[evt.Stage].Status = evt.Status
 
     // A stage has finished executing
-    } else if evt, ok := event.(*EvtStageFinish); ok {
+    } else if evt, ok := event.(EvtStageFinish); ok {
         if evt.Stage >= len(b.Stages) {
             return
         }
@@ -109,7 +109,7 @@ func (b *Build) Publish(event Event) {
         b.Stages[evt.Stage].Duration = evt.Duration
 
     // Append a log line to a stage
-    } else if evt, ok := event.(*EvtStageLog); ok {
+    } else if evt, ok := event.(EvtStageLog); ok {
         if evt.Stage >= len(b.Stages) {
             return
         }
@@ -117,12 +117,12 @@ func (b *Build) Publish(event Event) {
         b.Stages[evt.Stage].Log = append(b.Stages[evt.Stage].Log, evt.Message)
 
     // The whole pipeline has finished
-    } else if evt, ok := event.(*EvtPipelineFinished); ok {
+    } else if evt, ok := event.(EvtPipelineFinished); ok {
         b.Status = evt.Status
         b.Duration = evt.Duration
 
     // The Pipelinefile was found in the prolog step
-    } else if evt, ok := event.(*EvtPipelineFound); ok {
+    } else if evt, ok := event.(EvtPipelineFound); ok {
         stages := make([]Stage, len(evt.Stages))
         for i, stage := range evt.Stages {
             stages[i] = Stage{
@@ -135,7 +135,7 @@ func (b *Build) Publish(event Event) {
         b.Stages = append(b.Stages, stages...)
 
     // Information about
-    } else if evt, ok := event.(*EvtCommitFound); ok {
+    } else if evt, ok := event.(EvtCommitFound); ok {
         b.Commit = evt.Commit
 
     // the event is not handeled

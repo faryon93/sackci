@@ -36,23 +36,29 @@ app.controller("projectlist", function($scope, $location, projects, feed) {
         $scope.loading = false;
 
         // we are interested in all project status changes
-        feed.register("pipeline_begin", $scope, function(evt) {
+        feed.register("EvtPipelineBegin", $scope, function(evt) {
             angular.forEach($scope.projects, function(project) {
                 if (project.id === evt.project_id)
                 {
-                    project.status = evt.event.status;
-                    project.execution_time = evt.event.time;
+                    project.status = evt.status;
+                    project.execution_time = evt.time;
                     project.build_num = evt.build_num;
                     project.duration = 0;
                 }
             });
         });
-        feed.register("pipeline_finish", $scope, function(evt) {
+        feed.register("EvtPipelineFinished", $scope, function(evt) {
             angular.forEach($scope.projects, function(project) {
                 if (project.id === evt.project_id)
                 {
-                    project.status = evt.event.status;
-                    project.duration = evt.event.duration;
+                    project.status = evt.status;
+                    project.duration = evt.duration;
+
+                    if (evt.status === "waiting")
+                    {
+                        project.build_num = 0;
+                        project.execution_time = 0;
+                    }
                 }
             });
         });
@@ -139,8 +145,8 @@ app.controller("projectBuild", function($scope, $routeParams, builds, feed) {
             }
 
             // call the actual function
-            if (typeof callback === "function" && evt.event !== undefined)
-                callback(evt.event);
+            if (typeof callback === "function")
+                callback(evt);
         });
     };
 
@@ -151,29 +157,29 @@ app.controller("projectBuild", function($scope, $routeParams, builds, feed) {
     $scope.build = builds.get({project: $routeParams.id, id: buildId}, success, error);
 
     // register for updates from the news feed
-    registerFeed("commit_found", function(evt) {
+    registerFeed("EvtCommitFound", function(evt) {
         $scope.build.commit = evt.commit;
     });
-    registerFeed("pipeline_finish", function(evt) {
+    registerFeed("EvtPipelineFinished", function(evt) {
         $scope.build.status = evt.status;
         $scope.build.duration = evt.duration;
     });
-    registerFeed("stage_begin", function(evt) {
+    registerFeed("EvtStageBegin", function(evt) {
         $scope.build.stages[evt.stage].status = evt.status;
         $scope.stage = $scope.build.stages[evt.stage];
     });
-    registerFeed("pipeline_found", function(evt) {
+    registerFeed("EvtPipelineFound", function(evt) {
         evt.stages.forEach(function(stageName) {
             // TODO: the server should send the full stage structure
             $scope.build.stages.push({name: stageName, status: "ignored", duration: 0, log: []});
         });
     });
-    registerFeed("stage_log", function(evt) {
+    registerFeed("EvtStageLog", function(evt) {
         var stageId = evt.stage;
         if ($scope.build.stages[stageId] !== undefined)
             $scope.build.stages[stageId].log.push(evt.message);
     });
-    registerFeed("stage_finish", function(evt) {
+    registerFeed("EvtStageFinish", function(evt) {
         var stageId = evt.stage;
         if ($scope.build.stages[stageId] !== undefined)
         {
@@ -192,34 +198,34 @@ app.controller("projectHistory", function($scope, $routeParams, history, feed) {
         });
 
     // register for some events
-    feed.register("pipeline_begin", $scope, function(evt) {
+    feed.register("EvtPipelineBegin", $scope, function(evt) {
         angular.forEach($scope.builds, function(build) {
             if (evt.project_id === parseInt($routeParams.id) &&
                 evt.build_num === build.num)
             {
-                build.status = evt.event.status;
-                build.time = evt.event.time;
+                build.status = evt.status;
+                build.time = evt.time;
                 build.build_num = evt.build_num;
                 build.duration = 0;
             }
         });
     });
-    feed.register("pipeline_finish", $scope, function(evt) {
+    feed.register("EvtPipelineFinished", $scope, function(evt) {
         angular.forEach($scope.builds, function(build) {
             if (evt.project_id === parseInt($routeParams.id) &&
                 evt.build_num === build.num)
             {
-                build.status = evt.event.status;
-                build.duration = evt.event.duration;
+                build.status = evt.status;
+                build.duration = evt.duration;
             }
         });
     });
-    feed.register("commit_found", $scope, function(evt) {
+    feed.register("EvtCommitFound", $scope, function(evt) {
         angular.forEach($scope.builds, function(build) {
             if (evt.project_id === parseInt($routeParams.id) &&
                 evt.build_num === build.num)
             {
-                build.commit = evt.event.commit;
+                build.commit = evt.commit;
             }
         });
     });
