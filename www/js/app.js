@@ -489,6 +489,6 @@ app.filter('short', function() {
         if (str === undefined)
             return "";
 
-        return str.substr(0, 12);
+        return str.substr(0, 7);
     }
 });
