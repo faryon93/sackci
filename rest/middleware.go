@@ -22,12 +22,9 @@ package rest
 import (
     "net/http"
     "reflect"
-    "strconv"
-    "strings"
     "time"
 
     "github.com/gorilla/mux"
-    "github.com/asdine/storm/q"
 
     "github.com/faryon93/sackci/model"
     "github.com/faryon93/sackci/log"
@@ -39,7 +36,7 @@ import (
 //  public functions
 // --------------------------------------------------------------------------------------
 
-func Delete(router *mux.Router, path string, success func(*http.Request), mod interface{}, fields ...string) (error) {
+func Delete(router *mux.Router, path string, mod interface{}, success func(*http.Request)) (error) {
     // make sure only slices and structs are registred
     if reflect.TypeOf(mod).Kind() != reflect.Struct {
         return ErrMustBeStruct
@@ -47,25 +44,18 @@ func Delete(router *mux.Router, path string, success func(*http.Request), mod in
 
     // fetch just one item of the model by its id
     deleteFn := func(w http.ResponseWriter, r *http.Request) {
-        element := reflect.New(reflect.SliceOf(reflect.TypeOf(mod)))
 
         start := time.Now()
 
-        // construct the query
-        matchers := []q.Matcher{}
-        for _, field := range fields {
-            // parse the url parameters for the id
-            fieldVal, err := strconv.Atoi(mux.Vars(r)[strings.ToLower(field)])
-            if err != nil {
-                http.Error(w, "invalid value for field \"" + field + "\"", http.StatusNotAcceptable)
-                return
-            }
-
-            matchers = append(matchers, q.Eq(field, fieldVal))
+        query, err := httpQuery(r)
+        if err != nil {
+            http.Error(w, err.Error(), http.StatusNotAcceptable)
+            return
         }
 
         // execute the query in database
-        err := model.Get().Select(matchers...).Find(element.Interface())
+        element := reflect.New(reflect.SliceOf(reflect.TypeOf(mod)))
+        err = query.Find(element.Interface())
         if err == storm.ErrNotFound {
         } else if err != nil {
             http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -82,7 +72,8 @@ func Delete(router *mux.Router, path string, success func(*http.Request), mod in
             }
         }
 
-        log.Info("middleware",r.RequestURI, "took", time.Since(start), "to delete", element.Len(), "items")
+        log.Info("middleware", "DELETE", r.RequestURI, "took",
+            time.Since(start), "to delete", element.Len(), "items")
 
         // call the success handler and return a json success
         success(r)

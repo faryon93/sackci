@@ -41,10 +41,10 @@ func routes(router *mux.Router) {
     router.Methods("GET").Path("/project/{id}/build/latest").HandlerFunc(rest.ProjectLatestBuild)
 
     // register REST endpoints
-    rest.QueryAll(router, "/project/{project}/env","Project", model.Env{})
-    rest.QueryAll(router, "/project/{project}/history", "Project", model.Build{})
-    rest.QueryOne(router, "/project/{project}/build/{num}", model.Build{}, "Project", "Num")
-    rest.Delete(router, "/project/{project}/history", rest.BuildPurge, model.Build{}, "Project")
+    rest.QueryAll(router, "/project/{Project}/env",model.Env{})
+    rest.QueryAll(router, "/project/{Project}/history", model.Build{})
+    rest.QueryOne(router, "/project/{Project}/build/{Num}", model.Build{})
+    rest.Delete(router, "/project/{Project}/history", model.Build{}, rest.BuildPurge)
 
     // register SSE endpoints
     sse.Register(router, "/feed", ctx.Feed)

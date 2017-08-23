@@ -24,7 +24,6 @@ import (
     "reflect"
     "strconv"
     "errors"
-    "strings"
     "time"
 
     "github.com/gorilla/mux"
@@ -53,77 +52,9 @@ const (
 //  public functions
 // --------------------------------------------------------------------------------------
 
-func All(router *mux.Router, path string, mod interface{}) (error) {
-    // make sure only slices and structs are registred
-    if reflect.TypeOf(mod).Kind() != reflect.Struct {
-        return errors.New("model must be struct")
-    }
-
-    // fetches all items of the model
-    all := func(w http.ResponseWriter, r *http.Request) {
-        modelType := reflect.SliceOf(reflect.TypeOf(mod))
-        element := reflect.New(modelType)
-
-        // query the database for all elements of the given model
-        err := model.Get().All(element.Interface())
-        if err != nil {
-            http.Error(w, err.Error(), http.StatusInternalServerError)
-            return
-        }
-
-        // send the filtered response
-        filter(w, element.Interface(), GROUP_ALL)
-    }
-
-    // register the various handler functions
-    router.Methods("GET").Path(path).HandlerFunc(all)
-
-    return nil
-}
-
-// Registers a model in the REST interface router
-func One(router *mux.Router, path string, mod interface{}) (error) {
-    // make sure only slices and structs are registred
-    if reflect.TypeOf(mod).Kind() != reflect.Struct {
-        return errors.New("model must be struct")
-    }
-
-    // fetch just one item of the model by its id
-    one := func(w http.ResponseWriter, r *http.Request) {
-        element := reflect.New(reflect.TypeOf(mod))
-
-        // parse the url parameters for the id
-        id, err := strconv.Atoi(mux.Vars(r)["id"])
-        if err != nil {
-            http.Error(w, "invalid id", http.StatusNotAcceptable)
-            return
-        }
-
-        // search the database for the field
-        err = model.Get().One("Id", id, element.Interface())
-        if err == storm.ErrNotFound {
-            http.Error(w, err.Error(), http.StatusNotFound)
-            return
-
-        } else if err != nil {
-            http.Error(w, err.Error(), http.StatusInternalServerError)
-            return
-        }
-
-        // send the filtered response
-        filter(w, element.Interface(), GROUP_ONE)
-    }
-
-    // register the various handler functions
-    router.Methods("GET").Path(path).HandlerFunc(one)
-
-    return nil
-}
-
-// Queries a model by a field.
-// The provided field is matched with its lowercase
-// representation in the url parameters.
-func QueryAll(router *mux.Router, path string, field string, mod interface{}) (error) {
+// Queries all entries by one ore more fields.
+// The entries are matched against the url routing parameters.
+func QueryAll(router *mux.Router, path string, mod interface{}) (error) {
     modelType := reflect.SliceOf(reflect.TypeOf(mod))
 
     // make sure only slices and structs are registred
@@ -132,17 +63,16 @@ func QueryAll(router *mux.Router, path string, field string, mod interface{}) (e
     }
 
     handler := func(w http.ResponseWriter, r *http.Request) {
-        element := reflect.New(modelType)
-
-        // parse the url parameters for the id
-        id, err := strconv.Atoi(mux.Vars(r)[strings.ToLower(field)])
+        // construct the query
+        query, err := httpQuery(r)
         if err != nil {
-            http.Error(w, "invalid id", http.StatusNotAcceptable)
+            http.Error(w, err.Error(), http.StatusNotAcceptable)
             return
         }
 
         // query the database for all elements of the given model
-        err = model.Get().Find(field, id, element.Interface())
+        element := reflect.New(modelType)
+        err = query.Find(element.Interface())
         if err == storm.ErrNotFound {
             // we want to return an empty slice if nothing
             // has been found
@@ -163,7 +93,9 @@ func QueryAll(router *mux.Router, path string, field string, mod interface{}) (e
     return nil
 }
 
-func QueryOne(router *mux.Router, path string, mod interface{}, fields ...string) (error) {
+// Queries just on entry by one ore more fields.
+// The entries are matched against the url routing parameters.
+func QueryOne(router *mux.Router, path string, mod interface{}) (error) {
     // make sure only structs are registred
     if reflect.TypeOf(mod).Kind() != reflect.Struct {
         return errors.New("model must be struct")
@@ -171,23 +103,16 @@ func QueryOne(router *mux.Router, path string, mod interface{}, fields ...string
 
     // fetch just one item of the model by its id
     one := func(w http.ResponseWriter, r *http.Request) {
-        element := reflect.New(reflect.TypeOf(mod))
-
         // construct the query
-        matchers := []q.Matcher{}
-        for _, field := range fields {
-            // parse the url parameters for the id
-            fieldVal, err := strconv.Atoi(mux.Vars(r)[strings.ToLower(field)])
-            if err != nil {
-                http.Error(w, "invalid value for field \"" + field + "\"", http.StatusNotAcceptable)
-                return
-            }
-
-            matchers = append(matchers, q.Eq(field, fieldVal))
+        query, err := httpQuery(r)
+        if err != nil {
+            http.Error(w, err.Error(), http.StatusNotAcceptable)
+            return
         }
 
         // execute the query in database
-        err := model.Get().Select(matchers...).First(element.Interface())
+        element := reflect.New(reflect.TypeOf(mod))
+        err = query.First(element.Interface())
         if err != nil {
             http.Error(w, err.Error(), http.StatusInternalServerError)
             return
@@ -221,4 +146,24 @@ func filter(w http.ResponseWriter, v interface{}, groups ...string) {
 
     // send as json response
     Jsonify(w, filtered)
+}
+
+func httpQuery(r *http.Request) (storm.Query, error) {
+    fields := mux.Vars(r)
+
+    // construct the query expression
+    matchers := []q.Matcher{}
+    for field, value := range fields {
+        // convert the url parameter to an integer
+        fieldVal, err := strconv.Atoi(value)
+        if err != nil {
+            return nil, errors.New("faild to parse field \"" + field + "\"")
+        }
+
+        // All elements of the array are getting and'ed
+        matchers = append(matchers, q.Eq(field, fieldVal))
+    }
+
+    // obtain the query which can be executed
+    return model.Get().Select(matchers...), nil
 }

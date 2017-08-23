@@ -22,7 +22,6 @@ package rest
 import (
     "net/http"
     "time"
-    "strings"
     "strconv"
 
     "github.com/gorilla/mux"
@@ -38,7 +37,7 @@ import (
 
 func BuildPurge(r *http.Request) {
     // parse the url parameters for the id
-    fieldVal, err := strconv.Atoi(mux.Vars(r)[strings.ToLower("project")])
+    fieldVal, err := strconv.Atoi(mux.Vars(r)["Project"])
     if err != nil {
         return
     }
