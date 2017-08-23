@@ -45,7 +45,6 @@ import (
 // --------------------------------------------------------------------------------------
 
 const (
-    HTTP_API_BASE = "/api/v1"
     CONFIG_FILE = "sackci.conf"
     WORKDIR = "/work"
 )
@@ -76,10 +75,7 @@ func main() {
         log.Error("bolt", "failed to open database:", err.Error())
         return
     }
-    defer func() {
-        model.Close()
-        log.Info("bolt", "closed bolt database handle")
-    }()
+    defer model.Close()
     log.Info("bolt", "successfully opened bolt database")
 
     // initialize the global application context
@@ -91,7 +87,7 @@ func main() {
 
     // create http server
     // and setup the routes with corresponding handler functions
-    router := mux.NewRouter().StrictSlash(true).Path(HTTP_API_BASE).Subrouter()
+    router := mux.NewRouter().StrictSlash(true)
     routes(router)
 
     // execute http server asynchronously

@@ -30,22 +30,37 @@ import (
 
 
 // --------------------------------------------------------------------------------------
+//  constants
+// --------------------------------------------------------------------------------------
+
+const (
+    HTTP_API_BASE = "/api/v1"
+)
+
+
+// --------------------------------------------------------------------------------------
 //  routes
 // --------------------------------------------------------------------------------------
 
+//go:generate esc -prefix=assets -o assets.go assets
 func routes(router *mux.Router) {
+    api := router.PathPrefix(HTTP_API_BASE).Subrouter()
+
     // register classic RESET endpoints
-    router.Methods("GET").Path("/project").HandlerFunc(rest.ProjectList)
-    router.Methods("GET").Path("/project/{id}").HandlerFunc(rest.ProjectById)
-    router.Methods("GET").Path("/project/{id}/trigger").HandlerFunc(rest.ProjectTrigger)
-    router.Methods("GET").Path("/project/{id}/build/latest").HandlerFunc(rest.ProjectLatestBuild)
+    api.Methods("GET").Path("/project").HandlerFunc(rest.ProjectList)
+    api.Methods("GET").Path("/project/{id}").HandlerFunc(rest.ProjectById)
+    api.Methods("GET").Path("/project/{id}/trigger").HandlerFunc(rest.ProjectTrigger)
+    api.Methods("GET").Path("/project/{id}/build/latest").HandlerFunc(rest.ProjectLatestBuild)
 
     // register REST endpoints
-    rest.QueryAll(router, "/project/{Project}/env",model.Env{})
-    rest.QueryAll(router, "/project/{Project}/history", model.Build{})
-    rest.QueryOne(router, "/project/{Project}/build/{Num}", model.Build{})
-    rest.Delete(router, "/project/{Project}/history", model.Build{}, rest.BuildPurge)
+    rest.QueryAll(api, "/project/{Project}/env",model.Env{})
+    rest.QueryAll(api, "/project/{Project}/history", model.Build{})
+    rest.QueryOne(api, "/project/{Project}/build/{Num}", model.Build{})
+    rest.Delete(api, "/project/{Project}/history", model.Build{}, rest.BuildPurge)
 
     // register SSE endpoints
-    sse.Register(router, "/feed", ctx.Feed)
+    sse.Register(api, "/feed", ctx.Feed)
+
+    // register static assets
+    router.PathPrefix("/").Handler(PrettyUrl(FS(false)))
 }

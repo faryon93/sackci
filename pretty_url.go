@@ -1,4 +1,4 @@
-package model
+package main
 // sackci
 // Copyright (C) 2017 Maximilian Pachl
 
@@ -20,46 +20,37 @@ package model
 // --------------------------------------------------------------------------------------
 
 import (
-    "github.com/asdine/storm"
-    "github.com/asdine/storm/codec/gob"
-    "github.com/faryon93/sackci/log"
+    "net/http"
+    "path"
+    "os"
+    "strings"
 )
-
-
-// --------------------------------------------------------------------------------------
-//  global variables
-// --------------------------------------------------------------------------------------
-
-// tiedot database handle
-var db *storm.DB
 
 
 // --------------------------------------------------------------------------------------
 //  public functions
 // --------------------------------------------------------------------------------------
 
-// Opens the bolt database.
-func Open(path string) (error) {
-    var err error
+func PrettyUrl(fs http.FileSystem) http.Handler {
+    fsh := http.FileServer(fs)
 
-    // open the database directory an keep the handle for later
-    db, err = storm.Open(path, storm.Codec(gob.Codec))
-    if err != nil {
-        return err
-    }
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        // the webpage root cannot be checked in fs
+        // everything with a file ending should to be
+        // rewritten to index page for a more convenient
+        // user experiance and to prevent the server from delivering
+        // wrong file content to expected filetype
+        if r.URL.Path != "/" && !strings.Contains(path.Base(r.URL.Path), ".") {
+            // if the file does not exist in the virtual fs
+            // we just redirect to the root in order
+            // to support pretty urls
+            // TODO: not a perfect solution, because double parsing of file
+            _, err := fs.Open(path.Clean(r.URL.Path))
+            if os.IsNotExist(err) {
+                r.URL.Path = "/"
+            }
+        }
 
-    //db.Drop("Build")
-
-    return nil
-}
-
-// Closes the bolt database.
-func Close() (error) {
-    log.Info("bolt", "closed bolt database handle")
-    return db.Close()
-}
-
-// Returns the database handle.
-func Get() (*storm.DB) {
-    return db
+        fsh.ServeHTTP(w, r)
+    })
 }
