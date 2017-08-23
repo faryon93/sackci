@@ -190,6 +190,8 @@ app.controller("projectBuild", function($scope, $routeParams, builds, feed) {
 });
 
 app.controller("projectHistory", function($scope, $routeParams, history, feed) {
+    var projectId = parseInt($routeParams.id);
+
     // query for the build history
     $scope.builds = history.query({id: $routeParams.id},
         function(response) {},
@@ -199,21 +201,45 @@ app.controller("projectHistory", function($scope, $routeParams, history, feed) {
 
     // register for some events
     feed.register("EvtPipelineBegin", $scope, function(evt) {
+        if (evt.project_id !== projectId)
+            return;
+
+        var found = false;
         angular.forEach($scope.builds, function(build) {
-            if (evt.project_id === parseInt($routeParams.id) &&
-                evt.build_num === build.num)
+            if (build.num === evt.build_num)
             {
+                found = true;
                 build.status = evt.status;
                 build.time = evt.time;
-                build.build_num = evt.build_num;
                 build.duration = 0;
             }
         });
+
+        // the build is not in the liste -> create a new one and append
+        if (!found)
+        {
+            $scope.builds.push({
+                num: evt.build_num,
+                status: evt.status,
+                time: evt.time,
+                duration: 0
+            })
+        }
     });
     feed.register("EvtPipelineFinished", $scope, function(evt) {
+        if (evt.project_id !== projectId)
+            return;
+
+        // a build num 0 means the build history
+        // has been purged
+        if (evt.build_num === 0)
+        {
+            $scope.builds = [];
+            return;
+        }
+
         angular.forEach($scope.builds, function(build) {
-            if (evt.project_id === parseInt($routeParams.id) &&
-                evt.build_num === build.num)
+            if (build.num === evt.build_num)
             {
                 build.status = evt.status;
                 build.duration = evt.duration;
@@ -221,12 +247,12 @@ app.controller("projectHistory", function($scope, $routeParams, history, feed) {
         });
     });
     feed.register("EvtCommitFound", $scope, function(evt) {
+        if (evt.project_id !== projectId)
+            return;
+
         angular.forEach($scope.builds, function(build) {
-            if (evt.project_id === parseInt($routeParams.id) &&
-                evt.build_num === build.num)
-            {
+            if (build.num === evt.build_num)
                 build.commit = evt.commit;
-            }
         });
     });
 });

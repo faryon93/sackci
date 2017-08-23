@@ -46,7 +46,7 @@ const (
 func routes(router *mux.Router) {
     api := router.PathPrefix(HTTP_API_BASE).Subrouter()
 
-    // register classic RESET endpoints
+    // register classic REST endpoints
     api.Methods("GET").Path("/project").HandlerFunc(rest.ProjectList)
     api.Methods("GET").Path("/project/{id}").HandlerFunc(rest.ProjectById)
     api.Methods("GET").Path("/project/{id}/trigger").HandlerFunc(rest.ProjectTrigger)
