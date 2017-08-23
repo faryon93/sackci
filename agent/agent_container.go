@@ -48,6 +48,10 @@ func (a *Agent) Execute(vol string, image string, cmd string, stdio func(string)
         },
     })
     if err != nil {
+
+	if container == nil {
+		return "", -1, err
+	}
         return container.ID, -1, err
     }
 
