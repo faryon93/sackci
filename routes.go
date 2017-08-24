@@ -26,6 +26,7 @@ import (
     "github.com/faryon93/sackci/sse"
     "github.com/faryon93/sackci/ctx"
     "github.com/faryon93/sackci/rest"
+    "net/http"
 )
 
 
@@ -45,6 +46,7 @@ const (
 //go:generate esc -prefix=assets -o assets.go assets
 func routes(router *mux.Router) {
     api := router.PathPrefix(HTTP_API_BASE).Subrouter()
+    api.NotFoundHandler = http.HandlerFunc(NotFound)
 
     // register classic REST endpoints
     api.Methods("GET").Path("/project").HandlerFunc(rest.ProjectList)
@@ -63,4 +65,13 @@ func routes(router *mux.Router) {
 
     // register static assets
     router.PathPrefix("/").Handler(PrettyUrl(FS(false)))
+}
+
+
+// --------------------------------------------------------------------------------------
+//  common handlers
+// --------------------------------------------------------------------------------------
+
+func NotFound(w http.ResponseWriter, r *http.Request) {
+    http.Error(w, "not found", http.StatusNotFound)
 }

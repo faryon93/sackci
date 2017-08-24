@@ -36,6 +36,8 @@ import (
 
 type Config struct {
     Listen string `yaml:"listen"`
+    TlsKey string `yaml:"tlskey"`
+    TlsCert string `yaml:"tlscert"`
     Artifacts string `yaml:"artifacts"`
     Database string `yaml:"database"`
     Agents []agent.Agent `yaml:"agents"`

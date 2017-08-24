@@ -94,7 +94,15 @@ func main() {
     srv := &http.Server{Addr: ctx.Conf.Listen, Handler: router}
     go func() {
         log.Info("http", "http server is listening on", ctx.Conf.Listen)
-        err := srv.ListenAndServe()
+
+        // decide if a tls encrypted server needs to be setup or not
+        var err error
+        if len(ctx.Conf.TlsCert) > 0 && len(ctx.Conf.TlsKey) > 0 {
+            log.Info("http", "enabled TLS encryption for http server")
+            err = srv.ListenAndServeTLS(ctx.Conf.TlsCert, ctx.Conf.TlsKey)
+        } else {
+            err = srv.ListenAndServe()
+        }
         if err != nil && err != http.ErrServerClosed {
             log.Error("http", "failed to serv http:", err.Error())
             return
