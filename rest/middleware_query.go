@@ -40,11 +40,19 @@ import (
 // --------------------------------------------------------------------------------------
 
 const (
+    // groups
     GROUP_QUERYALL = "queryall"
-    GROUP_ALL      = "all"
-    GROUP_ONE      = "one"
+    GROUP_QUERYONE = "one"
 
+    // custom headerfields
     HEADER_TIMESTAMP = "X-Timestamp"
+
+    // HTTP GET query parameters for paging
+    GET_QUERY_LIMIT = "limit"
+    GET_QUERY_SKIP  = "skip"
+
+    // flags
+    QUERY_REVERSE = iota
 )
 
 
@@ -54,7 +62,7 @@ const (
 
 // Queries all entries by one ore more fields.
 // The entries are matched against the url routing parameters.
-func QueryAll(router *mux.Router, path string, mod interface{}) (error) {
+func QueryAll(router *mux.Router, path string, mod interface{}, flags ...int) (error) {
     modelType := reflect.SliceOf(reflect.TypeOf(mod))
 
     // make sure only slices and structs are registred
@@ -64,7 +72,7 @@ func QueryAll(router *mux.Router, path string, mod interface{}) (error) {
 
     handler := func(w http.ResponseWriter, r *http.Request) {
         // construct the query
-        query, err := httpQuery(r)
+        query, err := httpQuery(r, flags...)
         if err != nil {
             http.Error(w, err.Error(), http.StatusNotAcceptable)
             return
@@ -119,7 +127,7 @@ func QueryOne(router *mux.Router, path string, mod interface{}) (error) {
         }
 
         // send the filtered response
-        filter(w, element.Interface(), GROUP_ONE)
+        filter(w, element.Interface(), GROUP_QUERYONE)
     }
 
     // register the various handler functions
@@ -148,7 +156,7 @@ func filter(w http.ResponseWriter, v interface{}, groups ...string) {
     Jsonify(w, filtered)
 }
 
-func httpQuery(r *http.Request) (storm.Query, error) {
+func httpQuery(r *http.Request, flags ...int) (storm.Query, error) {
     fields := mux.Vars(r)
 
     // construct the query expression
@@ -163,7 +171,38 @@ func httpQuery(r *http.Request) (storm.Query, error) {
         // All elements of the array are getting and'ed
         matchers = append(matchers, q.Eq(field, fieldVal))
     }
+    query := model.Get().Select(matchers...)
+
+    // add all modifieres to the query
+    // according to the flags
+    for _, flag := range flags {
+        if flag == QUERY_REVERSE {
+            query = query.Reverse()
+        }
+    }
+
+    // apply the limit parameter
+    limit := r.URL.Query().Get(GET_QUERY_LIMIT)
+    if len(limit) > 0 {
+        limitVal, err := strconv.Atoi(limit)
+        if err != nil {
+            return nil, errors.New("invalid limit value")
+        }
+
+        query = query.Limit(limitVal)
+    }
+
+    // apply the skip parameter
+    skip := r.URL.Query().Get(GET_QUERY_SKIP)
+    if len(skip) > 0 {
+        skipVal, err := strconv.Atoi(skip)
+        if err != nil {
+            return nil, errors.New("invalid skip value")
+        }
+
+        query = query.Skip(skipVal)
+    }
 
     // obtain the query which can be executed
-    return model.Get().Select(matchers...), nil
+    return query, nil
 }

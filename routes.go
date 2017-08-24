@@ -53,8 +53,8 @@ func routes(router *mux.Router) {
     api.Methods("GET").Path("/project/{id}/build/latest").HandlerFunc(rest.ProjectLatestBuild)
 
     // register REST endpoints
-    rest.QueryAll(api, "/project/{Project}/env",model.Env{})
-    rest.QueryAll(api, "/project/{Project}/history", model.Build{})
+    rest.QueryAll(api, "/project/{Project}/env", model.Env{})
+    rest.QueryAll(api, "/project/{Project}/history", model.Build{}, rest.QUERY_REVERSE)
     rest.QueryOne(api, "/project/{Project}/build/{Num}", model.Build{})
     rest.Delete(api, "/project/{Project}/history", model.Build{}, rest.BuildPurge)
 

@@ -1,5 +1,5 @@
 // ------------------------------------------------------------------------------------------------
-var app = angular.module('app', ["ngRoute", "ngResource", "ui.bootstrap"]);
+var app = angular.module('app', ["ngRoute", "ngResource", "ui.bootstrap", "infinite-scroll"]);
 app.config(function($routeProvider, $locationProvider) {
     $routeProvider
         .when("/", {
@@ -191,10 +191,37 @@ app.controller("projectBuild", function($scope, $routeParams, builds, feed) {
 
 app.controller("projectHistory", function($scope, $routeParams, history, feed) {
     var projectId = parseInt($routeParams.id);
+    var limit = 10;
+    var skip = 0;
+
+    // eventhandler: infinite page scroll
+    $scope.scrollBusy = true;
+    $scope.scrollEnd = false;
+    $scope.nextPage = function() {
+        $scope.scrollBusy = true;
+
+        // get the next page from the api
+        skip += limit;
+        var builds = history.query({id: $routeParams.id, limit: limit, skip: skip},
+            function() {
+                // if the server sends an empty array no new
+                // elements are available
+                if (builds.length === 0)
+                    $scope.scrollEnd = true;
+
+                // append the new page of builds to the other ones
+                $scope.builds = $scope.builds.concat(builds);
+                $scope.scrollBusy = false;
+
+                console.log(builds);
+            });
+    };
 
     // query for the build history
-    $scope.builds = history.query({id: $routeParams.id},
-        function(response) {},
+    $scope.builds = history.query({id: $routeParams.id, limit: limit, skip: skip},
+        function() {
+            $scope.scrollBusy = false;
+        },
         function(error) {
             $scope.error = error.data;
         });
@@ -313,7 +340,8 @@ app.factory('builds', function($resource){
 });
 
 app.factory('history', function($resource){
-   return $resource('/api/v1/project/:id/history/');
+   return $resource('/api/v1/project/:id/history?limit=:limit&skip=:skip',
+       {limit:'@limit', skip: '@skip', id: '@id'});
 });
 
 app.factory('env', function($resource){
