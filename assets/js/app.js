@@ -212,8 +212,6 @@ app.controller("projectHistory", function($scope, $routeParams, history, feed) {
                 // append the new page of builds to the other ones
                 $scope.builds = $scope.builds.concat(builds);
                 $scope.scrollBusy = false;
-
-                console.log(builds);
             });
     };
 
@@ -221,6 +219,8 @@ app.controller("projectHistory", function($scope, $routeParams, history, feed) {
     $scope.builds = history.query({id: $routeParams.id, limit: limit, skip: skip},
         function() {
             $scope.scrollBusy = false;
+            if ($scope.builds.length < limit)
+                $scope.scrollEnd = true;
         },
         function(error) {
             $scope.error = error.data;
@@ -245,7 +245,7 @@ app.controller("projectHistory", function($scope, $routeParams, history, feed) {
         // the build is not in the liste -> create a new one and append
         if (!found)
         {
-            $scope.builds.push({
+            $scope.builds.unshift({
                 num: evt.build_num,
                 status: evt.status,
                 time: evt.time,
