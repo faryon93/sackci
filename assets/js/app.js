@@ -355,7 +355,15 @@ app.factory('trigger', function($resource){
 
 // ------------------------------------------------------------------------------------------------
 app.factory('feed', function($rootScope) {
+    $rootScope.liveUpdates = true;
     var sse = new EventSource('/api/v1/feed');
+    sse.onerror = function() {
+        // TODO: retry connection
+        $rootScope.$apply($rootScope.liveUpdates = false);
+    };
+    sse.onmessage = function() {
+        $rootScope.$apply($rootScope.liveUpdates = true);
+    };
 
     return {
         register: function(eventName, scope, callback) {

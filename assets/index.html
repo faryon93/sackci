@@ -41,7 +41,8 @@
             <li ng-class="{active: isActive('/admin')}"><a href="/admin">Administration</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-              <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+            <li ng-show="liveUpdates"><a href="#" style="color: #39aa56; cursor: default;"><i class="fa fa-signal"></i> Live Update</a></li>
+            <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
            </ul>
         </div>
       </div>
@@ -54,7 +55,7 @@
           <!-- filter -->
           <form class="filter">
             <div class="input-group">
-              <span class="input-group-addon"><i class="fa fa-search" aria-hidden="true"></i></span>
+              <span class="input-group-addon"><i class="fa fa-search"></i></span>
               <input type="text" class="form-control" placeholder="filter projects" ng-model="search.name">
             </div>
           </form>
