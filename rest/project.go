@@ -28,7 +28,9 @@ import (
 
     "github.com/faryon93/sackci/ctx"
     "github.com/faryon93/sackci/model"
+    "errors"
 )
+
 
 // --------------------------------------------------------------------------------------
 //  types
@@ -116,22 +118,8 @@ func ProjectById(w http.ResponseWriter, r *http.Request) {
 
 // Queries on project by its id.
 func ProjectLatestBuild(w http.ResponseWriter, r *http.Request) {
-    id, err := strconv.Atoi(mux.Vars(r)["id"])
+    build, err := getLastBuild(w, r)
     if err != nil {
-        http.Error(w, "invalid project id", http.StatusNotAcceptable)
-        return
-    }
-
-    // get the project
-    project := ctx.Conf.GetProject(id)
-    if project == nil {
-        http.Error(w, "project not found", http.StatusNotFound)
-        return
-    }
-
-    build, err := project.GetLastBuild()
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }
 
@@ -141,4 +129,50 @@ func ProjectLatestBuild(w http.ResponseWriter, r *http.Request) {
     }
 
     Jsonify(w, build)
+}
+
+// Badge (failing / passing) for the project.
+func ProjectBadge(w http.ResponseWriter, r *http.Request) {
+    build, err := getLastBuild(w, r)
+    if err != nil {
+        return
+    }
+
+    // the correct badge to display
+    file := "/img/waiting.svg"
+    if build != nil {
+        file = "/img/" + build.Status + ".svg"
+    }
+
+    // serve the file and disable all browser side caching
+    NoCaching(w)
+    ServeFile(w, file, CONTENT_TYPE_SVG)
+}
+
+
+// --------------------------------------------------------------------------------------
+//  private helpers
+// --------------------------------------------------------------------------------------
+
+func getLastBuild(w http.ResponseWriter, r *http.Request) (*model.Build, error) {
+    id, err := strconv.Atoi(mux.Vars(r)["id"])
+    if err != nil {
+        http.Error(w, "invalid project id", http.StatusNotAcceptable)
+        return nil, err
+    }
+
+    // get the project
+    project := ctx.Conf.GetProject(id)
+    if project == nil {
+        http.Error(w, "project not found", http.StatusNotFound)
+        return nil, errors.New("project not found")
+    }
+
+    build, err := project.GetLastBuild()
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return nil, err
+    }
+
+    return build, nil
 }

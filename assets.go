@@ -1811,6 +1811,65 @@ fZt9D7uu+kh8dPuh12Ab9CyxP3SfHqdnpKlOoXiWpWd4qlco7poVCgQKxf8fAAD//xriCNzOPQMA
 `,
 	},
 
+	"/img/failed.svg": {
+		local:   "assets/img/failed.svg",
+		size:    726,
+		modtime: 1503606960,
+		compressed: `
+H4sIAAAAAAAA/4yS34vcIBDH/xWZpdDCJmpiuGuJeSrcU58K926iRotrgrr5cX99sb0e2+1uOQRhxvl8
+5zuDbVxGtJ2cjxxMSvMXjNd1Lde6nMKIK0IIjssIaLUyGQ6PFJBRdjSJQ0Wga531SoSnIKRVPiErOQhA
+W8WBANorDpSQD9C1MU0zmrSOKv16ynExTG4KHA59379mplkMNu0cSgr4iqK3a/DfFro2qCGhsHGo79lG
+2jrH4dA0TVa4BPL98MYxdpNTpJGMZXQWyVxlkeTwrX5AxLClIqZgL9c9/mvqHNzHg/iUmfGPstYaUFJb
+KoQfTF7ZyUrpFCA9+VRocbJu5/BV/RDPZ/Rd+Hh8VkEKL45PyqtFHKPwsYgqWP3KRPuiOFAKXZuF89z0
+c9kA2jnQ5m1SQvP5HV4svoauP1snW5zhWxLsTkXz+P4WWlhn/XhPgv1Tgceuzd+1+xkAAP//R7Dg19YC
+AAA=
+`,
+	},
+
+	"/img/passed.svg": {
+		local:   "assets/img/passed.svg",
+		size:    724,
+		modtime: 1503606291,
+		compressed: `
+H4sIAAAAAAAA/5SSXasbIRCG/4pMKLSQXXU/ejhl3avCuepV4dy7q64W4y5q9iO/vpimIU2TQhGEGed5
+553BJswDWg/WBQY6xukLxsuy5EuZj37ABSEEh3kAtBgRNYNXAkhLM+jIoCDQNtY4yf2b58JIF5ERDDig
+tWBAAG0FA0rIB2ibEMcJjUoFGc9PKc760Y6ewa7ruktmnHhv4sYgp4DvKPq4Bv9poW287CPyK4PymW2k
+jLUMdnVdJ4VbIN0vV64uH3JVf+488ahvU0gw+Fa+IKKruSA6q0736v+0c/T2445/SszwW1YpBSjKNWbc
+9Tot62CEsBKQGl3MFD8YuzH4Kn/w9yP6zl3Yv0svuOP7N+nkzPeBu5AF6Y26MMGcJANKoW2ScJqYvuY1
+oI0Bra8zEprOr/Bm5SW03dFY0eAEP5KonlR8Lv6nycRDMG54LlL9VYOHtkmftf0ZAAD//yNy3HPUAgAA
+`,
+	},
+
+	"/img/running.svg": {
+		local:   "assets/img/running.svg",
+		size:    730,
+		modtime: 1503607852,
+		compressed: `
+H4sIAAAAAAAA/5SSXavcIBCG/4rMUmhhEzUfPZwSc1U4V70qnHsTNVpcE9R8nV9fbJftdrtbOAjCjPO8
+885gE5YBbSfrAgMd4/QF43Vd87XMRz/gghCCwzIAWo2ImsEzAaSlGXRkUBBoG2uc5P7Fc2Gki8gIBhzQ
+VjAggPaCASXkA7RNiOOERqWCjL+eUpz1ox09g0PXdefMOPHexJ1BTgHfUPR+Df7bQtt42UfkNwblI9tI
+GWsZHOq6TgrXQLqfLlxd3uWU6rqyTOjEo77JIsHgW/mEiK6Wguiservt8V9Ts7cfD/xTYoY/ygpQlFvM
+uOt1WtnJCGElIDW6mCl+MnZn8FX+4K8z+s5dOL5KL7jjxxfp5MKPgbuQBemNOjPBvEkGlELbJOE0N33O
+a0A7A1pfJiU0nd/h1eJLaLvZWNHgBN+TqB5UfC7e08TPzhk3PBap/qnBQ9ukL9v+DAAA///aAXS72gIA
+AA==
+`,
+	},
+
+	"/img/waiting.svg": {
+		local:   "assets/img/waiting.svg",
+		size:    730,
+		modtime: 1503607788,
+		compressed: `
+H4sIAAAAAAAA/5SSXavbMAyG/4pRGWzQxHY+djgjztXgXO1q0HsntmMP1wm2m4/++uGtK13XDg6CgBQ9
+r14JN2Ee0Hq0LjDQMU5fMF6WJV/KfPQDLgghOMwDoMWIqBm8EkBamkFHBgWBtrHGSe7fPBdGuoiMYMAB
+rQUDAmgrGFBCPkDbhDhOaFQqyPjrV8qzfrSjZ7Druu5SGSfem7gxyCngO4o+7sF/W2gbL/uI/MqgfGYb
+KWMtg11d10nhFkjflytXlw85UaZI6MSjvqsiweBb+YKIruaC6Kw638/4r6mTtx93/FNihj/KSilAUa4x
+467X6WRHI4SVgNToYqb40diNwVf5gx9O6Dt3YX+QXnDH92/SyZnvA3chC9IbdWGCOUsGlELbJOG0N33N
+a0AbA1pfNyU0xe/05vAltN3JWNHgBD+SqJ50fC7eM2ThJho3PBep/unBQ9ukJ9v+DAAA//9SPclr2gIA
+AA==
+`,
+	},
+
 	"/index.html": {
 		local:   "assets/index.html",
 		size:    4336,
@@ -2052,6 +2111,11 @@ h9pxuw1CciwhFX1exxu/ns1Km26iGXbE47CNnv68Ez41UXXPvwMAAP//rZpXd+4VAAA=
 	"/css": {
 		isDir: true,
 		local: "assets/css",
+	},
+
+	"/img": {
+		isDir: true,
+		local: "assets/img",
 	},
 
 	"/js": {

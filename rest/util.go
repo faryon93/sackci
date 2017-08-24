@@ -22,8 +22,27 @@ package rest
 import (
     "net/http"
     "encoding/json"
+    "io"
 )
 
+
+// --------------------------------------------------------------------------------------
+//  global variables
+// --------------------------------------------------------------------------------------
+
+var (
+    Fs http.FileSystem
+)
+
+
+// --------------------------------------------------------------------------------------
+//  imports
+// --------------------------------------------------------------------------------------
+
+const (
+    CONTENT_TYPE_JSON   = "application/json"
+    CONTENT_TYPE_SVG    = "image/svg+xml"
+)
 
 // --------------------------------------------------------------------------------------
 //  public functions
@@ -39,6 +58,37 @@ func Jsonify(w http.ResponseWriter, v interface{}) {
         return
     }
 
-    w.Header().Set("Content-Type", "application/json")
+    w.Header().Set("Content-Type", CONTENT_TYPE_JSON)
     w.Write(js)
+}
+
+// Serves a file from the global assetfs.
+func ServeFile(w http.ResponseWriter, path string, contentType string) {
+    if Fs == nil {
+        return
+    }
+
+    // proper headers
+    w.Header().Set("Content-Type", contentType)
+
+    // load the file from the asset fs
+    file, err := Fs.Open(path)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusNotFound)
+        return
+    }
+
+    // copy all bytes of the file to the http output writer
+    _, err = io.Copy(w, file)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+}
+
+// Applies necessary headers to disable caching.
+func NoCaching(w http.ResponseWriter) {
+    w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+    w.Header().Set("Pragma", "no-cache")
+    w.Header().Set("Expires", "0")
 }

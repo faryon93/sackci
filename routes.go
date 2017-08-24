@@ -20,13 +20,14 @@ package main
 // --------------------------------------------------------------------------------------
 
 import (
+    "net/http"
+
     "github.com/gorilla/mux"
 
     "github.com/faryon93/sackci/model"
     "github.com/faryon93/sackci/sse"
     "github.com/faryon93/sackci/ctx"
     "github.com/faryon93/sackci/rest"
-    "net/http"
 )
 
 
@@ -47,10 +48,12 @@ const (
 func routes(router *mux.Router) {
     api := router.PathPrefix(HTTP_API_BASE).Subrouter()
     api.NotFoundHandler = http.HandlerFunc(NotFound)
+    rest.Fs = FS(false)
 
     // register classic REST endpoints
     api.Methods("GET").Path("/project").HandlerFunc(rest.ProjectList)
     api.Methods("GET").Path("/project/{id}").HandlerFunc(rest.ProjectById)
+    api.Methods("GET").Path("/project/{id}/badge").HandlerFunc(rest.ProjectBadge)
     api.Methods("GET").Path("/project/{id}/trigger").HandlerFunc(rest.ProjectTrigger)
     api.Methods("GET").Path("/project/{id}/build/latest").HandlerFunc(rest.ProjectLatestBuild)
 
