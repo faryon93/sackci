@@ -52,11 +52,21 @@ type Agent struct {
 
 // Returns if this agent is ready for a new build.
 func (a *Agent) IsReady() (bool) {
+    a.mutex.Lock()
+    defer a.mutex.Unlock()
+
+    // decrease the timeout for the ping
     a.docker.SetTimeout(DOCKER_TIMEOUT)
     defer a.docker.SetTimeout(2 * time.Hour)
 
+    // some validity checks
+    okay := true
+    if a.Concurrent > 0 && a.BuildCount >= a.Concurrent {
+        okay = false
+    }
+
     // check connectivitiy to the build agent
-    return a.docker.Ping() == nil
+    return a.docker.Ping() == nil && okay
 }
 
 func (a *Agent) Free() {
