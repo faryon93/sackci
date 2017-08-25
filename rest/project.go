@@ -145,6 +145,8 @@ func ProjectBadge(w http.ResponseWriter, r *http.Request) {
     }
 
     // serve the file and disable all browser side caching
+    // its okay to include this badge from anywhere -> disable CORS
+    w.Header().Set("Access-Control-Allow-Origin", "*")
     NoCaching(w)
     ServeFile(w, file, CONTENT_TYPE_SVG)
 }
