@@ -80,10 +80,10 @@ func main() {
 
     // initialize the global application context
     ctx.Init()
-    agent.SetWorkdir(WORKDIR)
     agent.Add(ctx.Conf.Agents...)
-    scm.Setup()
+    agent.SetWorkdir(WORKDIR)
     ctx.Conf.Print()
+    scm.Setup()
 
     // create http server
     // and setup the routes with corresponding handler functions
