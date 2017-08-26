@@ -122,6 +122,7 @@ func poll(project *model.Project, t *util.CycleTimer) {
         return
     }
     pipeline.SetProject(project)
+    defer pipeline.Destroy()    // make sure the pipeline gets destroyed
 
     // check if changes have happend since the last polling cycle
     newRef, err := pipeline.HeadRef()
@@ -130,12 +131,20 @@ func poll(project *model.Project, t *util.CycleTimer) {
         return
     }
 
-    log.Error(LOG_TAG, "head ref for project", project.Name + ":", newRef)
+    // get the last build for the project
+    lastBuild, err := project.GetLastBuild()
+    if err != nil {
+        log.Error(LOG_TAG, "failed to get get last build:", err.Error())
+        return
+    }
 
-    // TODO: execute the pipeline
+    // detect if new changes are available in the repository
+    if lastBuild == nil || lastBuild.Commit.Ref != newRef {
+        log.Error(LOG_TAG, "changes detected for project", project.Name,
+                              "with ref:", util.ShortHash(newRef))
 
-    // cleanup the pipeline
-    pipeline.Destroy()
+        // TODO: execute the pipeline
+    }
 
     log.Info(LOG_TAG, "scm polling took", time.Since(t.StartTime))
 }
