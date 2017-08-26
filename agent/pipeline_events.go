@@ -96,10 +96,10 @@ func (p *Pipeline) FinishStage(stage int, status string, duration time.Duration)
 }
 
 // Inform about begining a pipeline.
-func (p *Pipeline) BeginPipeline(start time.Time) {
+func (p *Pipeline) BeginPipeline(start time.Time, agent string) {
     p.Events <- model.EvtPipelineBegin{
         p.getBaseEvent(),
-        start, model.BUILD_RUNNING,
+        start, model.BUILD_RUNNING, agent,
     }
 }
 

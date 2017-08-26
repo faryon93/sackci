@@ -238,6 +238,7 @@ app.controller("projectHistory", function($scope, $routeParams, history, feed) {
                 found = true;
                 build.status = evt.status;
                 build.time = evt.time;
+                build.node = evt.agent;
                 build.duration = 0;
             }
         });
@@ -248,6 +249,7 @@ app.controller("projectHistory", function($scope, $routeParams, history, feed) {
             $scope.builds.unshift({
                 num: evt.build_num,
                 status: evt.status,
+                node: evt.agent,
                 time: evt.time,
                 duration: 0
             })

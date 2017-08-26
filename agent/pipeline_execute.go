@@ -58,7 +58,7 @@ func (p *Pipeline) Execute() (error) {
 
     // begin the build for the project
     log.Info(LOG_TAG,"executing build for project \"" + p.project.Name + "\"")
-    p.BeginPipeline(p.StartTime)
+    p.BeginPipeline(p.StartTime, p.Agent.Name)
 
     // get a working copy of the repo
     start := time.Now()

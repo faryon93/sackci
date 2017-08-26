@@ -58,6 +58,7 @@ type EvtPipelineBegin struct {
     *EventBase
     Time time.Time `json:"time"`
     Status string `json:"status"`
+    Agent string `json:"agent"`
 }
 
 type EvtPipelineFinished struct {
