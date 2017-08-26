@@ -16,10 +16,38 @@ package util
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // --------------------------------------------------------------------------------------
+//  imports
+// --------------------------------------------------------------------------------------
+
+import (
+    "regexp"
+)
+
+
+// --------------------------------------------------------------------------------------
+//  global variables
+// --------------------------------------------------------------------------------------
+
+var (
+    reCredentialUrl = regexp.MustCompile("(https?)://(.*):(.*)@(.*)")
+)
+
+
+// --------------------------------------------------------------------------------------
 //  public functions
 // --------------------------------------------------------------------------------------
 
 // Returns the short hash of a longer one.
 func ShortHash(hash string) (string) {
     return hash[0:MinInt(12, len(hash))]
+}
+
+// Masks all creadentials in an url
+func MaskCredentials(url string) (string) {
+    match := reCredentialUrl.FindAllStringSubmatch(url, -1)
+    if len(match) > 0 {
+        return match[0][1] + "://****:****@" + match[0][4]
+    }
+
+    return url
 }

@@ -27,6 +27,7 @@ import (
     "github.com/faryon93/sackci/model"
     "github.com/faryon93/sackci/pipelinefile"
     "github.com/faryon93/sackci/log"
+    "github.com/faryon93/sackci/util"
 )
 
 
@@ -63,7 +64,7 @@ func (p *Pipeline) Execute() (error) {
     // get a working copy of the repo
     start := time.Now()
     p.BeginStage(STAGE_SCM_ID)
-    p.Log(STAGE_SCM_ID,"starting scm checkout for", p.project.Repository)
+    p.Log(STAGE_SCM_ID,"starting scm checkout for", util.MaskCredentials(p.project.Repository))
     commit, err := p.Clone()
     if err != nil {
         p.Log(STAGE_SCM_ID,"scm checkout failed:", err.Error())
@@ -155,7 +156,7 @@ func (p *Pipeline) ExecuteStage(stageId int, stage *pipelinefile.Stage) (error) 
 
     // execute the steps inside a container on the build agent
     ret, err := p.Container(image, steps, func(line string) {
-        p.LogTerminal(stageId, line)
+        p.LogTerminal(stageId, util.MaskCredentials(line))
     })
     if err != nil {
         return err

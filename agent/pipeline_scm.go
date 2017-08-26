@@ -22,8 +22,10 @@ package agent
 import (
     "strconv"
     "errors"
-    "github.com/faryon93/sackci/model"
     "encoding/json"
+
+    "github.com/faryon93/sackci/model"
+    "github.com/faryon93/sackci/util"
 )
 
 
@@ -55,7 +57,7 @@ func (p *Pipeline) Clone() (*model.Commit, error) {
 
     // start the special SCM container to clone the repository
     ret, err := p.Container(SCM_IMAGE, args, func(line string) {
-        p.LogTerminal(STAGE_SCM_ID, line)
+        p.LogTerminal(STAGE_SCM_ID, util.MaskCredentials(line))
         lastLine = line
     })
     if err != nil {
