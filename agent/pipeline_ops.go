@@ -16,16 +16,6 @@ package agent
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // ----------------------------------------------------------------------------------
-//  imports
-// ----------------------------------------------------------------------------------
-
-import (
-    "github.com/faryon93/sackci/log"
-    "github.com/faryon93/sackci/util"
-)
-
-
-// ----------------------------------------------------------------------------------
 //  public members
 // ----------------------------------------------------------------------------------
 
@@ -62,33 +52,4 @@ func (p *Pipeline) SavePath(path string, local string) (error) {
     }
 
     return p.Agent.SavePath(p.Containers[0], path, local)
-}
-
-// Destroys the whole pipeline
-func (p *Pipeline) Destroy() {
-    p.mutex.Lock()
-    defer p.mutex.Unlock()
-
-    // remove all containers
-    for _, container := range p.Containers {
-        err := p.Agent.RemoveContainer(container)
-        if err != nil {
-            log.Error(LOG_TAG, "failed to remove container:", err.Error())
-            continue
-        }
-        log.Info(LOG_TAG, "removed container", util.ShortHash(container))
-    }
-
-    // destroy the volume
-    err := p.Agent.RemoveVolume(p.Volume)
-    if err != nil {
-        log.Error(LOG_TAG, "failed to remove volume:", err.Error())
-    }
-    log.Info(LOG_TAG, "removed volume", util.ShortHash(p.Volume))
-
-    // free the agent
-    p.Agent.Free()
-
-    // close the event stream
-    close(p.Events)
 }

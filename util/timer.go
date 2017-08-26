@@ -24,6 +24,7 @@ import (
     "errors"
 )
 
+
 // --------------------------------------------------------------------------------------
 //  constants
 // --------------------------------------------------------------------------------------
@@ -38,8 +39,13 @@ var (
 // --------------------------------------------------------------------------------------
 
 type CycleTimer struct {
-    time chan bool
-    cancel chan bool
+    StartTime time.Time
+
+    timeout   chan bool
+    cancel    chan bool
+    cycleTime time.Duration
+    fn        func(t *CycleTimer)
+    done      func()
 }
 
 
@@ -47,10 +53,17 @@ type CycleTimer struct {
 //  constructors
 // --------------------------------------------------------------------------------------
 
-func NewTimer() (*CycleTimer) {
+func NewTimer(cycleTime time.Duration, fn func(t *CycleTimer), done func()) (*CycleTimer) {
+    if fn == nil {
+        return nil
+    }
+
     return &CycleTimer{
-        time:  make(chan bool),
-        cancel: make(chan bool),
+        timeout:    make(chan bool),
+        cancel:     make(chan bool),
+        cycleTime:  cycleTime,
+        fn:         fn,
+        done:       done,
     }
 }
 
@@ -59,14 +72,15 @@ func NewTimer() (*CycleTimer) {
 //  public members
 // --------------------------------------------------------------------------------------
 
+// Wait for the given amount of time.
 func (t *CycleTimer) Wait(duration time.Duration) (error)  {
     go func() {
         time.Sleep(duration)
-        t.time <- true
+        t.timeout <- true
     }()
 
     select {
-        case <- t.time:
+        case <- t.timeout:
             return nil
 
         case <- t.cancel:
@@ -74,6 +88,35 @@ func (t *CycleTimer) Wait(duration time.Duration) (error)  {
     }
 }
 
+// Canceling the waiting of a cycle.
 func (t *CycleTimer) Cancel()  {
     t.cancel <- true
+}
+
+func (t *CycleTimer) Start() {
+    go t.run()
+}
+
+
+// --------------------------------------------------------------------------------------
+//  private members
+// --------------------------------------------------------------------------------------
+
+func (t *CycleTimer) run() {
+    // if the cycle loop exits, run the done funtion if necessary
+    if t.done != nil {
+        defer t.done()
+    }
+
+    for {
+        // sleep for the cycle time
+        err := t.Wait(t.cycleTime)
+        if err != nil {
+            return
+        }
+
+        // run th supplied function
+        t.StartTime = time.Now()
+        t.fn(t)
+    }
 }

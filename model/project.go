@@ -20,6 +20,8 @@ package model
 // ----------------------------------------------------------------------------------
 
 import (
+    "sync"
+
     "github.com/asdine/storm"
 
     "github.com/faryon93/sackci/log"
@@ -48,6 +50,8 @@ type Project struct {
     Branch string `yaml:"branch"`
     Trigger string `yaml:"trigger"`
     Interval int `yaml:"interval"`
+
+    ExecutionLock sync.Mutex
 }
 
 

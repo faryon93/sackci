@@ -26,6 +26,8 @@ import (
 
     "github.com/faryon93/sackci/model"
     "github.com/faryon93/sackci/pipelinefile"
+    "github.com/faryon93/sackci/log"
+    "github.com/faryon93/sackci/util"
 )
 
 
@@ -94,6 +96,41 @@ func CreatePipeline() (*Pipeline, error) {
     }, nil
 }
 
+// Destroys the whole pipeline
+func (p *Pipeline) Destroy() {
+    p.mutex.Lock()
+    defer p.mutex.Unlock()
+
+    // remove all containers
+    for _, container := range p.Containers {
+        err := p.Agent.RemoveContainer(container)
+        if err != nil {
+            log.Error(LOG_TAG, "failed to remove container:", err.Error())
+            continue
+        }
+        log.Info(LOG_TAG, "removed container", util.ShortHash(container))
+    }
+
+    // destroy the volume
+    err := p.Agent.RemoveVolume(p.Volume)
+    if err != nil {
+        log.Error(LOG_TAG, "failed to remove volume:", err.Error())
+    }
+    log.Info(LOG_TAG, "removed volume", util.ShortHash(p.Volume))
+
+    // free the agent
+    p.Agent.Free()
+
+    // close the event stream
+    close(p.Events)
+
+    // if a project is assigned
+    // we need to clear the execution lock
+    if p.project != nil {
+        p.project.ExecutionLock.Unlock()
+    }
+}
+
 
 // ----------------------------------------------------------------------------------
 //  public members
@@ -101,6 +138,7 @@ func CreatePipeline() (*Pipeline, error) {
 
 func (p *Pipeline) SetProject(project *model.Project) {
     p.project = project
+    p.project.ExecutionLock.Lock()
 }
 
 func (p *Pipeline) SetBuild(build *model.Build) {
