@@ -112,9 +112,6 @@ func Destroy() {
 
 // The scm polling loop.
 func poll(project *model.Project, t *util.CycleTimer) {
-    // begin of the cycle
-    log.Info(LOG_TAG, "starting scm polling for project \"" + project.Name + "\"")
-
     // create a new pipeline
     pipeline, err := agent.CreatePipeline()
     if err != nil {
@@ -123,6 +120,8 @@ func poll(project *model.Project, t *util.CycleTimer) {
     }
     pipeline.SetProject(project)
     defer pipeline.Destroy()    // make sure the pipeline gets destroyed
+
+    log.Info(LOG_TAG, "starting scm polling for project \"" + project.Name + "\"")
 
     // check if changes have happend since the last polling cycle
     newRef, err := pipeline.HeadRef()

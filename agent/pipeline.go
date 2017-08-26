@@ -27,7 +27,6 @@ import (
     "github.com/faryon93/sackci/model"
     "github.com/faryon93/sackci/pipelinefile"
     "github.com/faryon93/sackci/log"
-    "github.com/faryon93/sackci/util"
 )
 
 
@@ -108,7 +107,6 @@ func (p *Pipeline) Destroy() {
             log.Error(LOG_TAG, "failed to remove container:", err.Error())
             continue
         }
-        log.Info(LOG_TAG, "removed container", util.ShortHash(container))
     }
 
     // destroy the volume
@@ -116,7 +114,6 @@ func (p *Pipeline) Destroy() {
     if err != nil {
         log.Error(LOG_TAG, "failed to remove volume:", err.Error())
     }
-    log.Info(LOG_TAG, "removed volume", util.ShortHash(p.Volume))
 
     // free the agent
     p.Agent.Free()
