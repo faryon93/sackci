@@ -29,7 +29,7 @@ import (
 // --------------------------------------------------------------------------------------
 
 var (
-    reCredentialUrl = regexp.MustCompile("(https?)://(.*):(.*)@(.*)")
+    reCredentialUrl = regexp.MustCompile("(.*)://(.*):(.*)@(.*)")
 )
 
 

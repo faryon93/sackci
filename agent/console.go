@@ -46,15 +46,17 @@ func (w *ConsoleOutput) Write(p []byte) (int, error) {
     lines := strings.Split(w.buffer, "\n")
     last := len(lines) - 1
 
-    for i := 0; i < last; i++ {
-        w.Callback(clean(lines[i]))
-    }
+    if last >= 0 {
+        for i := 0; i < last; i++ {
+            w.Callback(clean(lines[i]))
+        }
 
-    if strings.HasSuffix(lines[last], "\n") {
-        w.Callback(clean(lines[last]))
-        w.buffer = ""
-    } else {
-        w.buffer = lines[last]
+        if strings.HasSuffix(lines[last], "\n") {
+            w.Callback(clean(lines[last]))
+            w.buffer = ""
+        } else {
+            w.buffer = lines[last]
+        }
     }
 
     return len(p), nil
