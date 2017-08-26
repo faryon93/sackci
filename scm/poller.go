@@ -21,13 +21,13 @@ package scm
 
 import (
     "time"
+    "sync"
 
     "github.com/faryon93/sackci/model"
     "github.com/faryon93/sackci/agent"
     "github.com/faryon93/sackci/log"
     "github.com/faryon93/sackci/ctx"
     "github.com/faryon93/sackci/util"
-    "sync"
 )
 
 
@@ -138,13 +138,41 @@ func poll(project *model.Project, t *util.CycleTimer) {
         return
     }
 
+    log.Info(LOG_TAG, "scm polling took", time.Since(t.StartTime))
+
     // detect if new changes are available in the repository
+    // trigger a new build if changes are detected
     if lastBuild == nil || lastBuild.Commit.Ref != newRef {
         log.Error(LOG_TAG, "changes detected for project", project.Name,
                               "with ref:", util.ShortHash(newRef))
 
-        // TODO: execute the pipeline
-    }
+        // construct the build object for saving in the database
+        build := project.NewBuild()
+        build.Time = time.Now()
+        build.Node = pipeline.Agent.Name
+        build.Stages = []model.Stage{
+            {Name: agent.STAGE_SCM_NAME, Status: model.STAGE_IGNORED, Log: []string{}},
+        }
+        err = build.Save()
+        if err != nil {
+            log.Error(LOG_TAG, "failed to save build:", err.Error())
+            return
+        }
+        pipeline.SetBuild(build)
 
-    log.Info(LOG_TAG, "scm polling took", time.Since(t.StartTime))
+        // redirect all events for the eventstream
+        go func() {
+            for event := range pipeline.Events {
+                build.Publish(event)
+                ctx.Feed.Publish(event)
+            }
+        }()
+
+        // execute the pipeline
+        err = pipeline.Execute()
+        if err != nil {
+            log.Error(LOG_TAG, "failed to execute pipeline:", err.Error())
+            return
+        }
+    }
 }

@@ -56,9 +56,6 @@ func (p *Pipeline) Execute() (error) {
         return ErrNoProject
     }
 
-    // whenever we exit this funtion -> destroy the whole pipeline
-    defer p.Destroy()
-
     // begin the build for the project
     log.Info(LOG_TAG,"executing build for project \"" + p.project.Name + "\"")
     p.BeginPipeline(p.StartTime)

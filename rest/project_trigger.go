@@ -93,7 +93,10 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
     }()
 
     // asynchrounsly execute the proejct on the provisioned pipeline
-    go pipeline.Execute()
+    go func() {
+        pipeline.Execute()
+        pipeline.Destroy()
+    }()
 
     Jsonify(w, triggerResponse{
         Success: true,
