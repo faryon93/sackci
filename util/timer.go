@@ -29,7 +29,7 @@ import (
 // --------------------------------------------------------------------------------------
 
 var (
-    ErrCancel = errors.New("timer canceled")
+    ErrTimerCancel = errors.New("timer canceled")
 )
 
 
@@ -37,7 +37,7 @@ var (
 //  types
 // --------------------------------------------------------------------------------------
 
-type Timer struct {
+type CycleTimer struct {
     time chan bool
     cancel chan bool
 }
@@ -47,8 +47,8 @@ type Timer struct {
 //  constructors
 // --------------------------------------------------------------------------------------
 
-func NewTimer() (*Timer) {
-    return &Timer{
+func NewTimer() (*CycleTimer) {
+    return &CycleTimer{
         time:  make(chan bool),
         cancel: make(chan bool),
     }
@@ -59,7 +59,7 @@ func NewTimer() (*Timer) {
 //  public members
 // --------------------------------------------------------------------------------------
 
-func (t *Timer) Wait(duration time.Duration) (error)  {
+func (t *CycleTimer) Wait(duration time.Duration) (error)  {
     go func() {
         time.Sleep(duration)
         t.time <- true
@@ -70,10 +70,10 @@ func (t *Timer) Wait(duration time.Duration) (error)  {
             return nil
 
         case <- t.cancel:
-            return ErrCancel
+            return ErrTimerCancel
     }
 }
 
-func (t *Timer) Cancel()  {
+func (t *CycleTimer) Cancel()  {
     t.cancel <- true
 }

@@ -33,13 +33,12 @@ import (
 
 const (
     // scm commands
-    SCM_CLONE = "clone"
-    SCM_COMPARE = "compare"
+    SCM_CLONE    = "clone"
+    SCM_HEAD_REF = "head"
 
     // scm compare return codes
-    SCM_RET_NEW_REF = 0
-    SCM_RET_NO_CHANGES = 1
-    SCM_RET_INVALID_BRANCH = 2
+    SCM_RET_SUCCESS        = 0
+    SCM_RET_INVALID_BRANCH = 1
 )
 
 
@@ -73,9 +72,9 @@ func (p *Pipeline) Clone() (*model.Commit, error) {
     return &commit, json.Unmarshal([]byte(lastLine), &commit)
 }
 
-// Checks if a new commit is available.
-func (p *Pipeline) Compare(old string) (bool, string, error) {
-    args := SCM_COMPARE + " " + p.project.Repository + " " + p.project.Branch + " " + old
+// Gets the head reference of the given pipeline.
+func (p *Pipeline) HeadRef() (string, error) {
+    args := SCM_HEAD_REF + " " + p.project.Repository + " " + p.project.Branch
 
     // the last line of the output will be the reference
     ref := ""
@@ -85,20 +84,17 @@ func (p *Pipeline) Compare(old string) (bool, string, error) {
         ref = line
     })
     if err != nil {
-        return false, "", err
+        return "", err
     }
 
     // some return codes have a special meaning...
-    if ret == SCM_RET_NEW_REF {
-        return true, ref, nil
-
-    } else if ret == SCM_RET_NO_CHANGES {
-        return false, old, nil
+    if ret == SCM_RET_SUCCESS {
+        return ref, nil
 
     } else if ret == SCM_RET_INVALID_BRANCH {
-        return false, "", ErrInvalidBranch
+        return "", ErrInvalidBranch
 
     } else {
-        return false, "", errors.New("error code: " + strconv.Itoa(ret))
+        return "", errors.New("error code: " + strconv.Itoa(ret))
     }
 }

@@ -36,6 +36,9 @@ import (
 // --------------------------------------------------------------------------------------
 
 const (
+    // common constants
+    LOG_TAG = "scm"
+
     // minimal polling interval in seconds
     MIN_POLLING_INTERVAL = 10
 )
@@ -46,7 +49,7 @@ const (
 // --------------------------------------------------------------------------------------
 
 var (
-    timers = []*util.Timer{}
+    timers = []*util.CycleTimer{}
     waitgroup = sync.WaitGroup{}
 )
 
@@ -75,7 +78,6 @@ func Setup() {
 
             // execute the poller async
             go poll(project, timer)
-
         }
     }
 }
@@ -96,11 +98,11 @@ func Destroy() {
 // --------------------------------------------------------------------------------------
 
 // The scm polling loop.
-func poll(project *model.Project, timer *util.Timer) {
+func poll(project *model.Project, timer *util.CycleTimer) {
     // etry and exit logs
-    log.Info("scm", "setup project \"" + project.Name + "\" for scm polling (interval:", project.Interval, ")")
+    log.Info(LOG_TAG, "setup project \"" + project.Name + "\" for scm polling (interval:", project.Interval, ")")
     defer func() {
-        log.Info("scm", "scm polling for project \"" + project.Name + "\" exited")
+        log.Info(LOG_TAG, "scm polling for project \"" + project.Name + "\" exited")
         waitgroup.Done()
     }()
 
@@ -111,40 +113,39 @@ func poll(project *model.Project, timer *util.Timer) {
     for {
         // if an error on the timer occours -> finish
         err := timer.Wait(time.Duration(project.Interval) * time.Second)
-        if err == util.ErrCancel {
+        if err == util.ErrTimerCancel {
             return
 
         } else if err != nil {
-            log.Error("scm", "scm cycle timer for project failed:", err.Error())
+            log.Error(LOG_TAG, "scm cycle timer for project failed:", err.Error())
             return
         }
 
         // begin of the cycle
         start := time.Now()
-        log.Info("scm", "starting scm polling for project \"" + project.Name + "\"")
+        log.Info(LOG_TAG, "starting scm polling for project \"" + project.Name + "\"")
 
         // create a new pipeline
         pipeline, err := agent.CreatePipeline()
         if err != nil {
-            log.Error("scm", "failed to create scm polling pipeline:", err.Error())
+            log.Error(LOG_TAG, "failed to create scm polling pipeline:", err.Error())
             continue
         }
         pipeline.SetProject(project)
 
         // check if changes have happend since the last polling cycle
-        repoChanged, ref, err := pipeline.Compare(oldRef)
+        newRef, err := pipeline.HeadRef()
         if err != nil {
-            log.Error("scm", "failed to compare scm refs:", err.Error())
+            log.Error(LOG_TAG, "failed to compare scm refs:", err.Error())
             continue
         }
 
         // a new reference is available -> execute the build
-        if repoChanged {
-            log.Info("scm", "a new ref", ref, "for project \"" + project.Name + "\" is available")
-            oldRef = ref
-
+        if oldRef != newRef {
+            log.Info(LOG_TAG, "a new ref", newRef, "for project \"" + project.Name + "\" is available")
+            oldRef = newRef
         } else {
-            log.Info("scm", "project \"" + project.Name + "\" is up to date")
+            log.Info(LOG_TAG, "project", project.Name, "is up to date")
         }
 
         // TODO: execute the pipeline
@@ -152,6 +153,6 @@ func poll(project *model.Project, timer *util.Timer) {
         // cleanup the pipeline
         pipeline.Destroy()
 
-        log.Info("scm", "scm polling took", time.Since(start))
+        log.Info(LOG_TAG, "scm polling took", time.Since(start))
     }
 }
