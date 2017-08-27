@@ -11,7 +11,7 @@
             <div class="row no-hr">
                 <div class="col-md-4">
                     <div class="input-group">
-                        <input type="text" class="form-control" />
+                        <input type="text" class="form-control" ng-value="project.name" />
                         <span class="input-group-btn">
                             <button class="btn btn-default" type="button">Rename</button>
                         </span>
@@ -51,15 +51,37 @@
                     <form>
                         <div class="form-group">
                             <label for="repo-url">Repository URL</label>
-                            <input type="email" class="form-control" id="repo-url" placeholder="https://github.com/test.git">
+                            <input type="text" class="form-control" id="repo-url" ng-value="project.repository">
                         </div>
                         <div class="form-group">
                             <label for="repo-branch">Branch</label>
                             <select class="form-control" id="repo-branch">
-                                <option>master</option>
+                                <option>{{project.branch}}</option>
                             </select>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2>Status Badge</h2>
+    <div class="panel panel-default">
+        <div class="panel-body box">
+            <!-- enable status badge -->
+            <div class="row">
+                <div class="col-md-12">
+                    <strong>Enable status badge</strong> <input type="checkbox"><br />
+                    The status badge is a small SVG image reprenting the last build status of a given project. The status badge can be viewed without authentication.
+                </div>
+            </div>
+
+            <!-- status badge url -->
+            <div class="row">
+                <div class="col-md-12">
+                    <strong>Badge URL</strong><br />
+                    You can use the following URL to include the status badge into your website.<br /><br />
+                    <pre ng-bind="project | badgeUrl"></pre>
                 </div>
             </div>
         </div>

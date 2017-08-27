@@ -301,6 +301,7 @@ app.controller("projectEnv", function($scope, $routeParams, env) {
 });
 
 app.controller("settings", function($scope, $routeParams, history) {
+    // Purge action
     $scope.purge = {
         status: "",
         error: "",
@@ -554,5 +555,14 @@ app.filter('short', function() {
             return "";
 
         return str.substr(0, 7);
+    }
+});
+
+app.filter('badgeUrl', function() {
+    return function(project) {
+        if (project === undefined)
+            return "";
+
+        return window.location.origin + "/api/v1/project/" + project.id + "/badge";
     }
 });

@@ -133,6 +133,9 @@ func (p *Pipeline) Destroy() {
 //  public members
 // ----------------------------------------------------------------------------------
 
+// Assigns a project to this pipeline.
+// After this time the execution lock of the project is locked.
+// As recently as the pipeline is destroyed the lock is returned.
 func (p *Pipeline) SetProject(project *model.Project) {
     p.project = project
     p.project.ExecutionLock.Lock()

@@ -52,12 +52,12 @@ func routes(router *mux.Router) {
 
     // register classic REST endpoints
     api.Methods("GET").Path("/project").HandlerFunc(rest.ProjectList)
-    api.Methods("GET").Path("/project/{id}").HandlerFunc(rest.ProjectById)
     api.Methods("GET").Path("/project/{id}/badge").HandlerFunc(rest.ProjectBadge)
     api.Methods("GET").Path("/project/{id}/trigger").HandlerFunc(rest.ProjectTrigger)
     api.Methods("GET").Path("/project/{id}/build/latest").HandlerFunc(rest.ProjectLatestBuild)
 
     // register REST endpoints
+    rest.QueryOne(api, "/project/{Id}", ctx.Conf.Projects)
     rest.QueryAll(api, "/project/{Project}/env", model.Env{})
     rest.QueryAll(api, "/project/{Project}/history", model.Build{}, rest.QUERY_REVERSE)
     rest.QueryOne(api, "/project/{Project}/build/{Num}", model.Build{})

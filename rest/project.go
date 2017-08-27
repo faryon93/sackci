@@ -96,27 +96,6 @@ func ProjectList(w http.ResponseWriter, r *http.Request) {
 }
 
 // Queries on project by its id.
-func ProjectById(w http.ResponseWriter, r *http.Request) {
-    id, err := strconv.Atoi(mux.Vars(r)["id"])
-    if err != nil {
-        http.Error(w, "invalid project id", http.StatusNotAcceptable)
-        return
-    }
-
-    // return the runtime object
-    project := ctx.Conf.GetProject(id)
-    if project == nil {
-        http.Error(w, "not found", http.StatusNotFound)
-        return
-    }
-
-    Jsonify(w, projectListItem{
-        Id: id,
-        Name: project.Name,
-    })
-}
-
-// Queries on project by its id.
 func ProjectLatestBuild(w http.ResponseWriter, r *http.Request) {
     build, err := getLastBuild(w, r)
     if err != nil {
