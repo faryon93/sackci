@@ -22,13 +22,39 @@ package rest
 import (
     "net/http"
     "reflect"
+    "strconv"
     "time"
+    "errors"
 
     "github.com/gorilla/mux"
+    "github.com/liip/sheriff"
+)
 
-    "github.com/faryon93/sackci/model"
-    "github.com/faryon93/sackci/log"
-    "github.com/asdine/storm"
+
+// --------------------------------------------------------------------------------------
+//  constants
+// --------------------------------------------------------------------------------------
+
+const (
+    // groups
+    GROUP_QUERYALL = "queryall"
+    GROUP_QUERYONE = "one"
+
+    // custom headerfields
+    HEADER_TIMESTAMP = "X-Timestamp"
+
+    // HTTP GET query parameters for paging
+    GET_QUERY_LIMIT = "limit"
+    GET_QUERY_SKIP  = "skip"
+
+    // flags
+    QUERY_REVERSE = iota
+
+    LOG_TAG = "middleware"
+)
+
+var (
+    ErrInvalidRef = errors.New("ref must be struct or slice")
 )
 
 
@@ -36,53 +62,98 @@ import (
 //  public functions
 // --------------------------------------------------------------------------------------
 
-func Delete(router *mux.Router, path string, mod interface{}, success func(*http.Request)) (error) {
-    // make sure only slices and structs are registred
-    if reflect.TypeOf(mod).Kind() != reflect.Struct {
-        return ErrMustBeStruct
+// Queries all entries by one ore more fields.
+// The entries are matched against the url routing parameters.
+func QueryAll(router *mux.Router, path string, ref interface{}, flags ...int) (error) {
+    var fn func(w http.ResponseWriter, r *http.Request)
+
+    // slice query
+    kind := reflect.TypeOf(ref).Kind()
+    if kind == reflect.Struct {
+        fn = func(w http.ResponseWriter, r *http.Request) {
+            stormQueryAll(w, r, reflect.SliceOf(reflect.TypeOf(ref)), flags...)
+        }
+
+    // unknown type to process
+    } else {
+        return ErrInvalidRef
     }
 
-    // fetch just one item of the model by its id
-    deleteFn := func(w http.ResponseWriter, r *http.Request) {
+    // register the corresponding routes in the router
+    router.Methods(http.MethodGet).Path(path).HandlerFunc(fn)
 
-        start := time.Now()
+    return nil
+}
 
-        query, err := httpQuery(r)
-        if err != nil {
-            http.Error(w, err.Error(), http.StatusNotAcceptable)
-            return
+// Queries just on entry by one ore more fields.
+// The entries are matched against the url routing parameters.
+func QueryOne(r *mux.Router, path string, ref interface{}) (error) {
+    var fn func(w http.ResponseWriter, r *http.Request)
+
+    // slice query
+    kind := reflect.TypeOf(ref).Kind()
+    if kind == reflect.Slice {
+        fn = func(w http.ResponseWriter, r *http.Request) {
+            sliceQueryOne(w, r, ref)
         }
 
-        // execute the query in database
-        element := reflect.New(reflect.SliceOf(reflect.TypeOf(mod)))
-        err = query.Find(element.Interface())
-        if err == storm.ErrNotFound {
-        } else if err != nil {
-            http.Error(w, err.Error(), http.StatusInternalServerError)
-            return
+    // struct query -> storm
+    } else if kind == reflect.Struct {
+        fn = func(w http.ResponseWriter, r *http.Request) {
+            stormQueryOne(w, r, reflect.TypeOf(ref))
         }
 
-        // delete all queried elements in the database
-        element = element.Elem()
-        for i := 0; i < element.Len(); i++ {
-            err := model.Get().DeleteStruct(element.Index(i).Addr().Interface())
-            if err != nil {
-                log.Error("middleware", "failed to delete entry:", err.Error())
-                continue
-            }
-        }
-
-        log.Info("middleware", "DELETE", r.RequestURI, "took",
-            time.Since(start), "to delete", element.Len(), "items")
-
-        // call the success handler and return a json success
-        success(r)
-        Jsonify(w, struct{Success bool `json:"success"` }{true })
-
+    // unknown type to process
+    } else {
+        return ErrInvalidRef
     }
 
     // register the various handler functions
-    router.Methods(http.MethodDelete).Path(path).HandlerFunc(deleteFn)
+    r.Methods(http.MethodGet).Path(path).HandlerFunc(fn)
 
     return nil
+}
+
+// Deletes all url field matching entries.
+// The success function is called afterwards.
+func DeleteAll(r *mux.Router, path string, ref interface{}, success func(*http.Request)) (error) {
+    var fn func(w http.ResponseWriter, r *http.Request)
+
+    // slice query
+    kind := reflect.TypeOf(ref).Kind()
+    if kind == reflect.Struct {
+        fn = func(w http.ResponseWriter, r *http.Request) {
+            stormDeleteAll(w, r, reflect.TypeOf(ref), success)
+        }
+
+    // unknown type to process
+    } else {
+        return ErrInvalidRef
+    }
+
+    // register the various handler functions
+    r.Methods(http.MethodDelete).Path(path).HandlerFunc(fn)
+
+    return nil
+}
+
+
+// --------------------------------------------------------------------------------------
+//  private functions
+// --------------------------------------------------------------------------------------
+
+func filter(w http.ResponseWriter, v interface{}, groups ...string) {
+    // filter the output
+    options := sheriff.Options{Groups: groups}
+    filtered, err := sheriff.Marshal(&options, v)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    // add a timestamp to each response
+    w.Header().Set(HEADER_TIMESTAMP, strconv.FormatInt(time.Now().UnixNano(), 10))
+
+    // send as json response
+    Jsonify(w, filtered)
 }

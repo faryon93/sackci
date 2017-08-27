@@ -43,15 +43,15 @@ const (
 // ----------------------------------------------------------------------------------
 
 type Project struct {
-    Id int
-    Name string `yaml:"name"`
-    Scm string `yaml:"scm"`
-    Repository string `yaml:"repo"`
-    Branch string `yaml:"branch"`
-    Trigger string `yaml:"trigger"`
-    Interval int `yaml:"interval"`
+    Id int `json:"id"`
+    Name string `yaml:"name" json:"name"`
+    Scm string `yaml:"scm" json:"scm"`
+    Repository string `yaml:"repo" json:"repository"`
+    Branch string `yaml:"branch" json:"branch"`
+    Trigger string `yaml:"trigger" json:"trigger"`
+    Interval int `yaml:"interval" json:"interval"`
 
-    ExecutionLock sync.Mutex
+    ExecutionLock sync.Mutex `json:"-"`
 }
 
 
