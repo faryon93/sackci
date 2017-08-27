@@ -301,34 +301,22 @@ app.controller("projectEnv", function($scope, $routeParams, env) {
 });
 
 app.controller("settings", function($scope, $routeParams, history) {
-    // Purge action
-    $scope.purge = {
-        status: "",
-        error: "",
-        confirm: false,
+    // eventhandler: purge build history
+    $scope.purge = function(scope) {
+        scope.status = "waiting";
+        history.remove({id: $routeParams.id}, function() {
+                scope.status = "success";
+                scope.error = ""
+            },
+            function (error) {
+                scope.status = "error";
+                scope.error = error.data;
+            });
+    };
 
-        commit: function(confirmed) {
-            $scope.purge.confirm = !confirmed;
+    // eventhandler: delete project
+    $scope.delete = function(scope) {
 
-            if (confirmed)
-            {
-                $scope.purge.status = "waiting";
-
-                // remove
-                history.remove({id: $routeParams.id}, function(resp) {
-                    $scope.purge.status = "success";
-                    $scope.purge.error = ""
-                },
-                function (error) {
-                    $scope.purge.status = "error";
-                    $scope.purge.error = error.data;
-                });
-            }
-        },
-
-        cancel: function() {
-            $scope.purge.confirm = false;
-        }
     };
 });
 
@@ -564,5 +552,45 @@ app.filter('badgeUrl', function() {
             return "";
 
         return window.location.origin + "/api/v1/project/" + project.id + "/badge";
+    }
+});
+
+
+// ------------------------------------------------------------------------------------------------
+app.directive("confirm", function ($compile) {
+    return {
+        scope: {
+            confirm: '&'
+        },
+        link: function (scope, element, attrs) {
+            attrs.$set('ng-click', 'showConfirmation()');
+            attrs.$set('ng-show', '!show');
+            element.addClass('confirm');
+            element.removeAttr("confirm");
+
+            var contentTr = angular.element(
+                '<strong ng-show="show">Sure?</strong>&nbsp;' +
+                '<button type="button" class="btn btn-default" ng-show="show" ng-click="yes()">' +
+                '<i class="fa fa-check"></i> Yes</button>&nbsp;' +
+                '<button type="button" class="btn btn-default" ng-show="show" ng-click="no()">' +
+                '<i class="fa fa-remove"></i> No</button>');
+            element.after($compile(contentTr)(scope));
+
+            $compile(element)(scope);
+
+            scope.showConfirmation = function() {
+                scope.show = true;
+                scope.test = '';
+            };
+
+            scope.yes = function() {
+                scope.confirm()(scope);
+                scope.show = false;
+            };
+
+            scope.no = function() {
+                scope.show = false;
+            }
+        }
     }
 });

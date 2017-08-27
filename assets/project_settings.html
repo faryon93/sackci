@@ -93,34 +93,48 @@
             <div class="row">
                 <div class="col-md-9">
                     <strong>Purge Build History</strong><br />
-                    This action remoes all builds until now from the database. Associated artifacts are deleted as well.
+                    This action removes all builds until now from the database. Associated artifacts are deleted as well.
                 </div>
                 <div class="col-md-3">
                     <div class="pull-right">
-                        <button type="button" class="btn" ng-class="purge.status == 'success' ? 'btn-success' : 'btn-danger'" ng-show="!purge.confirm" ng-click="purge.commit(false)">
-                            <i class="fa fa-trash-o" ng-show="purge.confirm == '' && purge.status == ''"></i>
-                            <i class="fa fa-cog fa-spin" ng-show="purge.status == 'waiting'"></i>
-                            <i class="fa fa-check" ng-show="purge.status == 'success'"></i>
-                            <i class="fa fa-exclamation-triangle" ng-show="purge.status == 'error'"></i>
+                        <button type="button" ng-init="status = 'idle'"
+                                class="btn {{status == 'idle' ? 'btn-danger' : ''}}"
+                                ng-class="{'btn-success': status == 'success', 'btn-warning': status == 'waiting'}"
+                                confirm="purge">
+                            <i class="fa fa-ban" ng-show="status == 'idle'"></i>
+                            <i class="fa fa-cog fa-spin" ng-show="status == 'waiting'"></i>
+                            <i class="fa fa-check" ng-show="status == 'success'"></i>
+                            <i class="fa fa-exclamation-triangle" ng-show="status == 'error'"></i>
 
-                            <span ng-show="purge.status == '' || purge.status == 'waiting'">Purge History</span>
-                            <span ng-show="purge.status == 'error'">{{purge.error}}</span>
-                            <span ng-show="purge.status == 'success'">Success</span>
+                            <span ng-show="status == 'waiting' || status == 'idle'">Purge History</span>
+                            <span ng-show="status == 'error'">{{error}}</span>
+                            <span ng-show="status == 'success'">Success</span>
                         </button>
-                        <strong ng-show="purge.confirm">Sure?</strong>
-                        <button type="button" class="btn btn-default" ng-click="purge.commit(true)" ng-show="purge.confirm" ><i class="fa fa-check"></i> Yes</button>
-                        <button type="button" class="btn btn-default" ng-click="purge.cancel()" ng-show="purge.confirm"><i class="fa fa-remove"></i> No</button>
                     </div>
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-md-10">
+                <div class="col-md-9">
                     <strong>Delete Project</strong><br />
                     Deleting a project results in removing all artifacts, builds and configuration from the database / configuration file.
                 </div>
-                <div class="col-md-2">
-                    <button type="button" class="btn btn-danger pull-right">Delete Project</button>
+                <div class="col-md-3">
+                    <div class="pull-right">
+                        <button type="button" ng-init="status = 'idle'"
+                                class="btn {{status == 'idle' ? 'btn-danger' : ''}}"
+                                ng-class="{'btn-success': status == 'success', 'btn-warning': status == 'waiting'}"
+                                confirm="delete">
+                            <i class="fa fa-trash-o" ng-show="status == 'idle'"></i>
+                            <i class="fa fa-cog fa-spin" ng-show="status == 'waiting'"></i>
+                            <i class="fa fa-check" ng-show="status == 'success'"></i>
+                            <i class="fa fa-exclamation-triangle" ng-show="status == 'error'"></i>
+
+                            <span ng-show="status == 'waiting' || status == 'idle'">Delete Project</span>
+                            <span ng-show="status == 'error'">{{error}}</span>
+                            <span ng-show="status == 'success'">Success</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
