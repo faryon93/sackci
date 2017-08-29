@@ -236,6 +236,9 @@ div.build-details div.log > div.empty
     100% { transform: rotate(360deg); }
 }
 
+#loading-bar-spinner {
+	display: none;
+}
 
 /********************************************************************
  * ansi colors

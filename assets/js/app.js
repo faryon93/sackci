@@ -1,5 +1,5 @@
 // ------------------------------------------------------------------------------------------------
-var app = angular.module('app', ["ngRoute", "ngResource", "ui.bootstrap", "infinite-scroll"]);
+var app = angular.module('app', ["ngRoute", "ngResource", "ui.bootstrap", "infinite-scroll", "angular-loading-bar"]);
 app.config(function($routeProvider, $locationProvider) {
     $routeProvider
         .when("/", {
@@ -106,6 +106,8 @@ app.controller("project", function($scope, $location, $routeParams, projects, tr
 app.controller("projectBuild", function($scope, $routeParams, builds, feed) {
     // default variables
     $scope.timestamp = 0;
+    $scope.errorCode = 404;
+    $scope.error = "not found";
 
     // handler: select a stage
     $scope.selectStage = function(stage) {
@@ -117,6 +119,8 @@ app.controller("projectBuild", function($scope, $routeParams, builds, feed) {
     var success = function(response, headers) {
         // get the serverside timestamp in order to discard old feed events
         $scope.timestamp = headers()["x-timestamp"];
+        $scope.errorCode = 0;
+        $scope.error = "";
 
         // per default the stage wich is most recent
         // and not ignored is displayed when viewing the build
