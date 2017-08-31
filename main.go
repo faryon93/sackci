@@ -37,6 +37,7 @@ import (
     "github.com/faryon93/sackci/config"
     "github.com/faryon93/sackci/agent"
     "github.com/faryon93/sackci/scm"
+    "flag"
 )
 
 
@@ -45,8 +46,17 @@ import (
 // --------------------------------------------------------------------------------------
 
 const (
-    CONFIG_FILE = "sackci.conf"
+    DEFAULT_CONFIG = "sackci.conf"
     WORKDIR = "/work"
+)
+
+
+// --------------------------------------------------------------------------------------
+//  global variables
+// --------------------------------------------------------------------------------------
+
+var (
+    configPath string
 )
 
 
@@ -61,8 +71,12 @@ func main() {
     runtime.GOMAXPROCS(runtime.NumCPU())
     rand.Seed(time.Now().Unix())
 
+    // parse command line arguments
+    flag.StringVar(&configPath, "conf", DEFAULT_CONFIG, "Path to config file")
+    flag.Parse()
+
     // load the configuration file
-    conf, err := config.Load(CONFIG_FILE)
+    conf, err := config.Load(configPath)
     if err != nil {
         log.Error("main", "failed to load config:", err.Error())
         return
