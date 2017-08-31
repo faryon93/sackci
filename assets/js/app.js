@@ -290,18 +290,10 @@ app.controller("projectHistory", function($scope, $routeParams, history, feed) {
     });
 });
 
-app.controller("projectEnv", function($scope, $routeParams, env) {
-    $scope.refresh = function() {
-        // load environment information from the backend
-        $scope.envs = env.query({id: $routeParams.id});
-    };
-
+app.controller("projectEnv", function($scope, $routeParams) {
     $scope.showConfirm = function(show) {
         $scope.confirm = show;
     };
-
-    // the initial refresh
-    $scope.refresh();
 });
 
 app.controller("settings", function($scope, $routeParams, history) {
@@ -337,10 +329,6 @@ app.factory('builds', function($resource){
 app.factory('history', function($resource){
    return $resource('/api/v1/project/:id/history?limit=:limit&skip=:skip',
        {limit:'@limit', skip: '@skip', id: '@id'});
-});
-
-app.factory('env', function($resource){
-   return $resource('/api/v1/project/:id/env');
 });
 
 app.factory('trigger', function($resource){

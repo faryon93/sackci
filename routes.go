@@ -58,7 +58,6 @@ func routes(router *mux.Router) {
 
     // register model-based REST endpoints
     rest.QueryOne(api, "/project/{Id}", ctx.Conf.Projects)
-    rest.QueryAll(api, "/project/{Project}/env", model.Env{})
     rest.QueryAll(api, "/project/{Project}/history", model.Build{}, rest.QUERY_REVERSE)
     rest.QueryOne(api, "/project/{Project}/build/{Num}", model.Build{})
     rest.DeleteAll(api, "/project/{Project}/history", model.Build{}, rest.BuildPurge)
