@@ -99,6 +99,13 @@ func main() {
     ctx.Conf.Print()
     scm.Setup()
 
+    // check the project integrity
+    start := time.Now()
+    for _, project := range ctx.Conf.Projects {
+        project.CheckIntegrity()
+    }
+    log.Info("main", "project integrity check took", time.Since(start))
+
     // create http server
     // and setup the routes with corresponding handler functions
     router := mux.NewRouter().StrictSlash(true)

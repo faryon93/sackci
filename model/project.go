@@ -110,3 +110,27 @@ func (p *Project) GetLastBuild() (*Build, error) {
 
     return &builds[0], nil
 }
+
+// Checks the integrty of a project and corrects if necessary
+func (p *Project) CheckIntegrity() {
+    // query all builds
+    var builds []Build
+    err := Get().Find("Project", p.Id, &builds)
+    if err == storm.ErrNotFound {
+        return
+    } else if err != nil {
+        log.Error("project", "integrity check failed:", err.Error())
+        return
+    }
+
+    for _, build := range builds {
+        if build.Status == BUILD_RUNNING {
+            log.Info("project", "found build", build.Num, " of project \"" + p.Name +
+                "\" which is still \"" + build.Status + "\". Canceling the build.")
+
+            // cancel the build
+            build.Status = BUILD_FAILED
+            build.Save()
+        }
+    }
+}
