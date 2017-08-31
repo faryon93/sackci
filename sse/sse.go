@@ -59,8 +59,6 @@ func handler(group *Group, w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    log.Info(group.Name, "client", r.RemoteAddr, "opened sse connection")
-
     // register for the update feed
     // and make sure the channel gets closed
     // when the client disconnects
@@ -78,8 +76,6 @@ func handler(group *Group, w http.ResponseWriter, r *http.Request) {
             continue
         }
     }
-
-    log.Info(group.Name, "client", r.RemoteAddr, "closed sse connection")
 }
 
 // Upgrades the connection to an SSE connection.
