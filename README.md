@@ -61,7 +61,8 @@ projects:
 
 ## Required Tools
 To build the webfrontend some tools are required to process less files, minify the content and embed all assets into the application.
-All files are stored in *assets.go*, which should be up to date at any time. In order to generate a new *assets.go* file a simple `go generate` should be enough.
+All files are stored in *assets.go*, which should be up to date at any time. In order to generate a new *assets.go* file a
+simple `go generate assets/generate.go` should be enough.
 
 - **minify**: https://github.com/tdewolff/minify
 - **esc**: https://github.com/mjibson/esc
