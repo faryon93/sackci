@@ -33,12 +33,12 @@ import (
 
 type Agent struct {
     // from config file
-    Name string `yaml:"name" json:"name"`
-    Endpoint string `yaml:"endpoint" json:"endpoint"`
-    Concurrent int `yaml:"concurrent" json:"concurrent"`
+    Name string `yaml:"name,omitempty" json:"name"`
+    Endpoint string `yaml:"endpoint,omitempty" json:"endpoint"`
+    Concurrent int `yaml:"concurrent,omitempty" json:"concurrent"`
 
     // public runtime variables
-    BuildCount int `json:"build_count"`
+    BuildCount int `json:"build_count" yaml:"-"`
 
     // private runtime variables
     docker *docker.Client

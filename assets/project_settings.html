@@ -11,9 +11,9 @@
             <div class="row no-hr">
                 <div class="col-md-4">
                     <div class="input-group">
-                        <input type="text" class="form-control" ng-value="project.name" />
+                        <input class="form-control" ng-model="changeName" ng-value="project.name" />
                         <span class="input-group-btn">
-                            <button class="btn btn-default" type="button">Rename</button>
+                            <button class="btn btn-default" type="button" ng-click="rename()">Rename</button>
                         </span>
                     </div>
                 </div>

@@ -296,7 +296,7 @@ app.controller("projectEnv", function($scope, $routeParams) {
     };
 });
 
-app.controller("settings", function($scope, $routeParams, history) {
+app.controller("settings", function($scope, $routeParams, history, projects) {
     // eventhandler: purge build history
     $scope.purge = function(scope) {
         scope.status = "waiting";
@@ -313,6 +313,12 @@ app.controller("settings", function($scope, $routeParams, history) {
     // eventhandler: delete project
     $scope.delete = function(scope) {
 
+    };
+
+    // eventhandler: rename project
+    $scope.rename = function() {
+        if ($scope.changeName !== undefined && $scope.changeName !== "")
+            projects.save({id: $routeParams.id}, {name: $scope.changeName});
     };
 });
 

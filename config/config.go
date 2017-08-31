@@ -35,13 +35,15 @@ import (
 // ----------------------------------------------------------------------------------
 
 type Config struct {
-    Listen string `yaml:"listen"`
-    TlsKey string `yaml:"tlskey"`
-    TlsCert string `yaml:"tlscert"`
-    Artifacts string `yaml:"artifacts"`
-    Database string `yaml:"database"`
-    Agents []agent.Agent `yaml:"agents"`
-    Projects []model.Project `yaml:"projects"`
+    Listen string `yaml:"listen,omitempty"`
+    TlsKey string `yaml:"tlskey,omitempty"`
+    TlsCert string `yaml:"tlscert,omitempty"`
+    Artifacts string `yaml:"artifacts,omitempty"`
+    Database string `yaml:"database,omitempty"`
+    Agents []agent.Agent `yaml:"agents,omitempty"`
+    Projects []model.Project `yaml:"projects,omitempty"`
+
+    path string
 }
 
 
@@ -60,6 +62,7 @@ func Load(path string) (*Config, error) {
     if err != nil {
         return nil, err
     }
+    conf.path = path
 
     // fill in the project ids
     // TODO: better way of id handling
@@ -74,6 +77,16 @@ func Load(path string) (*Config, error) {
 // ----------------------------------------------------------------------------------
 //  public members
 // ----------------------------------------------------------------------------------
+
+// Saves the configuration file to the filesystem.
+func (c *Config) Save() (error) {
+    bytes, err := yaml.Marshal(c)
+    if err != nil {
+        return err
+    }
+
+    return ioutil.WriteFile(c.path, bytes, 0644)
+}
 
 // Returns a project by its ID.
 func (c *Config) GetProject(id int) (*model.Project) {

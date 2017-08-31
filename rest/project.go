@@ -23,12 +23,13 @@ import (
     "net/http"
     "time"
     "strconv"
+    "errors"
 
     "github.com/gorilla/mux"
 
     "github.com/faryon93/sackci/ctx"
     "github.com/faryon93/sackci/model"
-    "errors"
+    "github.com/faryon93/sackci/log"
 )
 
 
@@ -128,6 +129,16 @@ func ProjectBadge(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Access-Control-Allow-Origin", "*")
     NoCaching(w)
     ServeFile(w, file, CONTENT_TYPE_SVG)
+}
+
+// Success Handler: Update Project
+func ProjectUpdate(r *http.Request) {
+    err := ctx.Conf.Save()
+    if err != nil {
+        log.Info("project", "failed to write config file:", err.Error())
+        return
+    }
+    log.Info("project", "succesfully updated project with id:\"" + mux.Vars(r)["Id"] + "\"")
 }
 
 

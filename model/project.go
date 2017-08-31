@@ -43,18 +43,18 @@ const (
 // ----------------------------------------------------------------------------------
 
 type Project struct {
-    Id int `json:"id"`
-    Name string `yaml:"name" json:"name"`
-    Scm string `yaml:"scm" json:"scm"`
-    Repository string `yaml:"repo" json:"repository"`
-    Branch string `yaml:"branch" json:"branch"`
-    Trigger string `yaml:"trigger" json:"trigger"`
-    Interval int `yaml:"interval" json:"interval"`
-    Env map[string]string `yaml:"env" json:"env"`
-    CommitUrl string `yaml:"commit_url" json:"commit_url"`
+    Id int `yaml:"-" json:"id"`
+    Name string `yaml:"name,omitempty" json:"name"`
+    Scm string `yaml:"scm,omitempty" json:"scm"`
+    Repository string `yaml:"repo,omitempty" json:"repository"`
+    Branch string `yaml:"branch,omitempty" json:"branch"`
+    Trigger string `yaml:"trigger,omitempty" json:"trigger"`
+    Interval int `yaml:"interval,omitempty" json:"interval"`
+    Env map[string]string `yaml:"env,omitempty" json:"env"`
+    CommitUrl string `yaml:"commit_url,omitempty" json:"commit_url"`
 
     // runtime variables
-    ExecutionLock sync.Mutex `json:"-"`
+    ExecutionLock sync.Mutex `json:"-" yaml:"-"`
 }
 
 

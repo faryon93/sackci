@@ -25,6 +25,7 @@ import (
     "strconv"
     "time"
     "errors"
+    "encoding/json"
 
     "github.com/gorilla/mux"
     "github.com/liip/sheriff"
@@ -94,7 +95,7 @@ func QueryOne(r *mux.Router, path string, ref interface{}) (error) {
     kind := reflect.TypeOf(ref).Kind()
     if kind == reflect.Slice {
         fn = func(w http.ResponseWriter, r *http.Request) {
-            sliceQueryOne(w, r, ref)
+            sliceQueryOne(w, r, reflect.ValueOf(ref))
         }
 
     // struct query -> storm
@@ -133,6 +134,41 @@ func DeleteAll(r *mux.Router, path string, ref interface{}, success func(*http.R
 
     // register the various handler functions
     r.Methods(http.MethodDelete).Path(path).HandlerFunc(fn)
+
+    return nil
+}
+
+// Registers an update handler for one instance, matching the url fields.
+func UpdateOne(r *mux.Router, path string, ref interface{}, success func(*http.Request)) (error) {
+    var fn func(w http.ResponseWriter, r *http.Request)
+
+    // slice query
+    kind := reflect.TypeOf(ref).Kind()
+    if kind == reflect.Slice {
+        fn = func(w http.ResponseWriter, r *http.Request) {
+            // decode the update request
+            var data interface{}
+            err := json.NewDecoder(r.Body).Decode(&data)
+            if err != nil {
+                http.Error(w, err.Error(), http.StatusNotAcceptable)
+                return
+            }
+
+            update, okay := data.(map[string]interface{})
+            if !okay {
+                http.Error(w, "json decoding failed", http.StatusInternalServerError)
+                return
+            }
+
+            sliceUpdateOne(w, r, reflect.ValueOf(ref), update, success)
+        }
+
+    // unknown type to process
+    } else {
+        return ErrInvalidRef
+    }
+
+    r.Methods(http.MethodPost).Path(path).HandlerFunc(fn)
 
     return nil
 }

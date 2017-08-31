@@ -25,36 +25,71 @@ import (
     "net/http"
 
     "github.com/gorilla/mux"
+    "github.com/faryon93/sackci/util"
 )
+
 
 // --------------------------------------------------------------------------------------
 //  middleware handlers
 // --------------------------------------------------------------------------------------
 
 // Queries the first element of a slice matching the url fields.
-func sliceQueryOne(w http.ResponseWriter, r *http.Request, slice interface{}) {
-    query := mux.Vars(r)
-    value := reflect.ValueOf(slice)
+func sliceQueryOne(w http.ResponseWriter, r *http.Request, slice reflect.Value) {
+    elem := findInSlice(slice, mux.Vars(r))
+    if elem == nil {
+        http.Error(w, "not found", http.StatusNotFound)
+        return
+    }
 
-    // check all entries in the slice
-    for i := 0; i < value.Len(); i++ {
-        elem := value.Index(i).Interface()
+    filter(w, elem.Interface())
+}
 
-        // return the first matching one
-        if structMatches(elem, query) {
-            filter(w, elem)
-            return
+// Updates on struct inside the slice, matching the url fields.
+func sliceUpdateOne(w http.ResponseWriter, r *http.Request, slice reflect.Value,
+                    updates map[string]interface{}, success func(r *http.Request)) {
+    // find the struct inside the given slice matching the url fields
+    elem := findInSlice(slice, mux.Vars(r))
+    if elem == nil {
+        http.Error(w, "not found", http.StatusNotFound)
+        return
+    }
+
+    // range over the fields to update
+    for field, value := range updates {
+        structField := util.FieldByTag(*elem, "json", field)
+        if !structField.IsValid() {
+            continue
+        }
+
+        if v, ok := value.(int); ok {
+            structField.SetInt(int64(v))
+        } else if v, ok := value.(string); ok {
+            structField.SetString(v)
         }
     }
 
-    // none was found -> 404 handler
-    http.Error(w, "not found", http.StatusNotFound)
+    success(r)
 }
 
 
 // --------------------------------------------------------------------------------------
 //  private helpers
 // --------------------------------------------------------------------------------------
+
+// Finds the element discribed by query in slice and returns it.
+func findInSlice(slice reflect.Value, query map[string]string) (*reflect.Value) {
+    // check all entries in the slice
+    for i := 0; i < slice.Len(); i++ {
+        elem := slice.Index(i)
+
+        // return the first matching one
+        if structMatches(elem.Interface(), query) {
+            return &elem
+        }
+    }
+
+    return nil
+}
 
 // Checks if a structs matches the given query fields.
 func structMatches(o interface{}, query map[string]string) (bool) {
