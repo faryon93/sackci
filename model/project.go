@@ -51,6 +51,7 @@ type Project struct {
     Trigger string `yaml:"trigger" json:"trigger"`
     Interval int `yaml:"interval" json:"interval"`
     Env map[string]string `yaml:"env" json:"env"`
+    CommitUrl string `yaml:"commit_url" json:"commit_url"`
 
     // runtime variables
     ExecutionLock sync.Mutex `json:"-"`

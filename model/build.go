@@ -21,6 +21,7 @@ package model
 
 import (
     "time"
+    "strings"
 )
 
 
@@ -147,4 +148,9 @@ func (b *Build) Publish(event interface{}) {
     if handeled {
         b.Save()
     }
+}
+
+// Gets the raw log of the stage
+func (s *Stage) RawLog() string {
+    return strings.Join(s.Log, "")
 }

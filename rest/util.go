@@ -42,6 +42,7 @@ var (
 const (
     CONTENT_TYPE_JSON   = "application/json"
     CONTENT_TYPE_SVG    = "image/svg+xml"
+    CONTENT_TYPE_TEXT   = "text/plain"
 )
 
 // --------------------------------------------------------------------------------------

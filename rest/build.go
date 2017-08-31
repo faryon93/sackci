@@ -35,6 +35,28 @@ import (
 //  public functions
 // --------------------------------------------------------------------------------------
 
+func BuildRawLog(w http.ResponseWriter, r *http.Request) {
+    // construct the query
+    query, err := stormQuery(r)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusNotAcceptable)
+        return
+    }
+
+    var build model.Build
+    err = query.First(&build)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    w.Header().Set("Content-Type", CONTENT_TYPE_TEXT)
+
+    for _, stage := range build.Stages {
+        w.Write([]byte(stage.RawLog()))
+    }
+}
+
 func BuildPurge(r *http.Request) {
     // parse the url parameters for the id
     fieldVal, err := strconv.Atoi(mux.Vars(r)["Project"])

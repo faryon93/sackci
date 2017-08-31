@@ -51,10 +51,11 @@ func routes(router *mux.Router) {
     rest.Fs = FS(false)
 
     // register classic REST endpoints
-    api.Methods("GET").Path("/project").HandlerFunc(rest.ProjectList)
-    api.Methods("GET").Path("/project/{id}/badge").HandlerFunc(rest.ProjectBadge)
-    api.Methods("GET").Path("/project/{id}/trigger").HandlerFunc(rest.ProjectTrigger)
-    api.Methods("GET").Path("/project/{id}/build/latest").HandlerFunc(rest.ProjectLatestBuild)
+    api.Methods(http.MethodGet).Path("/project").HandlerFunc(rest.ProjectList)
+    api.Methods(http.MethodGet).Path("/project/{id}/badge").HandlerFunc(rest.ProjectBadge)
+    api.Methods(http.MethodGet).Path("/project/{id}/trigger").HandlerFunc(rest.ProjectTrigger)
+    api.Methods(http.MethodGet).Path("/project/{id}/build/latest").HandlerFunc(rest.ProjectLatestBuild)
+    api.Methods(http.MethodGet).Path("/project/{Project}/build/{Num}/log").HandlerFunc(rest.BuildRawLog)
 
     // register model-based REST endpoints
     rest.QueryOne(api, "/project/{Id}", ctx.Conf.Projects)

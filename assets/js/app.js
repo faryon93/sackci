@@ -547,7 +547,6 @@ app.filter('badgeUrl', function() {
     }
 });
 
-
 // ------------------------------------------------------------------------------------------------
 app.directive("confirm", function ($compile) {
     return {
