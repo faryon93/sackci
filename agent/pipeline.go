@@ -23,6 +23,7 @@ import (
     "sync"
     "errors"
     "time"
+    "strings"
 
     "github.com/faryon93/sackci/model"
     "github.com/faryon93/sackci/pipelinefile"
@@ -59,6 +60,7 @@ type Pipeline struct {
     Volume string
     Containers []string
     StartTime time.Time
+    Env map[string]string
     Events chan interface{}
 
     // private variables
@@ -91,6 +93,7 @@ func CreatePipeline() (*Pipeline, error) {
         Volume: volume,
         Containers: []string{},
         StartTime: start,
+        Env: make(map[string]string),
         Events: make(chan interface{}, EVENT_STREAM_BUFFER),
     }, nil
 }
@@ -137,10 +140,41 @@ func (p *Pipeline) Destroy() {
 // After this time the execution lock of the project is locked.
 // As recently as the pipeline is destroyed the lock is returned.
 func (p *Pipeline) SetProject(project *model.Project) {
+    project.ExecutionLock.Lock()
     p.project = project
-    p.project.ExecutionLock.Lock()
+
+    // copy the project env
+    if project.Env != nil {
+        for key, val := range project.Env {
+            p.Env[key] = val;
+        }
+    }
 }
 
 func (p *Pipeline) SetBuild(build *model.Build) {
     p.build = build
+}
+
+
+// ----------------------------------------------------------------------------------
+//  private members
+// ----------------------------------------------------------------------------------
+
+func (p *Pipeline) getEnv() []string {
+    env := make([]string, len(p.Env) + len(p.project.Env))
+    i := 0
+
+    // project specific variables
+    for key, val := range p.project.Env {
+        env[i] = strings.ToUpper(key) + "=" + val
+        i++
+    }
+
+    // pipeline specific variables
+    for key, val := range p.Env {
+        env[i] = strings.ToUpper(key) + "=" + val
+        i++
+    }
+
+    return env
 }

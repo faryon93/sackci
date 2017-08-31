@@ -21,7 +21,8 @@ package agent
 
 // Executes a command in the given image on this pipeline.
 func (p *Pipeline) Container(image string, cmd string, stdio func(string)) (int, error) {
-    container, ret, err := p.Agent.Execute(p.Volume, image, cmd, stdio)
+    // execute the container
+    container, ret, err := p.Agent.Execute(p.Volume, image, cmd, p.getEnv(), stdio)
     if container != "" {
         p.mutex.Lock()
         p.Containers = append(p.Containers, container)

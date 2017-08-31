@@ -61,6 +61,10 @@ func (p *Pipeline) Execute() (error) {
     log.Info(LOG_TAG,"executing build for project \"" + p.project.Name + "\"")
     p.BeginPipeline(p.StartTime, p.Agent.Name)
 
+    // assign the ci server generated environment variables
+    p.Env["CI_BUILDNR"] = strconv.Itoa(p.build.Num)
+    p.Env["CI_AGENT"] = p.Agent.Name
+
     // get a working copy of the repo
     start := time.Now()
     p.BeginStage(STAGE_SCM_ID)
