@@ -30,12 +30,11 @@ The sackci server communicates with the scm container via command line arguments
 $: docker run -t -i sackci/git:latest clone https://github.com/octocat/Hello-World.git master
 
 # checking for repo changes
-# exit code 0: indicates that there are new changes available
-# exit code 1: no changes detected
-# exit code 2: branch does not exist
+# exit code 0: no errors
+# exit code 1: branch does not exist
 # The last line of the console output should be the new ref,
 # which is saved for future repo change detection (e.g. old-ref parameter)
-$: docker run -t -i sackci/git:latest compare https://github.com/octocat/Hello-World.git master old-ref
+$: docker run -t -i sackci/git:latest head https://github.com/octocat/Hello-World.git master
 ```
 
 ## Configuration
@@ -66,7 +65,7 @@ All files are stored in *assets.go*, which should be up to date at any time. In 
 
 - **minify**: https://github.com/tdewolff/minify
 - **esc**: https://github.com/mjibson/esc
-- **lessc*: https://lesscss.org/
+- **lessc**: https://lesscss.org/
 
 ## Notice
 This project is far from beeing finished and should not be used in production. Feel free to contribute.
