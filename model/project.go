@@ -50,7 +50,9 @@ type Project struct {
     Branch string `yaml:"branch" json:"branch"`
     Trigger string `yaml:"trigger" json:"trigger"`
     Interval int `yaml:"interval" json:"interval"`
+    Env map[string]string `yaml:"env" json:"env"`
 
+    // runtime variables
     ExecutionLock sync.Mutex `json:"-"`
 }
 
