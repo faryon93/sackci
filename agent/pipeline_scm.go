@@ -56,7 +56,7 @@ func (p *Pipeline) Clone() (*model.Commit, error) {
     lastLine := ""
 
     // start the special SCM container to clone the repository
-    ret, err := p.Container(SCM_IMAGE, args, func(line string) {
+    ret, err := p.Container(p.project.Scm, args, func(line string) {
         p.LogTerminal(STAGE_SCM_ID, util.MaskCredentials(line))
         lastLine = line
     })
@@ -82,7 +82,7 @@ func (p *Pipeline) HeadRef() (string, error) {
     ref := ""
 
     // start the special SCM container to detect new changes
-    ret, err := p.Container(SCM_IMAGE, args, func(line string) {
+    ret, err := p.Container(p.project.Scm, args, func(line string) {
         ref = line
     })
     if err != nil {

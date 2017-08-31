@@ -36,13 +36,17 @@ import (
 // ----------------------------------------------------------------------------------
 
 const (
-    SCM_IMAGE = "sackci/git:latest"
     PIPELINEFILE = "Pipelinefile"
     STAGE_IMAGE = "alpine:latest"
 
     // scm stage definitions
     STAGE_SCM_ID = 0
     STAGE_SCM_NAME = "SCM"
+
+    // internal environment variables
+    CI_BUILDNR = "CI_BUILDNR"
+    CI_AGENT = "CI_AGENT"
+    CI_COMMIT_REF = "CI_COMMIT_REF"
 )
 
 
@@ -62,8 +66,8 @@ func (p *Pipeline) Execute() (error) {
     p.BeginPipeline(p.StartTime, p.Agent.Name)
 
     // assign the ci server generated environment variables
-    p.Env["CI_BUILDNR"] = strconv.Itoa(p.build.Num)
-    p.Env["CI_AGENT"] = p.Agent.Name
+    p.Env[CI_BUILDNR] = strconv.Itoa(p.build.Num)
+    p.Env[CI_AGENT] = p.Agent.Name
 
     // get a working copy of the repo
     start := time.Now()
@@ -77,6 +81,7 @@ func (p *Pipeline) Execute() (error) {
         return err
     }
     p.CommitFound(commit)
+    p.Env[CI_COMMIT_REF] = commit.Ref
     p.Log(STAGE_SCM_ID, "scm checkout completed successfully in", time.Since(start))
 
     // get the pipeline definition
