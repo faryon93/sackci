@@ -60,5 +60,13 @@ projects:
      interval: 10                                   # trigger interval in seconds for polling
 ```
 
+## Required Tools
+To build the webfrontend some tools are required to process less files, minify the content and embed all assets into the application.
+All files are stored in *assets.go*, which should be up to date at any time. In order to generate a new *assets.go* file a simple `go generate` should be enough.
+
+- **minify**: https://github.com/tdewolff/minify
+- **esc**: https://github.com/mjibson/esc
+- **lessc*: https://lesscss.org/
+
 ## Notice
 This project is far from beeing finished and should not be used in production. Feel free to contribute.

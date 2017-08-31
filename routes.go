@@ -44,7 +44,6 @@ const (
 //  routes
 // --------------------------------------------------------------------------------------
 
-//go:generate esc -prefix=assets -o assets.go assets
 func routes(router *mux.Router) {
     api := router.PathPrefix(HTTP_API_BASE).Subrouter()
     api.NotFoundHandler = http.HandlerFunc(NotFound)
