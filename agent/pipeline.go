@@ -178,3 +178,9 @@ func (p *Pipeline) getEnv() []string {
 
     return env
 }
+
+func (p *Pipeline) addContainer(container string) {
+    p.mutex.Lock()
+    p.Containers = append(p.Containers, container)
+    p.mutex.Unlock()
+}

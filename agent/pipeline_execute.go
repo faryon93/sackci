@@ -38,10 +38,11 @@ import (
 const (
     PIPELINEFILE = "Pipelinefile"
     STAGE_IMAGE = "alpine:latest"
+    KEY_PATH = "/tmp/id_rsa"
 
     // scm stage definitions
     STAGE_SCM_ID = 0
-    STAGE_SCM_NAME = "SCM"
+    STAGE_SCM_NAME = "Clone"
 
     // internal environment variables
     CI_BUILDNR = "CI_BUILDNR"
@@ -147,10 +148,13 @@ func (p *Pipeline) ExecuteStage(stageId int, stage *pipelinefile.Stage) (error) 
     steps := "/bin/sh -c '"
     for i := 0; i < len(stage.Steps); i++ {
         steps += "echo $: " + stage.Steps[i] + " && " + stage.Steps[i]
-        if i < len(stage.Steps) - 1 {
-            steps += " && "
-        }
+        steps += " && "
     }
+
+    // issue a newline, because the remote api is buffered
+    // so if the last log lines does not contain a newline gathering
+    // of the logs hangs inifitely
+    steps += "printf \"\n\""
     steps += "'"
 
     // default to configured image if neceasarry

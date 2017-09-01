@@ -31,8 +31,7 @@ import (
 //  public members
 // ----------------------------------------------------------------------------------
 
-// Executes a command on the build agent, while using the given volume and image.
-func (a *Agent) Execute(vol string, image string, cmd string, env []string, stdio func(string)) (string, int, error) {
+func(a *Agent) CreateContainer(vol string, image string, cmd string, env []string) (string, error) {
     // create the container in order to start it
     container, err := a.docker.CreateContainer(docker.CreateContainerOptions{
         Config: &docker.Config{
@@ -48,23 +47,24 @@ func (a *Agent) Execute(vol string, image string, cmd string, env []string, stdi
             Binds: []string{vol + ":" + workdir},
         },
     })
-    if err != nil {
-
-	if container == nil {
-		return "", -1, err
-	}
-        return container.ID, -1, err
+    if err != nil && container == nil {
+        return "", err
     }
 
+    return container.ID, err
+}
+
+// Executes a command on the build agent, while using the given volume and image.
+func (a *Agent) StartContainer(container string, stdio func(string)) (int, error) {
     // start the container
-    err = a.docker.StartContainer(container.ID, nil)
+    err := a.docker.StartContainer(container, nil)
     if err != nil {
-        return container.ID, -1, nil
+        return -1, err
     }
 
     // gather all console outputs
     err = a.docker.Logs(docker.LogsOptions{
-        Container: container.ID,
+        Container: container,
         OutputStream: &ConsoleOutput{Callback: stdio},
         ErrorStream: &ConsoleOutput{Callback: stdio},
         Stdout: true,
@@ -73,12 +73,12 @@ func (a *Agent) Execute(vol string, image string, cmd string, env []string, stdi
         RawTerminal: true,
     })
     if err != nil {
-        return container.ID, -1, err
+        return -1, err
     }
 
     // wait for the container to finish the command
-    ret, err := a.docker.WaitContainer(container.ID)
-    return container.ID, ret, err
+    ret, err := a.docker.WaitContainer(container)
+    return ret, err
 }
 
 // Removes a container with the given ID from the build agent.

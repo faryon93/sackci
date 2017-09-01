@@ -21,15 +21,23 @@ package agent
 
 // Executes a command in the given image on this pipeline.
 func (p *Pipeline) Container(image string, cmd string, stdio func(string)) (int, error) {
-    // execute the container
-    container, ret, err := p.Agent.Execute(p.Volume, image, cmd, p.getEnv(), stdio)
+    // create the container
+    container, err := p.Agent.CreateContainer(p.Volume, image, cmd, p.getEnv())
     if container != "" {
-        p.mutex.Lock()
-        p.Containers = append(p.Containers, container)
-        p.mutex.Unlock()
+        p.addContainer(container)
+    }
+    if err != nil {
+        return -1, err
     }
 
-    return ret, err
+    // copy the key file to the container
+    err = p.Agent.WriteFile(container, KEY_PATH, []byte(p.project.PrivateKey))
+    if err != nil {
+        return -1, err
+    }
+
+    // execute the container
+    return p.Agent.StartContainer(container, stdio)
 }
 
 // Read a file from the pipeline. At least on container has to be executed.

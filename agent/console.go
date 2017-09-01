@@ -72,5 +72,9 @@ func clean(str string) (string) {
     str = strings.Replace(str, "\u001b[K", "", -1)
 
     parts := strings.Split(str, "\r")
-    return parts[len(parts) - 2]
+    if len(parts) >= 2 {
+        return parts[len(parts) - 2]
+    } else {
+        return str
+    }
 }

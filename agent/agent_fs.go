@@ -110,6 +110,36 @@ func (a *Agent) SavePath(container string, path string, file string) (error) {
     })
 }
 
+// Writes a file to the container
+func (a *Agent) WriteFile(container string, path string, buf []byte) (error) {
+    r, w := io.Pipe()
+    defer r.Close()
+
+    go func() {
+        defer w.Close()
+
+        tarWriter := tar.NewWriter(w)
+        err := tarWriter.WriteHeader(&tar.Header{
+            Name: path,
+            Size: int64(len(buf)),
+            Mode: 0777,
+        })
+        if err != nil {
+            return
+        }
+
+        _, err = tarWriter.Write(buf)
+        if err != nil {
+            return
+        }
+    }()
+
+    return a.docker.UploadToContainer(container, docker.UploadToContainerOptions{
+        InputStream: r,
+        Path:        "/",
+    })
+}
+
 // Joins parts of a filepath to a complete path.
 func (a *Agent) Filepath(paths ...string) (string) {
     // the default linux implementation
