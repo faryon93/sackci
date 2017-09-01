@@ -113,8 +113,28 @@ func ProjectLatestBuild(w http.ResponseWriter, r *http.Request) {
 
 // Badge (failing / passing) for the project.
 func ProjectBadge(w http.ResponseWriter, r *http.Request) {
-    build, err := getLastBuild(w, r)
+    id, err := strconv.Atoi(mux.Vars(r)["id"])
     if err != nil {
+        http.Error(w, "invalid project id", http.StatusNotAcceptable)
+        return
+    }
+
+    // get the project
+    project := ctx.Conf.GetProject(id)
+    if project == nil {
+        http.Error(w, "project not found", http.StatusNotFound)
+        return
+    }
+
+    // send an error if the badge is disabled
+    if !project.BadgeEnable {
+        http.Error(w, "not enabled", http.StatusNotFound)
+        return
+    }
+
+    build, err := project.GetLastBuild()
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }
 

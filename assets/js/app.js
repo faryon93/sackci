@@ -572,7 +572,7 @@ app.directive("confirm", function ($compile) {
                 '<strong ng-show="show">Sure?</strong>&nbsp;' +
                 '<button type="button" class="btn btn-default" ng-show="show" ng-click="yes()">' +
                 '<i class="fa fa-check"></i> Yes</button>&nbsp;' +
-                '<button type="button" class="btn btn-default" ng-show="show" ng-click="no()">' +
+                '<button type="button" class="btn btn-default" style="margin-right: 8px" ng-show="show" ng-click="no()">' +
                 '<i class="fa fa-remove"></i> No</button>');
             element.after($compile(contentTr)(scope));
 

@@ -52,6 +52,7 @@ type Project struct {
     Interval int `yaml:"interval,omitempty" json:"interval"`
     Env map[string]string `yaml:"env,omitempty" json:"env"`
     CommitUrl string `yaml:"commit_url,omitempty" json:"commit_url"`
+    BadgeEnable bool `yaml:"badge" json:"badge"`
     PrivateKey string `yaml:"key" json:"key"`
 
     // runtime variables

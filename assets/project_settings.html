@@ -71,7 +71,7 @@
             <!-- enable status badge -->
             <div class="row">
                 <div class="col-md-12">
-                    <strong>Enable status badge</strong> <input type="checkbox"><br />
+                    <strong>Enable status badge</strong> <input type="checkbox" ng-model="project.badge"><br />
                     The status badge is a small SVG image representing the latest build status of your project. The badge can be viewed without authentication.
                 </div>
             </div>
@@ -147,19 +147,23 @@
 
                 <div class="col-md-3">
                     <div class="pull-right">
-                        <button type="button" class="btn btn-danger margin" ng-click="viewKey = !viewKey">
+                        <button type="button" class="btn btn-danger margin" ng-click="viewKey = !viewKey" ng-show="project.key.length > 0">
                             <i class="fa fa-eye"></i>&nbsp;
                             <span ng-if="!viewKey">View Key</span>
                             <span ng-if="viewKey">Hide Key</span>
+                        </button>
+
+                        <button type="button" class="btn btn-danger margin" ng-show="project.key.length <= 0">
+                            <i class="fa fa-plus"></i>&nbsp;<span>Add Key</span>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div class="row no-hr">
+            <div class="row no-hr" ng-show="project.key.length > 0">
                 <div class="col-md-12">
-                    <pre ng-if="viewKey">{{project.key}}</pre>
-                    <pre ng-if="!viewKey">-----BEGIN RSA PRIVATE KEY-----
+                    <pre ng-show="viewKey">{{project.key}}</pre>
+                    <pre ng-show="!viewKey">-----BEGIN RSA PRIVATE KEY-----
 {{project.key.substr(32, 12)}}...
 -----END RSA PRIVATE KEY-----</pre>
                 </div>
