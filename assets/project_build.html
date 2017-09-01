@@ -30,7 +30,8 @@
               <i class="fa fa-circle-o-notch"></i>
               <span>
                 <b>Commit:</b>
-                <a href="{{project.commit_url.replace('{ref}', build.commit.ref)}}" target="_blank">#{{build.commit.ref | short}}</a>
+                <a href="{{project.commit_url.replace('{ref}', build.commit.ref)}}" ng-if="project.commit_url != ''" target="_blank">#{{build.commit.ref | short}}</a>
+                <span ng-if="project.commit_url.length == ''">#{{build.commit.ref | short}}</span>
               </span>
             </h5>
           </div>
@@ -79,8 +80,8 @@
         <div class="panel panel-default">
           <div class="panel-heading">Actions</div>
           <div class="panel-body">
-            <button type="button" class="btn btn-default btn-block"><i class="fa fa-refresh" aria-hidden="true"></i> Rerun Build</button>
-            <button type="button" class="btn btn-default btn-block"><i class="fa fa-download" aria-hidden="true"></i> Get Artifacts</button>
+            <button type="button" class="btn btn-default btn-block"><i class="fa fa-refresh"></i> Rerun Build</button>
+            <button type="button" class="btn btn-default btn-block"><i class="fa fa-download"></i> Get Artifacts</button>
           </div>
         </div>
       </div>
