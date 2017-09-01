@@ -153,19 +153,23 @@
                             <span ng-if="viewKey">Hide Key</span>
                         </button>
 
-                        <button type="button" class="btn btn-danger margin" ng-show="project.key.length <= 0">
+                        <button type="button" class="btn btn-danger margin" ng-click="addKey = true" ng-show="project.key.length <= 0">
                             <i class="fa fa-plus"></i>&nbsp;<span>Add Key</span>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div class="row no-hr" ng-show="project.key.length > 0">
-                <div class="col-md-12">
+            <div class="row no-hr">
+                <div class="col-md-12" >
+                    <div ng-show="project.key.length > 0">
                     <pre ng-show="viewKey">{{project.key}}</pre>
                     <pre ng-show="!viewKey">-----BEGIN RSA PRIVATE KEY-----
 {{project.key.substr(32, 12)}}...
 -----END RSA PRIVATE KEY-----</pre>
+                    </div>
+
+                    <textarea class="form-control" ng-show="addKey" rows="24" style="resize: none;"></textarea>
                 </div>
             </div>
 
