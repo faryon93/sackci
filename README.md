@@ -8,9 +8,9 @@ Simple as *uck continuous integration server
 - pipeline configuration stored in project repository
 - configuration in text format (storable in vcs)
 - custom scm via special docker container
-- single database file
 - realtime web interface
 - REST interface (used by web ui)
+- single binary, which contains all necessary data
 
 ## Architecture
 The sackci server is the central node which orchestrates the builds on all "agents". On the build agents there is no software required, except a running docker daemon with exposed management api to the network.
