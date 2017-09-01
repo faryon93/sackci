@@ -51,7 +51,7 @@
                     <form>
                         <div class="form-group">
                             <label for="repo-url">Repository URL</label>
-                            <input type="text" class="form-control" id="repo-url" ng-value="project.repository">
+                            <input class="form-control" id="repo-url" ng-value="project.repository">
                         </div>
                         <div class="form-group">
                             <label for="repo-branch">Branch</label>
@@ -139,11 +139,29 @@
             </div>
 
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-9">
                     <strong>Private Key</strong><br />
                     Your private key is used to authenticate against the source code repository or other SSH based services.
                     It is stored in <span style="font-style: italic;">/tmp/id_rsa</span> that the default SSH utilities find it right away.<br /><br />
-                    <pre>{{project.key}}</pre>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-danger margin" ng-click="viewKey = !viewKey">
+                            <i class="fa fa-eye"></i>&nbsp;
+                            <span ng-if="!viewKey">View Key</span>
+                            <span ng-if="viewKey">Hide Key</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row no-hr">
+                <div class="col-md-12">
+                    <pre ng-if="viewKey">{{project.key}}</pre>
+                    <pre ng-if="!viewKey">-----BEGIN RSA PRIVATE KEY-----
+{{project.key.substr(32, 12)}}...
+-----END RSA PRIVATE KEY-----</pre>
                 </div>
             </div>
 

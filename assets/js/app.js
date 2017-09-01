@@ -297,6 +297,9 @@ app.controller("projectEnv", function($scope, $routeParams) {
 });
 
 app.controller("settings", function($scope, $routeParams, history, projects) {
+    // variable initialisation
+    $scope.viewKey = false;
+
     // eventhandler: purge build history
     $scope.purge = function(scope) {
         scope.status = "waiting";
