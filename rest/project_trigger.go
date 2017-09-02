@@ -39,6 +39,7 @@ import (
 type triggerResponse struct {
     Success bool `json:"success"`
     BuildId int `json:"build_id"`
+    Message string `json:"message"`
 }
 
 
@@ -47,6 +48,11 @@ type triggerResponse struct {
 // --------------------------------------------------------------------------------------
 
 func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
+    // if the pipeline is executed, the project has to be
+    // unlocked when the pipeline finished
+    ignoreDeferedUnlock := false
+
+    // parse the id of the project
     id, err := strconv.Atoi(mux.Vars(r)["id"])
     if err != nil {
         http.Error(w, "invalid project id", http.StatusNotAcceptable)
@@ -59,6 +65,18 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
         http.Error(w, "not found", http.StatusNotFound)
         return
     }
+
+    // try to lock the project -> if fails, a build
+    // is already running
+    if err := project.Lock(); err != nil {
+        http.Error(w, "Build already running", http.StatusConflict)
+        return
+    }
+    defer func() {
+        if !ignoreDeferedUnlock {
+            project.Unlock()
+        }
+    }()
 
     // create the pipeline on the build agent
     pipeline, err := agent.CreatePipeline()
@@ -93,9 +111,13 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
     }()
 
     // asynchrounsly execute the proejct on the provisioned pipeline
+    ignoreDeferedUnlock = true
     go func() {
         pipeline.Execute()
         pipeline.Destroy()
+
+        // release to project -> another build can now be executed
+        project.Unlock()
     }()
 
     Jsonify(w, triggerResponse{

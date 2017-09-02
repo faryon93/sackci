@@ -21,6 +21,7 @@ package model
 
 import (
     "sync"
+    "errors"
 
     "github.com/asdine/storm"
 
@@ -35,6 +36,10 @@ import (
 const (
     TRIGGER_MANUAL = "manual"
     TRIGGER_POLL   = "poll"
+)
+
+var (
+    ErrBuildRunning = errors.New("build running")
 )
 
 
@@ -56,7 +61,8 @@ type Project struct {
     PrivateKey string `yaml:"key" json:"key,omitempty"`
 
     // runtime variables
-    ExecutionLock sync.Mutex `json:"-" yaml:"-"`
+    mutex sync.Mutex `json:"-" yaml:"-"`
+    buildRunning bool `yaml:"-" json:"-"`
 }
 
 
@@ -136,4 +142,28 @@ func (p *Project) CheckIntegrity() {
             build.Save()
         }
     }
+}
+
+// Marks the project as running.
+func (p *Project) Lock() (error) {
+    p.mutex.Lock()
+    defer p.mutex.Unlock()
+
+    // if a build for this project is already running
+    // an error should be thrown
+    if p.buildRunning {
+        return ErrBuildRunning
+    }
+
+    p.buildRunning = true
+
+    return nil
+}
+
+// Marks the project as finished.
+func (p *Project) Unlock() {
+    p.mutex.Lock()
+    defer p.mutex.Unlock()
+
+    p.buildRunning = false
 }

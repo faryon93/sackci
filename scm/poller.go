@@ -142,6 +142,13 @@ func poll(project *model.Project, t *util.CycleTimer) {
     // detect if new changes are available in the repository
     // trigger a new build if changes are detected
     if lastBuild == nil || lastBuild.Commit.Ref != newRef {
+        // try to lock the project, if a build is already running
+        // skip this build cycle
+        if ok := project.Lock(); ok != nil {
+            return
+        }
+        defer project.Unlock()
+
         log.Error(LOG_TAG, "changes detected for project", project.Name,
                               "with ref:", util.ShortHash(newRef))
 

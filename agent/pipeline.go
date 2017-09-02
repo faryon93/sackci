@@ -123,12 +123,6 @@ func (p *Pipeline) Destroy() {
 
     // close the event stream
     close(p.Events)
-
-    // if a project is assigned
-    // we need to clear the execution lock
-    if p.project != nil {
-        p.project.ExecutionLock.Unlock()
-    }
 }
 
 
@@ -140,13 +134,12 @@ func (p *Pipeline) Destroy() {
 // After this time the execution lock of the project is locked.
 // As recently as the pipeline is destroyed the lock is returned.
 func (p *Pipeline) SetProject(project *model.Project) {
-    project.ExecutionLock.Lock()
     p.project = project
 
     // copy the project env
     if project.Env != nil {
         for key, val := range project.Env {
-            p.Env[key] = val;
+            p.Env[key] = val
         }
     }
 }
