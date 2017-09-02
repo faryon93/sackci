@@ -487,6 +487,7 @@ app.filter("ansicolor", ['$sce', function($sce) {
             var boldSpan = '<span class="ansi bold ' + foregroundColors[ansi] + '">';
             val = val.replace(new RegExp('\033\\[' + ansi + 'm', 'g'), span)
                      .replace(new RegExp('\033\\[0;' + ansi + 'm', 'g'), span)
+                     .replace(new RegExp('\033\\[1;' + ansi + 'm', 'g'), boldSpan)
                      .replace(new RegExp('\033\\[01;' + ansi + 'm', 'g'), boldSpan);
         });
 
@@ -497,6 +498,7 @@ app.filter("ansicolor", ['$sce', function($sce) {
         // closing tag
         val = val.replace(/\033\[m/g, '</span>');
         val = val.replace(/\033\[0m/g, '</span>');
+        val = val.replace(/\033\[0;0m/g, '</span>');
         val = val.replace(/\033\[39m/g, '</span>');
 
         return $sce.trustAsHtml(val);
