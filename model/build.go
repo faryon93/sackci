@@ -67,10 +67,10 @@ type Commit struct {
 }
 
 type Stage struct {
-    Name    string      `json:"name" groups:"one"`
-    Status  string      `json:"status" groups:"one"`
-    Duration time.Duration `json:"duration" groups:"one"`
-    Log     []string    `json:"log" groups:"one"`
+    Name     string         `json:"name" groups:"one"`
+    Status   string         `json:"status" groups:"one"`
+    Duration time.Duration  `json:"duration" groups:"one"`
+    Log      []string       `json:"-"`
 }
 
 

@@ -64,7 +64,7 @@
 
             <!-- status of the stages -->
             <div class="layer" ng-if="build.stages.length">
-              <div class="step" ng-class="stage.status" ng-repeat="stage in build.stages" ng-click="selectStage(stage)">
+              <div class="step" ng-class="stage.status" ng-repeat="stage in build.stages" ng-click="selectStage($index)">
                 <i class="fa fa-question" ng-if="stage.status == 'ignored'"></i>
                 <i class="fa fa-remove" ng-if="stage.status == 'failed'"></i>
                 <i class="fa fa-check" ng-if="stage.status == 'passed'"></i>
@@ -97,7 +97,7 @@
           <div class="panel-body log">
             <div class="empty" ng-if="!stage.log.length">No log output captured for selected step.</div>
 
-            <div class="line" ng-repeat="log in stage.log track by $index">
+            <div class="line" ng-repeat="log in stage.log track by $index" ng-if="log.length > 0">
               <span class="linenr">{{$index + 1}}</span>
               <span class="message" ng-bind-html="log | ansicolor"></span>
             </div>

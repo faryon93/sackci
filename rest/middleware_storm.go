@@ -32,6 +32,7 @@ import (
 
     "github.com/faryon93/sackci/model"
     "github.com/faryon93/sackci/log"
+    "github.com/faryon93/sackci/util"
 )
 
 // --------------------------------------------------------------------------------------
@@ -130,14 +131,17 @@ func stormQuery(r *http.Request, flags ...int) (storm.Query, error) {
     // construct the query expression
     matchers := []q.Matcher{}
     for field, value := range fields {
-        // convert the url parameter to an integer
-        fieldVal, err := strconv.Atoi(value)
-        if err != nil {
-            return nil, errors.New("faild to parse field \"" + field + "\"")
-        }
+        // only check upper case url parameters
+        if util.IsUpper(field[0]) {
+            // convert the url parameter to an integer
+            fieldVal, err := strconv.Atoi(value)
+            if err != nil {
+                return nil, errors.New("faild to parse field \"" + field + "\"")
+            }
 
-        // All elements of the array are getting and'ed
-        matchers = append(matchers, q.Eq(field, fieldVal))
+            // All elements of the array are getting and'ed
+            matchers = append(matchers, q.Eq(field, fieldVal))
+        }
     }
     query := model.Get().Select(matchers...)
 

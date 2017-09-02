@@ -55,6 +55,7 @@ func routes(router *mux.Router) {
     api.Methods(http.MethodGet).Path("/project/{id}/trigger").HandlerFunc(rest.ProjectTrigger)
     api.Methods(http.MethodGet).Path("/project/{id}/build/latest").HandlerFunc(rest.ProjectLatestBuild)
     api.Methods(http.MethodGet).Path("/project/{Project}/build/{Num}/log").HandlerFunc(rest.BuildRawLog)
+    api.Methods(http.MethodGet).Path("/project/{Project}/build/{Num}/log/{stage}").HandlerFunc(rest.BuildStageLog)
 
     // register model-based REST endpoints
     rest.QueryOne(api, "/project/{Id}", ctx.Conf.Projects)

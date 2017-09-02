@@ -51,10 +51,40 @@ func BuildRawLog(w http.ResponseWriter, r *http.Request) {
     }
 
     w.Header().Set("Content-Type", CONTENT_TYPE_TEXT)
-
     for _, stage := range build.Stages {
         w.Write([]byte(stage.RawLog()))
     }
+}
+
+func BuildStageLog(w http.ResponseWriter, r *http.Request) {
+    stage, err := strconv.Atoi(mux.Vars(r)["stage"])
+    if err != nil {
+        http.Error(w, "invalid stage", http.StatusNotAcceptable)
+        return
+    }
+
+    // construct the query
+    query, err := stormQuery(r)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusNotAcceptable)
+        return
+    }
+
+    var build model.Build
+    err = query.First(&build)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    // check stage boundries
+    if stage < 0 ||stage >= len(build.Stages) {
+        http.Error(w, "invalid stage", http.StatusNotAcceptable)
+        return
+    }
+
+    w.Header().Set("Content-Type", CONTENT_TYPE_TEXT)
+    w.Write([]byte(build.Stages[stage].RawLog()))
 }
 
 func BuildPurge(r *http.Request) {

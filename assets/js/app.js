@@ -103,16 +103,24 @@ app.controller("project", function($scope, $location, $routeParams, projects, tr
     };
 });
 
-app.controller("projectBuild", function($scope, $routeParams, builds, feed) {
+app.controller("projectBuild", function($scope, $routeParams, builds, feed, log) {
     // default variables
     $scope.timestamp = 0;
     $scope.errorCode = 404;
     $scope.error = "not found";
 
     // handler: select a stage
-    $scope.selectStage = function(stage) {
-        if (stage.status !== "ignored")
-            $scope.stage = stage;
+    $scope.selectStage = function(index) {
+        var stage = $scope.build.stages[index];
+        if (stage === undefined || stage.status === "ignored")
+            return;
+
+        $scope.stage = stage;
+        log.get({project: $routeParams.id, id: $scope.build.num, stage: index},
+            function(resp) {
+                $scope.stage.log = resp.log.split("\n");
+            }
+        );
     };
 
     // successfull loaded build details
@@ -124,10 +132,14 @@ app.controller("projectBuild", function($scope, $routeParams, builds, feed) {
 
         // per default the stage wich is most recent
         // and not ignored is displayed when viewing the build
+        var selectedStage = 0;
         $scope.build.stages.forEach(function(stage) {
             if (stage.status !== "ignored")
-                $scope.stage = stage;
+                selectedStage++
         });
+
+        if (selectedStage > 0)
+            $scope.selectStage(selectedStage - 1);
     };
 
     // error while loading build details
@@ -344,6 +356,17 @@ app.factory('trigger', function($resource){
     return $resource('/api/v1/project/:id/trigger');
 });
 
+app.factory('log', function($resource){
+    return $resource('/api/v1/project/:project/build/:id/log/:stage',
+                     {project:'@project', id: '@id', stage: '@stage'}, {
+                     get: {
+                         method: "GET",
+                         transformResponse: function(data) {
+                             return { log: data }
+                         }
+                     }
+        });
+});
 
 // ------------------------------------------------------------------------------------------------
 app.factory('feed', function($rootScope) {

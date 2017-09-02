@@ -51,3 +51,8 @@ func MaskCredentials(url string) (string) {
 
     return url
 }
+
+// Checks if a letter is uppercase
+func IsUpper(b byte) bool {
+    return b < []byte{0x5a}[0]
+}
