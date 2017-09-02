@@ -108,19 +108,30 @@ app.controller("projectBuild", function($scope, $routeParams, builds, feed, log)
     $scope.timestamp = 0;
     $scope.errorCode = 404;
     $scope.error = "not found";
+    $scope.loadingLog = false;
 
     // handler: select a stage
     $scope.selectStage = function(index) {
         var stage = $scope.build.stages[index];
         if (stage === undefined || stage.status === "ignored")
             return;
-
         $scope.stage = stage;
-        log.get({project: $routeParams.id, id: $scope.build.num, stage: index},
-            function(resp) {
-                $scope.stage.log = resp.log.split("\n");
-            }
-        );
+
+        // only display the loading spinner when no log
+        // is displayed right now
+        if ($scope.stage.log === undefined || $scope.stage.log.length === 0)
+        {
+            $scope.stage.log = [];
+            $scope.loadingLog = true;
+            // load the log of the stage
+            log.get({project: $routeParams.id, id: $scope.build.num, stage: index},
+                function(resp) {
+                    $scope.stage.log = resp.log.split("\n");
+                    $scope.loadingLog = false;
+                }
+                // TODO: error handling
+            );
+        }
     };
 
     // successfull loaded build details
