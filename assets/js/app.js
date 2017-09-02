@@ -499,44 +499,9 @@ app.directive('capitalize', function() {
 });
 
 app.filter("ansicolor", ['$sce', function($sce) {
-    var foregroundColors = {
-      '01': 'bold',
-      '30': 'black',
-      '31': 'red',
-      '32': 'green',
-      '33': 'yellow',
-      '34': 'blue',
-      '35': 'magenta',
-      '36': 'cyan',
-      '37': 'white'
-    };
-
-    return function(val)
-    {
-        if (val === undefined)
-            val = '';
-
-        Object.keys(foregroundColors).forEach(function (ansi) {
-            var span = '<span class="ansi ' + foregroundColors[ansi] + '">';
-            var boldSpan = '<span class="ansi bold ' + foregroundColors[ansi] + '">';
-            val = val.replace(new RegExp('\033\\[' + ansi + 'm', 'g'), span)
-                     .replace(new RegExp('\033\\[0;' + ansi + 'm', 'g'), span)
-                     .replace(new RegExp('\033\\[1;' + ansi + 'm', 'g'), boldSpan)
-                     .replace(new RegExp('\033\\[01;' + ansi + 'm', 'g'), boldSpan);
-        });
-
-        // bold and italic
-        val = val.replace(/\033\[1m/g, '<b>').replace(/\033\[22m/g, '</b>');
-        val = val.replace(/\033\[3m/g, '<i>').replace(/\033\[23m/g, '</i>');
-
-        // closing tag
-        val = val.replace(/\033\[m/g, '</span>');
-        val = val.replace(/\033\[0m/g, '</span>');
-        val = val.replace(/\033\[0;0m/g, '</span>');
-        val = val.replace(/\033\[39m/g, '</span>');
-
-        return $sce.trustAsHtml(val);
-    };
+    return function(val) {
+        return $sce.trustAsHtml(new AnsiUp().ansi_to_html(val));
+    }
 }]);
 
 app.filter('duration', function(){
