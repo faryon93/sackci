@@ -17,7 +17,7 @@
     <div class="panel panel-default" ng-repeat="build in builds">
       <div class="panel-body" ng-class="build.status" style="padding-top: 0; padding-bottom: 10px; padding-left: 30px;">
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-md-6 col-sm-6">
             <h5 class="commit">
               <i class="fa fa-check" ng-if="build.status == 'passed'"></i>
               <i class="fa fa-remove" ng-if="build.status == 'failed'"></i>
@@ -28,7 +28,7 @@
             <h5 class="text-muted"><i class="fa fa-circle-o-notch"></i><span><b>Commit:</b> #<span ng-bind="build.commit.ref | short" ></span></span></h5>
           </div>
 
-          <div class="col-md-3" style="padding-top: 0;">
+          <div class="col-md-3 col-sm-6" style="padding-top: 0;">
             <h5 class="text-muted"><i class="fa fa-calendar"></i><span><b>Time:</b> <span ng-bind="build.time | date:'yyyy-MM-dd HH:mm'"></span></span></h5>
             <h5 class="text-muted"><i class="fa fa-hourglass-half"></i> <span><b>Duration:</b> <span ng-bind="build.duration | duration"></span></span></h5>
             <h5 class="text-muted"><i class="fa fa-server"></i> <span><b>Node:</b> {{build.node}}</span></h5>
