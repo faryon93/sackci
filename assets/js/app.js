@@ -314,9 +314,9 @@ app.controller("projectHistory", function($scope, $routeParams, history, feed) {
 });
 
 app.controller("projectEnv", function($scope, $routeParams) {
-    $scope.showConfirm = function(show) {
-        $scope.confirm = show;
-    };
+    $scope.delete = function (scope) {
+        alert("deleting...");
+    }
 });
 
 app.controller("settings", function($scope, $routeParams, history, projects) {

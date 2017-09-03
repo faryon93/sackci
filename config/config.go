@@ -21,6 +21,7 @@ package config
 
 import (
     "io/ioutil"
+    "strings"
 
     "gopkg.in/yaml.v2"
 
@@ -65,9 +66,21 @@ func Load(path string) (*Config, error) {
     conf.path = path
 
     // fill in the project ids
-    // TODO: better way of id handling
     for i := 0; i < len(conf.Projects); i++ {
+        // TODO: better way of id handling
         conf.Projects[i].Id = i + 1
+
+        // capitalize the environment variable names
+        env := make(map[string]string)
+        for key, value := range conf.Projects[i].Env {
+            env[strings.ToUpper(key)] = value
+        }
+        conf.Projects[i].Env = env
+
+        // an empty trigger means manual triggering
+        if conf.Projects[i].Trigger == "" {
+            conf.Projects[i].Trigger = model.TRIGGER_MANUAL
+        }
     }
 
     return &conf, nil
