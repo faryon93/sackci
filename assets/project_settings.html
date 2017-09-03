@@ -25,11 +25,18 @@
                     Starting a build can be triggered by various sources. Polling the SCM repository for changes is the most used way.
                     Manually triggering the builds from the web interface is possible at any time.<br /><br />
 
-                    <div class="dropdown">
-                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Manual Trigger
-                            <span class="caret"></span></button>
-                        <ul class="dropdown-menu">
-                            <li><a href="#">Manual Trigger</a></li>
+
+
+                </div>
+            </div>
+            <div class="row no-hr">
+                <div class="col-md-2">
+                    <div class="btn-group dropdown" uib-dropdown>
+                        <button class="btn btn-default dropdown-toggle" type="button" uib-dropdown-toggle>
+                            Manual Trigger&nbsp;<span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" uib-dropdown-menu>
+                            <li><a href="#">Manual</a></li>
                             <li><a href="#">SCM Polling</a></li>
                             <li><a href="#">Webhook</a></li>
                         </ul>
