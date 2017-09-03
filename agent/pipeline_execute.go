@@ -71,22 +71,22 @@ func (p *Pipeline) Execute() (error) {
     p.Env[CI_AGENT] = p.Agent.Name
 
     // get a working copy of the repo
-    start := time.Now()
+    scmStart := time.Now()
     p.BeginStage(STAGE_SCM_ID)
     p.Log(STAGE_SCM_ID,"starting scm checkout for", util.MaskCredentials(p.project.Repository))
     commit, err := p.Clone()
     if err != nil {
         p.Log(STAGE_SCM_ID,"scm checkout failed:", err.Error())
-        p.FinishStage(STAGE_SCM_ID, model.STAGE_FAILED, time.Since(start))
+        p.FinishStage(STAGE_SCM_ID, model.STAGE_FAILED, time.Since(scmStart))
         p.FinishPipeline(model.BUILD_FAILED, time.Since(p.StartTime))
         return err
     }
     p.CommitFound(commit)
     p.Env[CI_COMMIT_REF] = commit.Ref
-    p.Log(STAGE_SCM_ID, "scm checkout completed successfully in", time.Since(start))
+    p.Log(STAGE_SCM_ID, "scm checkout completed successfully in", time.Since(scmStart))
 
     // get the pipeline definition
-    start = time.Now()
+    start := time.Now()
     definition, err := p.GetPipelinefile()
     if err != nil {
         p.Log(STAGE_SCM_ID, "failed to get Pipelinefile:", err.Error())
@@ -100,7 +100,7 @@ func (p *Pipeline) Execute() (error) {
     p.Log(STAGE_SCM_ID, "sucessfully obtained Pipelinefile in", time.Since(start))
     p.Log(STAGE_SCM_ID, "found", len(definition.Stages), "stages", "(" + definition.StageString() + ") in Pipelinefile")
     p.PublishPipeline()
-    p.FinishStage(STAGE_SCM_ID, model.STAGE_PASSED, time.Since(start))
+    p.FinishStage(STAGE_SCM_ID, model.STAGE_PASSED, time.Since(scmStart))
 
     // execute all configured stages
     for stageId, stage := range definition.Stages {
