@@ -111,7 +111,7 @@ func (a *Agent) SavePath(container string, path string, file string) (error) {
 }
 
 // Writes a file to the container
-func (a *Agent) WriteFile(container string, path string, buf []byte) (error) {
+func (a *Agent) WriteFile(container string, path string, buf []byte, mode int64) (error) {
     r, w := io.Pipe()
     defer r.Close()
 
@@ -122,7 +122,7 @@ func (a *Agent) WriteFile(container string, path string, buf []byte) (error) {
         err := tarWriter.WriteHeader(&tar.Header{
             Name: path,
             Size: int64(len(buf)),
-            Mode: 0777,
+            Mode: mode,
         })
         if err != nil {
             return
