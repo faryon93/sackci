@@ -31,7 +31,7 @@ import (
 //  public members
 // ----------------------------------------------------------------------------------
 
-func(a *Agent) CreateContainer(vol string, image string, cmd string, env []string) (string, error) {
+func(a *Agent) CreateContainer(vol string, image string, cmd string, env []string, workdir string) (string, error) {
     // create the container in order to start it
     container, err := a.docker.CreateContainer(docker.CreateContainerOptions{
         Config: &docker.Config{
@@ -42,9 +42,10 @@ func(a *Agent) CreateContainer(vol string, image string, cmd string, env []strin
             AttachStdout: true,
             WorkingDir: workdir,
             Env: env,
+            User: "1000",
         },
         HostConfig: &docker.HostConfig{
-            Binds: []string{vol + ":" + workdir},
+            Binds: []string{vol + ":" + MOUNTPOINT},
         },
     })
     if err != nil && container == nil {

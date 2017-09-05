@@ -20,9 +20,9 @@ package agent
 // ----------------------------------------------------------------------------------
 
 // Executes a command in the given image on this pipeline.
-func (p *Pipeline) Container(image string, cmd string, stdio func(string)) (int, error) {
+func (p *Pipeline) Container(image string, cmd string, workdir string, stdio func(string)) (int, error) {
     // create the container
-    container, err := p.Agent.CreateContainer(p.Volume, image, cmd, p.getEnv())
+    container, err := p.Agent.CreateContainer(p.Volume, image, cmd, p.getEnv(), workdir)
     if container != "" {
         p.addContainer(container)
     }

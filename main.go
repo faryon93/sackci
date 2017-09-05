@@ -95,7 +95,6 @@ func main() {
     // initialize the global application context
     ctx.Init()
     agent.Add(ctx.Conf.Agents...)
-    agent.SetWorkdir(WORKDIR)
     ctx.Conf.Print()
     scm.Setup()
 

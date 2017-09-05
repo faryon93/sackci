@@ -44,7 +44,6 @@ const (
 var (
     poolMutex = sync.Mutex{}
     pool      = []Agent{}
-    workdir   = "/"
 )
 
 
@@ -105,9 +104,4 @@ func Allocate() (*Agent) {
     }
 
     return agent
-}
-
-// Sets the workdir for alle containers.
-func SetWorkdir(dir string) {
-    workdir = dir
 }

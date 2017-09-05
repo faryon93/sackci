@@ -32,6 +32,19 @@ import (
 
 
 // ----------------------------------------------------------------------------------
+//  constants
+// ----------------------------------------------------------------------------------
+
+const (
+    UID = 1000
+    GID = 1000
+
+    MOUNTPOINT = "/mnt"
+    WORKDIR = MOUNTPOINT + "/work"
+)
+
+
+// ----------------------------------------------------------------------------------
 //  types
 // ----------------------------------------------------------------------------------
 
@@ -81,7 +94,7 @@ func (a *Agent) ReadFile(container string, file string) ([]byte, error) {
 
     // Download the file from the container
     err := a.docker.DownloadFromContainer(container, docker.DownloadFromContainerOptions{
-        Path: a.Filepath(workdir, file),
+        Path: a.Filepath(WORKDIR, file),
         OutputStream: &fs,
     })
     if err != nil {
@@ -123,6 +136,8 @@ func (a *Agent) WriteFile(container string, path string, buf []byte, mode int64)
             Name: path,
             Size: int64(len(buf)),
             Mode: mode,
+            Uid: UID,
+            Gid: GID,
         })
         if err != nil {
             return
