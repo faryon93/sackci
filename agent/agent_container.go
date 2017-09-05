@@ -42,7 +42,6 @@ func(a *Agent) CreateContainer(vol string, image string, cmd string, env []strin
             AttachStdout: true,
             WorkingDir: workdir,
             Env: env,
-            User: "1000",
         },
         HostConfig: &docker.HostConfig{
             Binds: []string{vol + ":" + MOUNTPOINT},
