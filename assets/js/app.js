@@ -149,6 +149,14 @@ app.controller("projectBuild", function($scope, $routeParams, builds, feed, log)
         $scope.logLimit += LOG_LIMIT;
     };
 
+    // eventhandler: jump to end
+    $scope.logJump = function () {
+        $scope.logLimit = $scope.stage.log.length;
+        $scope.$$postDigest(function() {
+            window.scrollTo(0, document.body.scrollHeight);
+        });
+    };
+
     // successfull loaded build details
     var success = function(response, headers) {
         // get the serverside timestamp in order to discard old feed events

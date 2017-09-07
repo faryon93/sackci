@@ -97,6 +97,8 @@
             Log: {{stage.name}}
             <div class="pull-right">
               <a target="_blank" ng-href="/api/v1/project/{{project.id}}/build/{{build.num}}/log" style="text-decoration: none;"><i class="fa fa-file-text-o"></i>&nbsp;Open Raw</a>
+              |
+              <a ng-href="#" ng-click="logJump()" style="text-decoration: none;"><i class="fa fa-chevron-down"></i>&nbsp;Jump to End</a>
             </div>
           </div>
           <div class="panel-body log" infinite-scroll="moreLog()">
