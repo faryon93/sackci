@@ -216,7 +216,10 @@ app.controller("projectBuild", function($scope, $routeParams, builds, feed, log)
     registerFeed("EvtStageLog", function(evt) {
         var stageId = evt.stage;
         if ($scope.build.stages[stageId] !== undefined)
+        {
+            $scope.logLimit++;
             $scope.build.stages[stageId].log.push(evt.message);
+        }
     });
     registerFeed("EvtStageFinish", function(evt) {
         var stageId = evt.stage;

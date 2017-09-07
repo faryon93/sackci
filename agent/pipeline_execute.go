@@ -147,13 +147,10 @@ func (p *Pipeline) ExecuteStage(stageId int, stage *pipelinefile.Stage) (error) 
     steps := "/bin/sh -c '"
     for i := 0; i < len(stage.Steps); i++ {
         steps += "echo $: " + stage.Steps[i] + " && " + stage.Steps[i]
-        steps += " && "
+        if i < len(stage.Steps) - 1 {
+            steps += " && "
+        }
     }
-
-    // issue a newline, because the remote api is buffered
-    // so if the last log lines does not contain a newline gathering
-    // of the logs hangs inifitely
-    steps += "printf \"\n\""
     steps += "'"
 
     // default to configured image if neceasarry
