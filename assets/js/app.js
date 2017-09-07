@@ -104,6 +104,9 @@ app.controller("project", function($scope, $location, $routeParams, projects, tr
 });
 
 app.controller("projectBuild", function($scope, $routeParams, builds, feed, log) {
+    // constants
+    const LOG_LIMIT = 50;
+
     // default variables
     $scope.timestamp = 0;
     $scope.errorCode = 404;
@@ -112,9 +115,13 @@ app.controller("projectBuild", function($scope, $routeParams, builds, feed, log)
 
     // handler: select a stage
     $scope.selectStage = function(index) {
+        // do not display ignored stages
         var stage = $scope.build.stages[index];
         if (stage === undefined || stage.status === "ignored")
             return;
+
+        // asign the dataobject to be rendered
+        $scope.logLimit = LOG_LIMIT;
         $scope.stage = stage;
 
         // only display the loading spinner when no log
@@ -132,6 +139,11 @@ app.controller("projectBuild", function($scope, $routeParams, builds, feed, log)
                 // TODO: error handling
             );
         }
+    };
+
+    // eventhandler: more logs lines
+    $scope.moreLog = function() {
+        $scope.logLimit += LOG_LIMIT;
     };
 
     // successfull loaded build details

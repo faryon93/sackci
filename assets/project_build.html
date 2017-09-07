@@ -99,13 +99,13 @@
               <a target="_blank" ng-href="/api/v1/project/{{project.id}}/build/{{build.num}}/log" style="text-decoration: none;"><i class="fa fa-file-text-o"></i>&nbsp;Open Raw</a>
             </div>
           </div>
-          <div class="panel-body log">
+          <div class="panel-body log" infinite-scroll="moreLog()">
             <div class="empty" ng-if="!stage.log.length && !loadingLog">No log output captured for selected step.</div>
             <div class="empty" ng-if="loadingLog"><i class="fa fa-spinner fa-spin"></i>&nbsp;Loading Stage Log...</div>
 
             <table>
               <tbody>
-                <tr class="line" ng-repeat="log in stage.log track by $index" ng-if="log.length > 0">
+                <tr class="line" ng-repeat="log in stage.log | limitTo: logLimit track by $index" ng-if="log.length > 0">
                   <td class="linenr">{{$index + 1}}</td>
                   <td class="message" ng-bind-html="log | ansicolor"></td>
                 </tr>
