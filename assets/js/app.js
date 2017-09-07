@@ -120,6 +120,9 @@ app.controller("projectBuild", function($scope, $routeParams, builds, feed, log)
         if (stage === undefined || stage.status === "ignored")
             return;
 
+        if ($scope.stage === stage)
+            return;
+
         // asign the dataobject to be rendered
         $scope.logLimit = LOG_LIMIT;
         $scope.stage = stage;
