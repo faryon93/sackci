@@ -194,31 +194,29 @@ div.build-details div.log
 	background-color: #222;
 	color: #f1f1f1;
 	font-family: Monaco, monospace;
-	padding-left: 0;
-	padding-right: 0;
+	padding: 10px;
 }
 
-div.build-details div.log > div.line:hover
+div.build-details div.log .line:hover
 {
 	background-color: #444;
 }
 
-div.build-details div.log > div.line > span.linenr
+div.build-details div.log .linenr
 {
 	color: #666;
-	padding-left: 15px;
-	margin-right: 5px;
 	text-align: right;
-	width: 30px;
-	display: inline-block;
+	padding-right: 10px;
+	vertical-align: top;
 }
 
-div.build-details div.log > div.line > span.message
+div.build-details div.log .message
 {
-	white-space:pre;
+	white-space: pre-wrap;
+	word-wrap: break-word;
 }
 
-div.build-details div.log > div.empty
+div.build-details div.log div.empty
 {
 	text-align: center;
 }

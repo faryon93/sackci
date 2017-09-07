@@ -103,10 +103,14 @@
             <div class="empty" ng-if="!stage.log.length && !loadingLog">No log output captured for selected step.</div>
             <div class="empty" ng-if="loadingLog"><i class="fa fa-spinner fa-spin"></i>&nbsp;Loading Stage Log...</div>
 
-            <div class="line" ng-repeat="log in stage.log track by $index" ng-if="log.length > 0">
-              <span class="linenr">{{$index + 1}}</span>
-              <span class="message" ng-bind-html="log | ansicolor"></span>
-            </div>
+            <table>
+              <tbody>
+                <tr class="line" ng-repeat="log in stage.log track by $index" ng-if="log.length > 0">
+                  <td class="linenr">{{$index + 1}}</td>
+                  <td class="message" ng-bind-html="log | ansicolor"></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

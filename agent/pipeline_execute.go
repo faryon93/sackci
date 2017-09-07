@@ -125,7 +125,6 @@ func (p *Pipeline) Execute() (error) {
 
     p.FinishPipeline(model.BUILD_PASSED, time.Since(p.StartTime))
 
-
     return nil
 }
 
