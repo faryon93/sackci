@@ -62,6 +62,7 @@ type Project struct {
 
     // runtime variables
     mutex sync.Mutex `json:"-" yaml:"-"`
+    buildMutex sync.Mutex `json:"-" yaml:"-"`
     buildRunning bool `yaml:"-" json:"-"`
 }
 
@@ -72,6 +73,9 @@ type Project struct {
 
 // Creates a new Build from this project.
 func (p *Project) NewBuild() (*Build) {
+    p.buildMutex.Lock()
+    defer p.buildMutex.Unlock()
+
     // in order to assign the next build number
     // we need to get the latest build for the project
     build, err := p.GetLastBuild()
