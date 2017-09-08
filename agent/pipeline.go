@@ -23,7 +23,6 @@ import (
     "sync"
     "errors"
     "time"
-    "strings"
 
     "github.com/faryon93/sackci/model"
     "github.com/faryon93/sackci/pipelinefile"
@@ -159,13 +158,13 @@ func (p *Pipeline) getEnv() []string {
 
     // project specific variables
     for key, val := range p.project.Env {
-        env[i] = strings.ToUpper(key) + "=" + val
+        env[i] = key + "=" + val
         i++
     }
 
     // pipeline specific variables
     for key, val := range p.Env {
-        env[i] = strings.ToUpper(key) + "=" + val
+        env[i] = key + "=" + val
         i++
     }
 
