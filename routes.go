@@ -64,7 +64,6 @@ func routes(router *mux.Router) {
     rest.QueryOne(api, "/project/{Project}/build/{Num}", model.Build{})
     rest.DeleteAll(api, "/project/{Project}/history", model.Build{}, rest.BuildPurge)
 
-
     // register SSE endpoints
     sse.Register(api, "/feed", ctx.Feed)
 

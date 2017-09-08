@@ -38,6 +38,7 @@ import (
     "github.com/faryon93/sackci/agent"
     "github.com/faryon93/sackci/scm"
     "flag"
+    "github.com/faryon93/sackci/util"
 )
 
 
@@ -117,7 +118,7 @@ func main() {
 
         // decide if a tls encrypted server needs to be setup or not
         var err error
-        if len(ctx.Conf.TlsCert) > 0 && len(ctx.Conf.TlsKey) > 0 {
+        if !util.StrEmpty(ctx.Conf.TlsCert, ctx.Conf.TlsKey) {
             log.Info("http", "enabled TLS encryption for http server")
             err = srv.ListenAndServeTLS(ctx.Conf.TlsCert, ctx.Conf.TlsKey)
         } else {

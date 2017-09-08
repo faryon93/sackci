@@ -39,7 +39,6 @@ import (
 type triggerResponse struct {
     Success bool `json:"success"`
     BuildId int `json:"build_id"`
-    Message string `json:"message"`
 }
 
 
@@ -59,15 +58,14 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // return the runtime object
+    // search for the project in the configuration
     project := ctx.Conf.GetProject(id)
     if project == nil {
         http.Error(w, "not found", http.StatusNotFound)
         return
     }
 
-    // try to lock the project -> if fails, a build
-    // is already running
+    // try to lock the project -> if fails, a build is already running
     if err := project.Lock(); err != nil {
         http.Error(w, "Build already running", http.StatusConflict)
         return
@@ -120,8 +118,5 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
         project.Unlock()
     }()
 
-    Jsonify(w, triggerResponse{
-        Success: true,
-        BuildId: build.Num,
-    })
+    Jsonify(w, triggerResponse{true, build.Num})
 }

@@ -56,3 +56,14 @@ func MaskCredentials(url string) (string) {
 func IsUpper(b byte) bool {
     return b < []byte{0x5a}[0]
 }
+
+// Checks if a give strings are empty
+func StrEmpty(strs ...string) bool {
+    for _, str := range strs {
+        if len(str) > 0 {
+            return false
+        }
+    }
+
+    return true
+}

@@ -69,6 +69,7 @@ type Pipeline struct {
     definition *pipelinefile.Definition
 }
 
+
 // ----------------------------------------------------------------------------------
 //  public functions
 // ----------------------------------------------------------------------------------
@@ -130,8 +131,6 @@ func (p *Pipeline) Destroy() {
 // ----------------------------------------------------------------------------------
 
 // Assigns a project to this pipeline.
-// After this time the execution lock of the project is locked.
-// As recently as the pipeline is destroyed the lock is returned.
 func (p *Pipeline) SetProject(project *model.Project) {
     p.project = project
 
@@ -143,6 +142,7 @@ func (p *Pipeline) SetProject(project *model.Project) {
     }
 }
 
+// Assigns a build to this pipeline.
 func (p *Pipeline) SetBuild(build *model.Build) {
     p.build = build
 }
@@ -152,6 +152,7 @@ func (p *Pipeline) SetBuild(build *model.Build) {
 //  private members
 // ----------------------------------------------------------------------------------
 
+// Gets the accumulated environment (pipeline and project) settings of this pipeline.
 func (p *Pipeline) getEnv() []string {
     env := make([]string, len(p.Env) + len(p.project.Env))
     i := 0
@@ -171,6 +172,7 @@ func (p *Pipeline) getEnv() []string {
     return env
 }
 
+// Adds a container for destruction to this pipeline.
 func (p *Pipeline) addContainer(container string) {
     p.mutex.Lock()
     p.Containers = append(p.Containers, container)
