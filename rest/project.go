@@ -158,7 +158,7 @@ func ProjectUpdate(r *http.Request) {
         log.Info("project", "failed to write config file:", err.Error())
         return
     }
-    log.Info("project", "succesfully updated project with id:\"" + mux.Vars(r)["Id"] + "\"")
+    log.Info("project", "succesfully updated project with id: \"" + mux.Vars(r)["Id"] + "\"")
 }
 
 

@@ -339,9 +339,33 @@ app.controller("projectHistory", function($scope, $routeParams, history, feed) {
     });
 });
 
-app.controller("projectEnv", function($scope, $routeParams) {
+app.controller("projectEnv", function($scope, $routeParams, projects) {
+    $scope.addName = "";
+    $scope.addValue = "";
+
+    // eventhandler: add env variable button
+    $scope.add = function() {
+        $scope.showForm = true;
+        $scope.addName = "";
+        $scope.addValue = "";
+    };
+
+    // eventhandler: cancel adding of env variable
+    $scope.cancelAdd = function() {
+        $scope.showForm = false;
+    };
+
+    // eventhandler: save the new env variable
+    $scope.save = function() {
+        if ($scope.addName === "" || $scope.addValue === "")
+            return;
+
+        $scope.showForm = false;
+    };
+
+    // delete an env variable
     $scope.delete = function (scope) {
-        alert("deleting...");
+
     }
 });
 
