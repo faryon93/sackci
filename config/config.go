@@ -1,5 +1,5 @@
 package config
-// dockertest
+// sackci
 // Copyright (C) 2017 Maximilian Pachl
 
 // This program is free software: you can redistribute it and/or modify
@@ -21,12 +21,23 @@ package config
 
 import (
     "io/ioutil"
+    "path/filepath"
 
     "gopkg.in/yaml.v2"
 
     "github.com/faryon93/sackci/agent"
     "github.com/faryon93/sackci/log"
     "github.com/faryon93/sackci/model"
+)
+
+
+// ----------------------------------------------------------------------------------
+//  constants
+// ----------------------------------------------------------------------------------
+
+const (
+    DATABASE = "meta.db"
+    ARTIFACTS = "artifacts"
 )
 
 
@@ -38,12 +49,13 @@ type Config struct {
     Listen string `yaml:"listen,omitempty"`
     TlsKey string `yaml:"tlskey,omitempty"`
     TlsCert string `yaml:"tlscert,omitempty"`
-    Artifacts string `yaml:"artifacts,omitempty"`
-    Database string `yaml:"database,omitempty"`
+    DataDir string `yaml:"datadir,omitempty"`
     Agents []agent.Agent `yaml:"agents,omitempty"`
     Projects []model.Project `yaml:"projects,omitempty"`
 
-    path string
+    // path of the config file this
+    // instance was loaded from
+    loadPath string
 }
 
 
@@ -62,7 +74,7 @@ func Load(path string) (*Config, error) {
     if err != nil {
         return nil, err
     }
-    conf.path = path
+    conf.loadPath = path
 
     // fill in the project ids
     for i := 0; i < len(conf.Projects); i++ {
@@ -90,7 +102,7 @@ func (c *Config) Save() (error) {
         return err
     }
 
-    return ioutil.WriteFile(c.path, bytes, 0644)
+    return ioutil.WriteFile(c.loadPath, bytes, 0644)
 }
 
 // Returns a project by its ID.
@@ -104,11 +116,21 @@ func (c *Config) GetProject(id int) (*model.Project) {
     return &c.Projects[index]
 }
 
+// Returns the artifacts directory
+func (c *Config) GetArtifactsDir() string {
+    return filepath.Join(c.DataDir, ARTIFACTS)
+}
+
+// Returns the path to the database file
+func (c *Config) GetDatabaseFile() string {
+    return filepath.Join(c.DataDir, DATABASE)
+}
+
 // Prints some important information of the config
 func (c *Config) Print() {
     for _, project := range c.Projects {
         log.Info("conf", "adding project", project.Name, "(" + project.Repository + ")")
     }
 
-    log.Info("conf", "artifact storage location:", c.Artifacts)
+    log.Info("conf", "artifact storage location:", c.GetArtifactsDir())
 }

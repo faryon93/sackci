@@ -28,6 +28,7 @@ import (
     "time"
     "runtime"
     "math/rand"
+    "flag"
 
     "github.com/gorilla/mux"
 
@@ -37,7 +38,6 @@ import (
     "github.com/faryon93/sackci/config"
     "github.com/faryon93/sackci/agent"
     "github.com/faryon93/sackci/scm"
-    "flag"
     "github.com/faryon93/sackci/util"
 )
 
@@ -48,7 +48,6 @@ import (
 
 const (
     DEFAULT_CONFIG = "sackci.conf"
-    WORKDIR = "/work"
 )
 
 
@@ -73,7 +72,7 @@ func main() {
     rand.Seed(time.Now().Unix())
 
     // parse command line arguments
-    flag.StringVar(&configPath, "conf", DEFAULT_CONFIG, "Path to config file")
+    flag.StringVar(&configPath, "conf", DEFAULT_CONFIG, "path to config file")
     flag.Parse()
 
     // load the configuration file
@@ -85,7 +84,7 @@ func main() {
     ctx.Conf = conf
 
     // open database
-    err = model.Open(ctx.Conf.Database)
+    err = model.Open(ctx.Conf.GetDatabaseFile())
     if err != nil {
         log.Error("bolt", "failed to open database:", err.Error())
         return
@@ -142,7 +141,7 @@ func main() {
     scm.Destroy()
 
     // gracefully shutdown the http server
-    httpCtx, _ := context.WithTimeout(context.Background(), 1*time.Second)
+    httpCtx, _ := context.WithTimeout(context.Background(), 1 * time.Second)
     srv.Shutdown(httpCtx)
 }
 
