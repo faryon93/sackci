@@ -43,6 +43,7 @@ const (
     CONTENT_TYPE_JSON   = "application/json"
     CONTENT_TYPE_SVG    = "image/svg+xml"
     CONTENT_TYPE_TEXT   = "text/plain"
+    CONTENT_TYPE_STREAM  = "application/octet-stream"
 )
 
 // --------------------------------------------------------------------------------------

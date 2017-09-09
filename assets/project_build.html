@@ -83,7 +83,9 @@
           <div class="panel-heading">Actions</div>
           <div class="panel-body">
             <button type="button" class="btn btn-default btn-block"><i class="fa fa-refresh"></i> Rerun Build</button>
-            <button type="button" class="btn btn-default btn-block"><i class="fa fa-download"></i> Get Artifacts</button>
+            <a ng-href="/api/v1/project/{{project.id}}/build/{{build.num}}/artifacts.tar.gz" class="btn btn-default btn-block" target="_self"  download>
+              <i class="fa fa-download"></i>&nbsp;Get Artifacts
+            </a>
           </div>
         </div>
       </div>

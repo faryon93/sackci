@@ -67,6 +67,7 @@ type Pipeline struct {
     project *model.Project
     build *model.Build
     definition *pipelinefile.Definition
+    artifactDir string
 }
 
 
@@ -145,6 +146,10 @@ func (p *Pipeline) SetProject(project *model.Project) {
 // Assigns a build to this pipeline.
 func (p *Pipeline) SetBuild(build *model.Build) {
     p.build = build
+}
+
+func (p *Pipeline) SetArtifactsDir(dir string) {
+    p.artifactDir = dir
 }
 
 

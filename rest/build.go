@@ -28,6 +28,9 @@ import (
 
     "github.com/faryon93/sackci/ctx"
     "github.com/faryon93/sackci/model"
+    "path/filepath"
+    "fmt"
+    "os"
 )
 
 
@@ -35,6 +38,7 @@ import (
 //  public functions
 // --------------------------------------------------------------------------------------
 
+// Gets the whole raw log of a build.
 func BuildRawLog(w http.ResponseWriter, r *http.Request) {
     // construct the query
     query, err := stormQuery(r)
@@ -56,6 +60,7 @@ func BuildRawLog(w http.ResponseWriter, r *http.Request) {
     }
 }
 
+// Gets the raw log of a specific stage of a build.
 func BuildStageLog(w http.ResponseWriter, r *http.Request) {
     stage, err := strconv.Atoi(mux.Vars(r)["stage"])
     if err != nil {
@@ -87,6 +92,36 @@ func BuildStageLog(w http.ResponseWriter, r *http.Request) {
     w.Write([]byte(build.Stages[stage].RawLog()))
 }
 
+// Gets the tar.gz archive of the build artifacts.
+func BuildArtifacts(w http.ResponseWriter, r *http.Request) {
+    project := mux.Vars(r)["Project"]
+    build := mux.Vars(r)["Num"]
+
+    if val , err := strconv.Atoi(project); val <= 0 || err != nil {
+        http.Error(w, "invalid project", http.StatusNotAcceptable)
+        return
+    }
+
+    if val, err := strconv.Atoi(build); val <= 0 || err != nil {
+        http.Error(w, "invalid build number", http.StatusNotAcceptable)
+        return
+    }
+
+    // check if the artifact exists in filesystem
+    artifactFile := filepath.Join(ctx.Conf.GetArtifactsDir(), project, build + ".tar.gz")
+    if _, err := os.Stat(artifactFile); err != nil {
+        http.Error(w, "artifact not found", http.StatusNotFound)
+        return
+    }
+
+    // set headers to start a download
+    filename := fmt.Sprintf("artifact-%s-%s.tar.gz", project, build)
+    w.Header().Set("Content-Type", CONTENT_TYPE_STREAM)
+    w.Header().Set("Content-Disposition", "attachment; filename=" + filename)
+    http.ServeFile(w, r, artifactFile)
+}
+
+// Callback when build history purging was successfull.
 func BuildPurge(r *http.Request) {
     // parse the url parameters for the id
     fieldVal, err := strconv.Atoi(mux.Vars(r)["Project"])

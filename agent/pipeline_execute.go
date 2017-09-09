@@ -23,6 +23,7 @@ import (
     "errors"
     "strconv"
     "time"
+    "path/filepath"
 
     "github.com/faryon93/sackci/model"
     "github.com/faryon93/sackci/pipelinefile"
@@ -121,6 +122,22 @@ func (p *Pipeline) Execute() (error) {
         // stage executed successfully
         p.Log(stageId, "stage \"" + stage.Name + "\" completed in", time.Since(start))
         p.FinishStage(stageId, model.STAGE_PASSED, time.Since(start))
+    }
+
+    // download the artifact directory if configured in Pipelinefile
+    if !util.StrEmpty(definition.Artifacts, p.artifactDir) {
+        start := time.Now()
+
+        // construct the filepaths
+        containerPath := p.Agent.Filepath(WORKDIR, definition.Artifacts)
+        localPath := filepath.Join(p.artifactDir, strconv.Itoa(p.project.Id), strconv.Itoa(p.build.Num) + ".tar.gz")
+
+        // download as tar.gz archive through docker api
+        err := p.SavePath(containerPath, localPath)
+        if err != nil {
+            log.Error(LOG_TAG, "failed to download artifacts:", err.Error())
+        }
+        log.Info(LOG_TAG, "downloaded artifacts for project \"" + p.project.Name + "\" in", time.Since(start))
     }
 
     p.FinishPipeline(model.BUILD_PASSED, time.Since(p.StartTime))

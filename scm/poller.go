@@ -119,6 +119,7 @@ func poll(project *model.Project, t *util.CycleTimer) {
         return
     }
     pipeline.SetProject(project)
+    pipeline.SetArtifactsDir(ctx.Conf.GetArtifactsDir())
     defer pipeline.Destroy()    // make sure the pipeline gets destroyed
 
     log.Info(LOG_TAG, "starting scm polling for project \"" + project.Name + "\"")

@@ -16,6 +16,16 @@ package agent
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // ----------------------------------------------------------------------------------
+//  imports
+// ----------------------------------------------------------------------------------
+
+import (
+    "os"
+    "path/filepath"
+)
+
+
+// ----------------------------------------------------------------------------------
 //  public members
 // ----------------------------------------------------------------------------------
 
@@ -58,6 +68,11 @@ func (p *Pipeline) SavePath(path string, local string) (error) {
     // access the volume
     if len(p.Containers) <= 0 {
         return ErrNoContainer
+    }
+
+    err := os.MkdirAll(filepath.Dir(local), os.ModePerm)
+    if err != nil {
+        return err
     }
 
     return p.Agent.SavePath(p.Containers[0], path, local)

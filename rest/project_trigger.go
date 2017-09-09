@@ -84,6 +84,7 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
         return
     }
     pipeline.SetProject(project)
+    pipeline.SetArtifactsDir(ctx.Conf.GetArtifactsDir())
 
     // construct the build object for saving in the database
     build := project.NewBuild()
