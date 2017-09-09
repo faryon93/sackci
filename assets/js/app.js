@@ -3,7 +3,7 @@ var app = angular.module('app', ["ngRoute", "ngResource", "ui.bootstrap", "infin
 app.config(function($routeProvider, $locationProvider) {
     $routeProvider
         .when("/", {
-            templateUrl : "project.html"
+            templateUrl : "home.html"
         })
         .when("/admin", {
             templateUrl : "admin.html"
