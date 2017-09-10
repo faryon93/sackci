@@ -179,8 +179,15 @@ func (p *Project) CheckIntegrity() {
 
     for _, build := range builds {
         if build.Status == BUILD_RUNNING {
-            log.Info("project", "found build", build.Num, " of project \"" + p.Name +
+            log.Info("project", "found build", build.Num, "of project \"" + p.Name +
                 "\" which is still \"" + build.Status + "\". Canceling the build.")
+
+            // cancel the running stages
+            for y := range build.Stages {
+                if build.Stages[y].Status == STAGE_RUNNING {
+                    build.Stages[y].Status = STAGE_FAILED
+                }
+            }
 
             // cancel the build
             build.Status = BUILD_FAILED
