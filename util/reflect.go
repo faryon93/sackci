@@ -20,7 +20,11 @@ package util
 // --------------------------------------------------------------------------------------
 
 import (
+    "fmt"
     "reflect"
+    "encoding/hex"
+    "crypto/sha1"
+    "math/rand"
 )
 
 
@@ -42,4 +46,10 @@ func FieldByTag(ref reflect.Value, tag string, tagValue string) (reflect.Value) 
     }
 
     return reflect.Value{}
+}
+
+// Hashes the given argument.
+func Hash(v interface{}) (string) {
+    hash := sha1.Sum([]byte(fmt.Sprintf("%d%d%v", rand.Int(), rand.Int(), v)))
+    return hex.EncodeToString(hash[0:20])
 }

@@ -36,6 +36,8 @@ import (
 // ----------------------------------------------------------------------------------
 
 const (
+    LOG_TAG = "conf"
+
     DATABASE = "meta.db"
     ARTIFACTS = "artifacts"
 )
@@ -77,12 +79,9 @@ func Load(path string) (*Config, error) {
     conf.loadPath = path
 
     // fill in the project ids
-    for i := 0; i < len(conf.Projects); i++ {
-        // TODO: better way of id handling
-        conf.Projects[i].Id = i + 1
-
+    for i, project := range conf.Projects {
         // an empty trigger means manual triggering
-        if conf.Projects[i].Trigger == "" {
+        if project.Trigger == "" {
             conf.Projects[i].Trigger = model.TRIGGER_MANUAL
         }
     }
@@ -107,21 +106,22 @@ func (c *Config) Save() (error) {
 
 // Returns a project by its ID.
 func (c *Config) GetProject(id int) (*model.Project) {
-    // check array bounds
-    index := id - 1
-    if index < 0 || index >= len(c.Projects) {
-        return nil
+    // serach for project with given id field
+    for i, project := range c.Projects {
+        if project.Id == id {
+            return &c.Projects[i]
+        }
     }
 
-    return &c.Projects[index]
+    return nil
 }
 
-// Returns the artifacts directory
+// Returns the artifacts directory.
 func (c *Config) GetArtifactsDir() string {
     return filepath.Join(c.DataDir, ARTIFACTS)
 }
 
-// Returns the path to the database file
+// Returns the path to the database file.
 func (c *Config) GetDatabaseFile() string {
     return filepath.Join(c.DataDir, DATABASE)
 }
@@ -129,8 +129,8 @@ func (c *Config) GetDatabaseFile() string {
 // Prints some important information of the config
 func (c *Config) Print() {
     for _, project := range c.Projects {
-        log.Info("conf", "adding project", project.Name, "(" + project.Repository + ")")
+        log.Info(LOG_TAG, "adding project", project.Name, "(" + project.Repository + ")")
     }
 
-    log.Info("conf", "artifact storage location:", c.GetArtifactsDir())
+    log.Info(LOG_TAG, "artifact storage location:", c.GetArtifactsDir())
 }

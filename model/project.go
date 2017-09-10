@@ -26,6 +26,7 @@ import (
     "github.com/asdine/storm"
 
     "github.com/faryon93/sackci/log"
+    "github.com/faryon93/sackci/util"
 )
 
 
@@ -58,7 +59,8 @@ type Project struct {
     Env map[string]string `yaml:"env,omitempty" json:"env"`
     CommitUrl string `yaml:"commit_url,omitempty" json:"commit_url"`
     BadgeEnable bool `yaml:"badge" json:"badge"`
-    PrivateKey string `yaml:"key" json:"key,omitempty"`
+    Hash string `yaml:"hash,omitempty" josn:"-"`
+    PrivateKey string `yaml:"key,omitempty" json:"key"`
 
     // runtime variables
     mutex sync.Mutex `json:"-" yaml:"-"`
@@ -124,7 +126,44 @@ func (p *Project) GetLastBuild() (*Build, error) {
     return &builds[0], nil
 }
 
-// Checks the integrty of a project and corrects if necessary
+// Assigns a proper ID to this project.
+func (p *Project) AssignId() (bool) {
+    // if this project was added recently there is no
+    // hash -> generate one and store mapping in database
+    if util.StrEmpty(p.Hash) {
+        hash := util.Hash(*p)
+
+        // insert the mapping into the database
+        mapping := ProjectMapping{Hash: hash}
+        err := Get().Save(&mapping)
+        if err != nil {
+            log.Error("project", "failed to initialize new project \"" + p.Name + "\"")
+            return false
+        }
+
+        // update the project runtime object
+        p.Hash = hash
+        p.Id = mapping.Id
+
+        log.Info("project", "found new project \"" + p.Name + "\", assigning new hash", hash)
+        return true
+
+        // there is a hash in the config file -> lookup id
+    } else {
+        var mapping ProjectMapping
+        err := Get().One("Hash", p.Hash, &mapping)
+        if err != nil {
+            log.Error("project", "id lookup failed for project \"" + p.Name + "\"")
+            return false
+        }
+
+        p.Id = mapping.Id
+    }
+
+    return false
+}
+
+// Checks the integrty of a project and corrects if necessary.
 func (p *Project) CheckIntegrity() {
     // query all builds
     var builds []Build

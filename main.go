@@ -100,9 +100,13 @@ func main() {
 
     // check the project integrity
     start := time.Now()
-    for _, project := range ctx.Conf.Projects {
-        project.CheckIntegrity()
+    for i := range ctx.Conf.Projects {
+        ctx.Conf.Projects[i].AssignId()
+        ctx.Conf.Projects[i].CheckIntegrity()
+
+
     }
+    ctx.Conf.Save()
     log.Info("main", "project integrity check took", time.Since(start))
 
     // create http server

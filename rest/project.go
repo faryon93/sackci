@@ -57,12 +57,8 @@ func ProjectList(w http.ResponseWriter, r *http.Request) {
     projects := ctx.Conf.Projects
 
     // construct the project list
-    // TODO: some smarter way to generate the project ids
     list := make([]projectListItem, len(projects))
     for index, project := range projects {
-        // the project ids start with id = 1
-        id := index + 1
-
         // find the latest build for the project
         build, err := project.GetLastBuild()
         if err != nil {
@@ -72,7 +68,7 @@ func ProjectList(w http.ResponseWriter, r *http.Request) {
 
         // construct the list entry
         item := projectListItem{
-            Id: id,
+            Id: project.Id,
             Name: project.Name,
         }
 
