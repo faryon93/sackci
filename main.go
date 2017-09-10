@@ -93,21 +93,9 @@ func main() {
     log.Info("bolt", "successfully opened bolt database")
 
     // initialize the global application context
-    ctx.Init()
+    ctx.Conf.Setup()
     agent.Add(ctx.Conf.Agents...)
-    ctx.Conf.Print()
     scm.Setup()
-
-    // check the project integrity
-    start := time.Now()
-    for i := range ctx.Conf.Projects {
-        ctx.Conf.Projects[i].AssignId()
-        ctx.Conf.Projects[i].CheckIntegrity()
-
-
-    }
-    ctx.Conf.Save()
-    log.Info("main", "project integrity check took", time.Since(start))
 
     // create http server
     // and setup the routes with corresponding handler functions

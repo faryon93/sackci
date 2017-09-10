@@ -39,7 +39,7 @@ var (
 //  initializer
 // --------------------------------------------------------------------------------------
 
-func Init() {
+func init() {
     // initialize the context variables
     Feed = sse.NewGroup("feed")
 }

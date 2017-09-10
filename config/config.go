@@ -22,6 +22,7 @@ package config
 import (
     "io/ioutil"
     "path/filepath"
+    "time"
 
     "gopkg.in/yaml.v2"
 
@@ -78,14 +79,6 @@ func Load(path string) (*Config, error) {
     }
     conf.loadPath = path
 
-    // fill in the project ids
-    for i, project := range conf.Projects {
-        // an empty trigger means manual triggering
-        if project.Trigger == "" {
-            conf.Projects[i].Trigger = model.TRIGGER_MANUAL
-        }
-    }
-
     return &conf, nil
 }
 
@@ -93,6 +86,40 @@ func Load(path string) (*Config, error) {
 // ----------------------------------------------------------------------------------
 //  public members
 // ----------------------------------------------------------------------------------
+
+func (c *Config) Setup() {
+    start := time.Now()
+
+    // each project has to be completed for runtime
+    for i, project := range c.Projects {
+        err := c.Projects[i].AssignId()
+        if err != nil {
+            log.Info(LOG_TAG,"ignoring project \"" + project.Name + "\":", err.Error())
+            c.Projects[i].Id = -1
+            continue
+        }
+
+        // check the project integrity
+        c.Projects[i].CheckIntegrity()
+
+        // an empty trigger means manual triggering
+        if project.Trigger == "" {
+            c.Projects[i].Trigger = model.TRIGGER_MANUAL
+        }
+
+        // everything was fine -> we want to keep this project in our list
+        log.Info(LOG_TAG, "adding project", project.Name, "(" + project.Repository + ")")
+    }
+
+    // save config file to disk -> a hash might have been inserted
+    // TODO: only save when necessary
+    err := c.Save()
+    if err != nil {
+        log.Error(LOG_TAG, "failed to save conf file:", err.Error())
+    }
+
+    log.Info(LOG_TAG, "project integrity check took", time.Since(start))
+}
 
 // Saves the configuration file to the filesystem.
 func (c *Config) Save() (error) {
@@ -108,7 +135,7 @@ func (c *Config) Save() (error) {
 func (c *Config) GetProject(id int) (*model.Project) {
     // serach for project with given id field
     for i, project := range c.Projects {
-        if project.Id == id {
+        if project.IsValid() && project.Id == id {
             return &c.Projects[i]
         }
     }
@@ -124,13 +151,4 @@ func (c *Config) GetArtifactsDir() string {
 // Returns the path to the database file.
 func (c *Config) GetDatabaseFile() string {
     return filepath.Join(c.DataDir, DATABASE)
-}
-
-// Prints some important information of the config
-func (c *Config) Print() {
-    for _, project := range c.Projects {
-        log.Info(LOG_TAG, "adding project", project.Name, "(" + project.Repository + ")")
-    }
-
-    log.Info(LOG_TAG, "artifact storage location:", c.GetArtifactsDir())
 }

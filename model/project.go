@@ -41,6 +41,7 @@ const (
 
 var (
     ErrBuildRunning = errors.New("build running")
+    ErrUnknownHash = errors.New("unknown hash")
 )
 
 
@@ -127,7 +128,7 @@ func (p *Project) GetLastBuild() (*Build, error) {
 }
 
 // Assigns a proper ID to this project.
-func (p *Project) AssignId() (bool) {
+func (p *Project) AssignId() (error) {
     // if this project was added recently there is no
     // hash -> generate one and store mapping in database
     if util.StrEmpty(p.Hash) {
@@ -138,7 +139,7 @@ func (p *Project) AssignId() (bool) {
         err := Get().Save(&mapping)
         if err != nil {
             log.Error("project", "failed to initialize new project \"" + p.Name + "\"")
-            return false
+            return err
         }
 
         // update the project runtime object
@@ -146,21 +147,22 @@ func (p *Project) AssignId() (bool) {
         p.Id = mapping.Id
 
         log.Info("project", "found new project \"" + p.Name + "\", assigning new hash", hash)
-        return true
+        return nil
 
         // there is a hash in the config file -> lookup id
     } else {
         var mapping ProjectMapping
         err := Get().One("Hash", p.Hash, &mapping)
-        if err != nil {
-            log.Error("project", "id lookup failed for project \"" + p.Name + "\"")
-            return false
+        if err == storm.ErrNotFound {
+            return ErrUnknownHash
+        } else if err != nil {
+            return err
         }
 
         p.Id = mapping.Id
     }
 
-    return false
+    return nil
 }
 
 // Checks the integrty of a project and corrects if necessary.
@@ -209,4 +211,8 @@ func (p *Project) Unlock() {
     defer p.mutex.Unlock()
 
     p.buildRunning = false
+}
+
+func (p *Project) IsValid() (bool) {
+    return p.Id > 0
 }

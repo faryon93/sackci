@@ -60,8 +60,11 @@ var (
 
 // Setup the necessary go routines for all projects with "polling" trigger.
 func Setup() {
-    for i := 0; i < len(ctx.Conf.Projects); i++ {
+    for i := range ctx.Conf.Projects {
         project := &ctx.Conf.Projects[i]
+        if !project.IsValid() {
+            continue
+        }
 
         // we are not interested in non-polling projects
         if project.Trigger != model.TRIGGER_POLL {

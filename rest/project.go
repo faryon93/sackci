@@ -57,8 +57,12 @@ func ProjectList(w http.ResponseWriter, r *http.Request) {
     projects := ctx.Conf.Projects
 
     // construct the project list
-    list := make([]projectListItem, len(projects))
-    for index, project := range projects {
+    list := make([]projectListItem, 0)
+    for _, project := range projects {
+        if !project.IsValid() {
+            continue
+        }
+
         // find the latest build for the project
         build, err := project.GetLastBuild()
         if err != nil {
@@ -86,7 +90,7 @@ func ProjectList(w http.ResponseWriter, r *http.Request) {
         }
 
         // add the new item to the list
-        list[index] = item
+        list = append(list, item)
     }
 
     Jsonify(w, list)
