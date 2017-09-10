@@ -112,9 +112,6 @@ func (p *Project) NewBuild() (*Build) {
 
 // Gets the latest build of this project.
 func (p *Project) GetLastBuild() (*Build, error) {
-    p.buildMutex.Lock()
-    defer p.buildMutex.Unlock()
-
     // fetch the last inserted build for the project
     var builds []Build
     err := Get().Find("Project", p.Id, &builds, storm.Limit(1), storm.Reverse())
