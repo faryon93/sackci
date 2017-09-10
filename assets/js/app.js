@@ -393,9 +393,9 @@ app.controller("settings", function($scope, $routeParams, $timeout, history, pro
 
     // eventhandler: rename project
     $scope.rename = function(scope) {
-        if ($scope.changeName === undefined || $scope.changeName === "")
+        if ($scope.changeName === undefined || $scope.changeName === "" ||
+            $scope.project.name === $scope.changeName)
         {
-            console.log($scope);
             return false;
         }
 
