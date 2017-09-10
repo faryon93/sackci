@@ -247,34 +247,11 @@ div.build-details div.log div.empty
 	display: none;
 }
 
+
 /********************************************************************
- * ansi colors
- ********************************************************************/ 
+ * fonts
+ ********************************************************************/
 
-.ansi.bold {
-	font-weight: bold;
-}
-
-.ansi.red {
-	color: #FF6C60;
-}
-
-.ansi.green {
-	color: #B1FD79;
-}
-
-.ansi.yellow {
-	color: #FFFF91;
-}
-
-.ansi.blue{
-	color: #96CBFE;
-}
-
-.ansi.magenta {
-	color: #FF73FD;
-}
-
-.ansi.cyan {
-	color: cyan;
+.code {
+	font-family: Menlo,Monaco,Consolas,'Courier New',monospace;
 }

@@ -7,16 +7,16 @@
 	<table class="table table-hover">
 		<thead>
 			<tr>
-				<th>Variable Name</th>
-				<th>Value</th>
-				<th>Actions</th>
+				<th class="col-md-5">Variable Name</th>
+				<th class="col-md-5">Value</th>
+				<th class="col-md-2">Actions</th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr ng-repeat="(key, value) in project.env">
-				<td>{{key}}</td>
-				<td>{{value}}</td>
-				<td class="col-md-2">
+				<td class="code">{{key}}</td>
+				<td class="code">{{value}}</td>
+				<td>
 					<button type="button" class="btn btn-danger" confirm="delete">
 						<i class="fa fa-trash-o"></i>&nbsp;Delete
 					</button>
@@ -27,7 +27,6 @@
 				<td><input type="text" ng-show="showForm" ng-model="addValue"></td>
 				<td>
 					<button class="btn btn-success" ng-show="!showForm" ng-click="add()"><i class="fa fa-plus"></i>&nbsp;Add</button>
-
 					<button class="btn btn-success" ng-show="showForm" ng-click="save()"><i class="fa fa-check"></i>&nbsp;Save</button>
 					<button class="btn btn-default" ng-show="showForm" ng-click="cancelAdd()"><i class="fa fa-remove"></i>&nbsp;Cancel</button>
 				</td>

@@ -66,6 +66,7 @@ func sliceUpdateOne(w http.ResponseWriter, r *http.Request, slice reflect.Value,
         } else if v, ok := value.(string); ok {
             structField.SetString(v)
         }
+        // TODO: handle maps
     }
 
     success(r)

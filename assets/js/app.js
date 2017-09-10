@@ -360,6 +360,10 @@ app.controller("projectEnv", function($scope, $routeParams, projects) {
         if ($scope.addName === "" || $scope.addValue === "")
             return;
 
+        var obj = {};
+        obj[$scope.addName] = $scope.addValue;
+        projects.save({id: $routeParams.id}, {env: obj});
+
         $scope.showForm = false;
     };
 
