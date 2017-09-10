@@ -41,7 +41,6 @@ type projectListItem struct {
     Id       int             `json:"id"`
     Name     string          `json:"name"`
     Status   string          `json:"status"`
-    BuildId  int             `json:"build"`
     BuildNum int             `json:"build_num"`
     Time     time.Time       `json:"execution_time"`
     Duration time.Duration   `json:"duration"`
@@ -79,7 +78,6 @@ func ProjectList(w http.ResponseWriter, r *http.Request) {
         // a build is present -> display it
         if build != nil {
             item.Status = build.Status
-            item.BuildId = int(build.Id)
             item.Time = build.Time
             item.Duration = build.Duration
             item.BuildNum = build.Num
