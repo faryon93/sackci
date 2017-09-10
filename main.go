@@ -57,6 +57,7 @@ const (
 
 var (
     configPath string
+    purge bool
 )
 
 
@@ -73,6 +74,7 @@ func main() {
 
     // parse command line arguments
     flag.StringVar(&configPath, "conf", DEFAULT_CONFIG, "path to config file")
+    flag.BoolVar(&purge, "purge", false, "purge unreferenced metadata")
     flag.Parse()
 
     // load the configuration file
@@ -93,7 +95,13 @@ func main() {
     log.Info("bolt", "successfully opened bolt database")
 
     // initialize the global application context
+    // purge all unreferenced metadata if user wants to
     ctx.Conf.Setup()
+    if purge {
+        model.PurgeProjects(ctx.Conf.Projects)
+    }
+
+    // setup agents and SCM polling
     agent.Add(ctx.Conf.Agents...)
     scm.Setup()
 
