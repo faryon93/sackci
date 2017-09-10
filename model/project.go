@@ -157,7 +157,7 @@ func (p *Project) AssignId() (error) {
         log.Info("project", "found new project \"" + p.Name + "\", assigning new hash", hash)
         return nil
 
-        // there is a hash in the config file -> lookup id
+    // there is a hash in the config file -> lookup id
     } else {
         var mapping ProjectMapping
         err := Get().One("Hash", p.Hash, &mapping)
@@ -228,6 +228,8 @@ func (p *Project) Unlock() {
     p.buildRunning = false
 }
 
+// Returns true if the project is valid and should be
+// made available to the public.
 func (p *Project) IsValid() (bool) {
     return p.Id > 0
 }

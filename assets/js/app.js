@@ -369,7 +369,7 @@ app.controller("projectEnv", function($scope, $routeParams, projects) {
     }
 });
 
-app.controller("settings", function($scope, $routeParams, history, projects) {
+app.controller("settings", function($scope, $routeParams, $timeout, history, projects) {
     // variable initialisation
     $scope.viewKey = false;
 
@@ -392,9 +392,23 @@ app.controller("settings", function($scope, $routeParams, history, projects) {
     };
 
     // eventhandler: rename project
-    $scope.rename = function() {
-        if ($scope.changeName !== undefined && $scope.changeName !== "")
-            projects.save({id: $routeParams.id}, {name: $scope.changeName});
+    $scope.rename = function(scope) {
+        if ($scope.changeName === undefined || $scope.changeName === "")
+        {
+            console.log($scope);
+            return false;
+        }
+
+        projects.save({id: $routeParams.id}, {name: $scope.changeName},
+            function() {
+                scope.success();
+                $scope.project.name = $scope.changeName;
+            },
+            function(error) {
+                scope.error(error.data);
+            });
+
+        return true;
     };
 });
 
@@ -642,6 +656,72 @@ app.directive("confirm", function ($compile) {
             scope.no = function() {
                 scope.show = false;
             }
+        }
+    }
+});
+
+app.directive("ngButton", function($compile) {
+    return {
+        scope: {
+            ngButton: '&'
+        },
+        link: function (scope, element, attrs) {
+            // variable initialization
+            scope.errorText = "";
+            scope.text = element.text();
+
+            // add error message popover
+            attrs.$set("popover-title", "Internal Server Error");
+            attrs.$set("popover-trigger", "'none'");
+            attrs.$set("popover-is-open", "errorText !== ''");
+            attrs.$set("popover-append-to-body", true);
+            attrs.$set("uib-popover", "{{errorText}}");
+
+            // setup eventhandlers
+            attrs.$set('ng-click', 'click()');
+            attrs.$set('ng-blur', 'blur()');
+
+            // avoid endless recursion due to $scompile
+            element.removeAttr("ngButton");
+            element.removeAttr("ng-button");
+            $compile(element)(scope);
+
+            // local functions
+            var setClass = function(className) {
+                element.removeClass("btn-default");
+                element.removeClass("btn-danger");
+                element.removeClass("btn-success");
+                element.removeClass("btn-warning");
+                element.addClass(className);
+            };
+
+            // eventhandler: click()
+            scope.click = function () {
+                if (scope.ngButton()(scope))
+                {
+                    setClass("btn-warning");
+                    element.html('<i class="fa fa-cog fa-spin"></i>');
+                }
+            };
+
+            // eventhandler: blur()
+            scope.blur = function() {
+                scope.errorText = "";
+                setClass("btn-default");
+                element.html(scope.text);
+            };
+
+            // functions for use within callback
+            scope.success = function() {
+                setClass("btn-success");
+                element.html('<i class="fa fa-check"></i>&nbsp;Success');
+            };
+
+            scope.error = function(text) {
+                setClass("btn-danger");
+                element.html('<i class="fa fa-exclamation-triangle"></i>&nbsp;Error');
+                scope.errorText = text;
+            };
         }
     }
 });

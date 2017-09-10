@@ -15,7 +15,9 @@
 }
 
 .btn-primary,
-.btn-danger {
+.btn-danger,
+.btn-warning,
+.btn-default {
 	outline: none !important;
 }
 
@@ -29,6 +31,12 @@
 .btn-danger:focus {
 	background-color: #d9534f;
 	border-color: #d43f3a;
+}
+
+.btn-warning:active,
+.btn-warning:focus {
+	background-color: #f0ad4e;
+	border-color: #eea236;
 }
 
 .panel.danger {
