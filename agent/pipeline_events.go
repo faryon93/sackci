@@ -73,9 +73,14 @@ func (p *Pipeline) Log(stage int, v ...interface{}) {
 
 // Appends a terminal log line to a stage.
 func (p *Pipeline) LogTerminal(stage int, v ...interface{}) {
+    msg := fmt.Sprintln(v...)
+    if msg == "\n" {
+        return
+    }
+
     p.Events <- model.EvtStageLog{
         p.getBaseEvent(),
-        stage, fmt.Sprintln(v...),
+        stage, msg,
     }
 }
 

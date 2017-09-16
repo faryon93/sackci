@@ -41,7 +41,8 @@ func (p *Pipeline) Container(image string, cmd string, workdir string, stdio fun
     }
 
     // copy the key file to the container
-    err = p.Agent.WriteFile(container, KEY_PATH, []byte(p.project.PrivateKey), 0600)
+    buf := []byte(p.project.PrivateKey)
+    err = p.Agent.WriteFile(container, KEY_PATH, buf, 0600)
     if err != nil {
         return -1, err
     }
