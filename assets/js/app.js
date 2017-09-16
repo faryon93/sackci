@@ -5,8 +5,8 @@ app.config(function($routeProvider, $locationProvider) {
         .when("/", {
             templateUrl : "home.html"
         })
-        .when("/admin", {
-            templateUrl : "admin.html"
+        .when("/config", {
+            templateUrl : "config.html"
         })
         .when("/project/:id", {
             templateUrl : "project.html"
