@@ -48,11 +48,11 @@ func (w *ConsoleOutput) Write(p []byte) (int, error) {
 
     if last >= 0 {
         for i := 0; i < last; i++ {
-            w.Callback(clean(lines[i]))
+            w.Callback(lines[i])
         }
 
         if strings.HasSuffix(lines[last], "\n") {
-            w.Callback(clean(lines[last]))
+            w.Callback(lines[last])
             w.buffer = ""
         } else {
             w.buffer = lines[last]
@@ -60,21 +60,4 @@ func (w *ConsoleOutput) Write(p []byte) (int, error) {
     }
 
     return len(p), nil
-}
-
-
-// ----------------------------------------------------------------------------------
-//  private functions
-// ----------------------------------------------------------------------------------
-
-func clean(str string) (string) {
-    // TODO: better handling of ansi terminal codes
-    str = strings.Replace(str, "\u001b[K", "", -1)
-
-    parts := strings.Split(str, "\r")
-    if len(parts) >= 2 {
-        return parts[len(parts) - 2]
-    } else {
-        return str
-    }
 }

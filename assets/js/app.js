@@ -113,6 +113,19 @@ app.controller("projectBuild", function($scope, $routeParams, builds, feed, log)
     $scope.error = "not found";
     $scope.loadingLog = false;
 
+    var cleanTerminal = function(str) {
+        // find the last line with actual text in it
+        var lines = str.split("\r");
+        for (var i = (lines.length - 1); i >= 0; i--)
+        {
+            if (lines[i] !== "" && lines[i] !== "\r" && lines[i] !== '\n')
+                return lines[i]
+        }
+
+        // fallback: nothing to split
+        return str;
+    };
+
     // handler: select a stage
     $scope.selectStage = function(index) {
         // do not display ignored stages
@@ -136,7 +149,7 @@ app.controller("projectBuild", function($scope, $routeParams, builds, feed, log)
             // load the log of the stage
             log.get({project: $routeParams.id, id: $scope.build.num, stage: index},
                 function(resp) {
-                    $scope.stage.log = resp.log.split("\n");
+                    $scope.stage.log = resp.log.split("\n").map(cleanTerminal);
                     $scope.loadingLog = false;
                 }
                 // TODO: error handling
@@ -229,7 +242,7 @@ app.controller("projectBuild", function($scope, $routeParams, builds, feed, log)
         if ($scope.build.stages[stageId] !== undefined)
         {
             $scope.logLimit++;
-            $scope.build.stages[stageId].log.push(evt.message);
+            $scope.build.stages[stageId].log.push(cleanTerminal(evt.message));
         }
     });
     registerFeed("EvtStageFinish", function(evt) {
