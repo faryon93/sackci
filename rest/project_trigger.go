@@ -52,7 +52,7 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
     ignoreDeferedUnlock := false
 
     // parse the id of the project
-    id, err := strconv.Atoi(mux.Vars(r)["id"])
+    id, err := strconv.Atoi(mux.Vars(r)["Project"])
     if err != nil {
         http.Error(w, "invalid project id", http.StatusNotAcceptable)
         return

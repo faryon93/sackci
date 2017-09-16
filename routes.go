@@ -41,6 +41,14 @@ const (
 
 
 // --------------------------------------------------------------------------------------
+//  types
+// --------------------------------------------------------------------------------------
+
+// HTTP Handler function.
+type HttpFn func(http.ResponseWriter, *http.Request)
+
+
+// --------------------------------------------------------------------------------------
 //  routes
 // --------------------------------------------------------------------------------------
 
@@ -50,13 +58,13 @@ func routes(router *mux.Router) {
     rest.Fs = FS(false)
 
     // register classic REST endpoints
-    api.Methods(http.MethodGet).Path("/project").HandlerFunc(rest.ProjectList)
-    api.Methods(http.MethodGet).Path("/project/{id}/badge").HandlerFunc(rest.ProjectBadge)
-    api.Methods(http.MethodGet).Path("/project/{id}/trigger").HandlerFunc(rest.ProjectTrigger)
-    api.Methods(http.MethodGet).Path("/project/{id}/build/latest").HandlerFunc(rest.ProjectLatestBuild)
-    api.Methods(http.MethodGet).Path("/project/{Project}/build/{Num}/log").HandlerFunc(rest.BuildRawLog)
-    api.Methods(http.MethodGet).Path("/project/{Project}/build/{Num}/log/{stage}").HandlerFunc(rest.BuildStageLog)
-    api.Methods(http.MethodGet).Path("/project/{Project}/build/{Num}/artifacts.tar.gz").HandlerFunc(rest.BuildArtifacts)
+    Get(api,"/project", rest.ProjectList)
+    Get(api,"/project/{Project}/badge", rest.ProjectBadge)
+    Get(api,"/project/{Project}/trigger", rest.ProjectTrigger)
+    Get(api,"/project/{Project}/build/latest", rest.ProjectLatestBuild)
+    Get(api,"/project/{Project}/build/{Num}/log", rest.BuildRawLog)
+    Get(api,"/project/{Project}/build/{Num}/log/{stage}", rest.BuildStageLog)
+    Get(api,"/project/{Project}/build/{Num}/artifacts.tar.gz", rest.BuildArtifacts)
 
     // register model-based REST endpoints
     rest.QueryOne(api, "/project/{Id:[0-9]+}", ctx.Conf.Projects)
@@ -72,11 +80,21 @@ func routes(router *mux.Router) {
     router.PathPrefix("/").Handler(PrettyUrl(FS(false)))
 }
 
+// --------------------------------------------------------------------------------------
+//  helper functions
+// --------------------------------------------------------------------------------------
+
+// Registers a handler function for the GET Method on the given path.
+func Get(router *mux.Router, path string, fn HttpFn) (*mux.Route) {
+    return router.Methods(http.MethodGet).Path(path).HandlerFunc(fn)
+}
+
 
 // --------------------------------------------------------------------------------------
 //  common handlers
 // --------------------------------------------------------------------------------------
 
+// Default not found handler.
 func NotFound(w http.ResponseWriter, r *http.Request) {
     http.Error(w, "not found", http.StatusNotFound)
 }

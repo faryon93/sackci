@@ -111,7 +111,7 @@ func ProjectLatestBuild(w http.ResponseWriter, r *http.Request) {
 
 // Badge (failing / passing) for the project.
 func ProjectBadge(w http.ResponseWriter, r *http.Request) {
-    id, err := strconv.Atoi(mux.Vars(r)["id"])
+    id, err := strconv.Atoi(mux.Vars(r)["Project"])
     if err != nil {
         http.Error(w, "invalid project id", http.StatusNotAcceptable)
         return
@@ -165,7 +165,7 @@ func ProjectUpdate(r *http.Request) {
 // --------------------------------------------------------------------------------------
 
 func getLastBuild(w http.ResponseWriter, r *http.Request) (*model.Build, error) {
-    id, err := strconv.Atoi(mux.Vars(r)["id"])
+    id, err := strconv.Atoi(mux.Vars(r)["Project"])
     if err != nil {
         http.Error(w, "invalid project id", http.StatusNotAcceptable)
         return nil, err
