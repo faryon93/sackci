@@ -60,7 +60,7 @@ type Project struct {
     Env map[string]string `yaml:"env,omitempty" json:"env"`
     CommitUrl string `yaml:"commit_url,omitempty" json:"commit_url"`
     BadgeEnable bool `yaml:"badge" json:"badge"`
-    Hash string `yaml:"hash,omitempty" josn:"-"`
+    Hash string `yaml:"hash,omitempty" json:"-"`
     PrivateKey string `yaml:"key,omitempty" json:"key"`
 
     // runtime variables
