@@ -5,22 +5,37 @@ app.config(function($routeProvider, $locationProvider) {
         .when("/", {
             templateUrl : "home.html"
         })
+        .when("/login", {
+            templateUrl: "login.html",
+            fullpage: true
+        })
         .when("/config", {
-            templateUrl : "config.html"
+            templateUrl : "config.html",
+            login: true
         })
         .when("/project/:id", {
-            templateUrl : "project.html"
+            templateUrl : "project.html",
+            login: true
         })
         .when("/project/:id/:tab", {
-            templateUrl : "project.html"
+            templateUrl : "project.html",
+            login: true
         })
         .when("/project/:id/:tab/:build", {
-            templateUrl : "project.html"
+            templateUrl : "project.html",
+            login: true
         });
 
     $locationProvider.html5Mode(true);
 });
 
+// ------------------------------------------------------------------------------------------------
+app.run(function($rootScope) {
+    $rootScope.$on("$routeChangeStart", function(event, next, current) {
+        // TODO: check authentication state
+        $rootScope.showProjectList = !next.fullpage;
+    });
+});
 
 // ------------------------------------------------------------------------------------------------
 app.controller("navigation", function($scope, $location) {

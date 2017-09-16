@@ -53,7 +53,7 @@
     <div class="container-fluid" style="height:100%;">
       <div class="row equal" style="min-height: 100%;">
         <!-- sidebar: project list -->
-        <div class="col-md-2 projectlist" ng-controller="projectlist">
+        <div class="col-md-2 projectlist" ng-if="showProjectList" ng-controller="projectlist">
           <!-- filter -->
           <form class="filter">
             <div class="input-group">
@@ -90,7 +90,7 @@
         </div>
 
         <!-- content view -->
-        <div class="col-md-9 content-view" ng-view></div>
+        <div class="content-view" ng-class="showProjectList ? 'col-md-9' : 'col-md-12'" ng-view></div>
       </div>
     </div>
   </body>
