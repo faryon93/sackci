@@ -18,6 +18,6 @@ package assets
 // Some generate rules
 //go:generate lessc css/pipeline.less css/pipeline.css
 //go:generate minify -a -r -o ../assets.min/ ./
-//go:generate esc -prefix=../assets.min -ignore (.*).go -o ../assets.go ../assets.min
 //go:generate cp favicon.ico ../assets.min/
+//go:generate esc -prefix=../assets.min -ignore (.*).go -o ../assets.go ../assets.min
 //go:generate rm -rf ../assets.min
