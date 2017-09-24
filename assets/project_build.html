@@ -83,10 +83,10 @@
         <div class="panel panel-default">
           <div class="panel-heading">Actions</div>
           <div class="panel-body">
-            <button type="button" class="btn btn-default btn-block"><i class="fa fa-refresh"></i> Rerun Build</button>
             <a ng-href="/api/v1/project/{{project.id}}/build/{{build.num}}/artifacts.tar.gz" class="btn btn-default btn-block" target="_self"  download>
               <i class="fa fa-download"></i>&nbsp;Get Artifacts
             </a>
+            <button type="button" class="btn btn-default btn-block" disabled><i class="fa fa-refresh"></i> Rerun Build</button>
           </div>
         </div>
       </div>
