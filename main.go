@@ -20,11 +20,9 @@ package main
 // --------------------------------------------------------------------------------------
 
 import (
-    "net/http"
     "os"
     "os/signal"
     "syscall"
-    "context"
     "time"
     "runtime"
     "math/rand"
@@ -38,7 +36,6 @@ import (
     "github.com/faryon93/sackci/config"
     "github.com/faryon93/sackci/agent"
     "github.com/faryon93/sackci/scm"
-    "github.com/faryon93/sackci/util"
 )
 
 
@@ -48,6 +45,7 @@ import (
 
 const (
     DEFAULT_CONFIG = "sackci.conf"
+    HTTP_SHUTDOWN_TIMEOUT = 1 * time.Second
 )
 
 
@@ -104,45 +102,27 @@ func main() {
     // setup agents and SCM polling
     agent.Add(ctx.Conf.Agents...)
     scm.Setup()
+    defer scm.Destroy()
 
     // create http server
     // and setup the routes with corresponding handler functions
     router := mux.NewRouter().StrictSlash(true)
     routes(router)
 
-    // execute http server asynchronously
-    srv := &http.Server{Addr: ctx.Conf.Listen, Handler: router}
-    go func() {
-        log.Info("http", "http server is listening on", ctx.Conf.Listen)
-
-        // decide if a tls encrypted server needs to be setup or not
-        var err error
-        if !util.StrEmpty(ctx.Conf.TlsCert, ctx.Conf.TlsKey) {
-            log.Info("http", "enabled TLS encryption for http server")
-            err = srv.ListenAndServeTLS(ctx.Conf.TlsCert, ctx.Conf.TlsKey)
-        } else {
-            err = srv.ListenAndServe()
-        }
-        if err != nil && err != http.ErrServerClosed {
-            log.Error("http", "failed to serv http:", err.Error())
-            return
-        }
-
-        log.Info("http", "http server is now closed")
-    }()
+    // setup http and https servers and make sure the are
+    // shutdown gracefully
+    srv := SetupHttpEndpoint(conf, router)
+    defer ShutdownHttp(srv, HTTP_SHUTDOWN_TIMEOUT)
+    if conf.IsHttpsEnabled() {
+        srv := SetupHttpsEndpoint(conf, router)
+        defer ShutdownHttp(srv, HTTP_SHUTDOWN_TIMEOUT)
+    }
 
     log.Info("main", "everything is now up and running, ready to build!")
 
     // wait for a signal to shutdown the application
     wait(os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
     log.Info("main", "initiating application shutdown (SIGINT / SIGTERM)")
-
-    // destroy scm polling routines
-    scm.Destroy()
-
-    // gracefully shutdown the http server
-    httpCtx, _ := context.WithTimeout(context.Background(), 1 * time.Second)
-    srv.Shutdown(httpCtx)
 }
 
 

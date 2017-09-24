@@ -29,6 +29,7 @@ import (
     "github.com/faryon93/sackci/agent"
     "github.com/faryon93/sackci/log"
     "github.com/faryon93/sackci/model"
+    "github.com/faryon93/sackci/util"
 )
 
 
@@ -49,12 +50,13 @@ const (
 // ----------------------------------------------------------------------------------
 
 type Config struct {
-    Listen string `yaml:"listen,omitempty"`
-    TlsKey string `yaml:"tlskey,omitempty"`
-    TlsCert string `yaml:"tlscert,omitempty"`
-    DataDir string `yaml:"datadir,omitempty"`
-    Agents []agent.Agent `yaml:"agents,omitempty"`
-    Projects []model.Project `yaml:"projects,omitempty"`
+    HttpListen  string          `yaml:"http_listen,omitempty"`
+    HttpsListen string          `yaml:"https_listen,omitempty"`
+    HttpsKey    string          `yaml:"https_key,omitempty"`
+    HttpsCert   string          `yaml:"https_cert,omitempty"`
+    DataDir     string          `yaml:"datadir,omitempty"`
+    Agents      []agent.Agent   `yaml:"agents,omitempty"`
+    Projects    []model.Project `yaml:"projects,omitempty"`
 
     // path of the config file this
     // instance was loaded from
@@ -152,3 +154,14 @@ func (c *Config) GetArtifactsDir() string {
 func (c *Config) GetDatabaseFile() string {
     return filepath.Join(c.DataDir, DATABASE)
 }
+
+// Returns true if http server is enabled.
+func (c *Config) IsHttpEnabled() bool {
+    return c.HttpListen != ""
+}
+
+// Returns true if ssl encrypted http(s) server is enabled.
+func (c *Config) IsHttpsEnabled() bool {
+    return !util.StrEmpty(c.HttpsListen, c.HttpsCert, c.HttpsKey)
+}
+

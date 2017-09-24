@@ -57,13 +57,13 @@ func IsUpper(b byte) bool {
     return b < []byte{0x5a}[0]
 }
 
-// Checks if a give strings are empty
+// Returns true if all strings are empty.
 func StrEmpty(strs ...string) bool {
     for _, str := range strs {
-        if len(str) > 0 {
-            return false
+        if len(str) <= 0 {
+            return true
         }
     }
 
-    return true
+    return false
 }
