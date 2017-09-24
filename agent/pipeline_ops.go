@@ -22,6 +22,7 @@ package agent
 import (
     "os"
     "path/filepath"
+    "github.com/faryon93/sackci/log"
 )
 
 
@@ -41,10 +42,22 @@ func (p *Pipeline) Container(image string, cmd string, workdir string, stdio fun
     }
 
     // copy the key file to the container
-    buf := []byte(p.project.PrivateKey)
-    err = p.Agent.WriteFile(container, KEY_PATH, buf, 0600)
-    if err != nil {
-        return -1, err
+    buf, err := p.project.GetPrivateKey()
+    if err == nil {
+        // if there was no problem loaded the private key
+        // it should be uploaded to the container
+        // just write the privatekey to the container if there
+        // is a privatekey configured
+        if len(buf) > 0 {
+            err = p.Agent.WriteFile(container, KEY_PATH, buf, KEY_PERMISSIONS)
+            if err != nil {
+                return -1, err
+            }
+        }
+
+    // there was an error loading the private key
+    } else {
+        log.Error(LOG_TAG, "failed to get private key:", err.Error())
     }
 
     // execute the container

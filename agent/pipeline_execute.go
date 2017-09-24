@@ -40,6 +40,7 @@ const (
     PIPELINEFILE = "Pipelinefile"
     STAGE_IMAGE = "alpine:latest"
     KEY_PATH = "/tmp/id_rsa"
+    KEY_PERMISSIONS = 0600
 
     // scm stage definitions
     STAGE_SCM_ID = 0

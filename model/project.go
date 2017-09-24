@@ -27,6 +27,8 @@ import (
 
     "github.com/faryon93/sackci/log"
     "github.com/faryon93/sackci/util"
+    "strings"
+    "io/ioutil"
 )
 
 
@@ -35,8 +37,9 @@ import (
 // ----------------------------------------------------------------------------------
 
 const (
-    TRIGGER_MANUAL = "manual"
-    TRIGGER_POLL   = "poll"
+    TRIGGER_MANUAL  = "manual"
+    TRIGGER_POLL    = "poll"
+    KEY_PREFIX      = "-----BEGIN"
 )
 
 var (
@@ -229,4 +232,22 @@ func (p *Project) Unlock() {
 // made available to the public.
 func (p *Project) IsValid() (bool) {
     return p.Id > 0
+}
+
+// Returns the private key which is configured
+// for the project. It is ether read from the
+// given file or from the property itself.
+func (p *Project) GetPrivateKey() ([]byte, error) {
+    if len(p.PrivateKey) <= 0 {
+        return []byte{}, nil
+    }
+
+    // check if the confile file contains the
+    // key directoy as plain text
+    if strings.HasPrefix(strings.TrimSpace(p.PrivateKey), KEY_PREFIX) {
+        return []byte(p.PrivateKey), nil
+    }
+
+    // otherwise its the path to a file containing the key
+    return ioutil.ReadFile(p.PrivateKey)
 }
