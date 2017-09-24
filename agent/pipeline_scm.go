@@ -50,7 +50,7 @@ const (
 
 // Clones a copy of the source repository to the pipelines working dir.
 func (p *Pipeline) Clone() (*model.Commit, error) {
-    args := SCM_CLONE + " " + p.project.Repository + " " + p.project.Branch
+    args := SCM_CLONE + " " + p.project.GetRepository() + " " + p.project.Branch
 
     // the last line is the json representation of the commit
     lastLine := ""
@@ -76,7 +76,7 @@ func (p *Pipeline) Clone() (*model.Commit, error) {
 
 // Gets the head reference of the given pipeline.
 func (p *Pipeline) HeadRef() (string, error) {
-    args := SCM_HEAD_REF + " " + p.project.Repository + " " + p.project.Branch
+    args := SCM_HEAD_REF + " " + p.project.GetRepository() + " " + p.project.Branch
 
     // the last line of the output will be the reference
     ref := ""

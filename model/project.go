@@ -29,6 +29,7 @@ import (
     "github.com/faryon93/sackci/util"
     "strings"
     "io/ioutil"
+    "net/url"
 )
 
 
@@ -250,4 +251,30 @@ func (p *Project) GetPrivateKey() ([]byte, error) {
 
     // otherwise its the path to a file containing the key
     return ioutil.ReadFile(p.PrivateKey)
+}
+
+// Returns the repository url for this project.
+// A dummy username and password is inserted if no
+// one is provided in the configuration file.
+func (p *Project) GetRepository() (string) {
+    repo := p.Repository
+
+    // it's a http based repository url -> insert dummy
+    // credentials if necessary
+    if strings.HasPrefix(p.Repository, "http") ||
+       strings.HasPrefix(p.Repository, "https") {
+        repoUrl, err := url.Parse(p.Repository)
+        if err != nil {
+            return p.Repository
+        }
+
+        // we need to insert credentials
+        if repoUrl.User == nil {
+            repoUrl.User = url.UserPassword("anonymous", "null")
+        }
+
+        repo = repoUrl.String()
+    }
+
+    return repo
 }

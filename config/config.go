@@ -110,7 +110,7 @@ func (c *Config) Setup() {
         }
 
         // everything was fine -> we want to keep this project in our list
-        log.Info(LOG_TAG, "adding project", project.Name, "(" + project.Repository + ")")
+        log.Info(LOG_TAG, "adding project", project.Name, "(" + util.MaskCredentials(project.Repository) + ")")
     }
 
     // save config file to disk -> a hash might have been inserted
