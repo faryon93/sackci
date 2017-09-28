@@ -26,12 +26,31 @@ import (
     "github.com/fsouza/go-dockerclient"
 )
 
+// ----------------------------------------------------------------------------------
+//  public members
+// ----------------------------------------------------------------------------------
+
+const (
+    DOCKER_SOCKET = "/var/run/docker.sock"
+)
+
 
 // ----------------------------------------------------------------------------------
 //  public members
 // ----------------------------------------------------------------------------------
 
 func(a *Agent) CreateContainer(vol string, image string, cmd string, env []string, workdir string) (string, error) {
+    // setup the mount points use in container
+    volumes := []string {
+        vol + ":" + MOUNTPOINT,
+    }
+
+    // when using the special docker image, a socket to the
+    // host docker daemon is needed as well
+    if strings.Contains(image, "docker") {
+        volumes = append(volumes, DOCKER_SOCKET + ":" + DOCKER_SOCKET)
+    }
+
     // create the container in order to start it
     container, err := a.docker.CreateContainer(docker.CreateContainerOptions{
         Config: &docker.Config{
@@ -43,9 +62,7 @@ func(a *Agent) CreateContainer(vol string, image string, cmd string, env []strin
             WorkingDir: workdir,
             Env: env,
         },
-        HostConfig: &docker.HostConfig{
-            Binds: []string{vol + ":" + MOUNTPOINT},
-        },
+        HostConfig: &docker.HostConfig{Binds: volumes},
     })
     if err != nil && container == nil {
         return "", err
