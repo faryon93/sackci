@@ -32,8 +32,16 @@ app.config(function($routeProvider, $locationProvider) {
 // ------------------------------------------------------------------------------------------------
 app.run(function($rootScope) {
     $rootScope.$on("$routeChangeStart", function(event, next, current) {
+        if (next === undefined)
+        {
+            $rootScope.showProjectList = true;
+            $rootScope.hideNavigation = false;
+            return;
+        }
+
         // TODO: check authentication state
-        $rootScope.showProjectList = !next.fullpage;
+        $rootScope.showProjectList = next.fullpage === undefined ? true : !next.fullpage;
+        $rootScope.hideNavigation = next.fullpage === undefined ? false : next.fullpage;
     });
 });
 
