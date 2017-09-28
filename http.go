@@ -28,6 +28,8 @@ import (
     "context"
     "net"
     "github.com/faryon93/sackci/ctx"
+    "strings"
+    "errors"
 )
 
 
@@ -44,6 +46,9 @@ const (
 //  public functions
 // ----------------------------------------------------------------------------------
 
+// Starts the http endpoint.
+// If a TLS encrypted endpoint is configured this endpoint is just used
+// to redirect automatically to the secured endpoint.
 func SetupHttpEndpoint(conf *config.Config, mux http.Handler) (*http.Server) {
     var srv *http.Server
 
@@ -57,7 +62,7 @@ func SetupHttpEndpoint(conf *config.Config, mux http.Handler) (*http.Server) {
 
     // serve the normal api and frontend endpoints
     } else {
-        srv = &http.Server{Addr: conf.HttpListen, Handler: mux}
+        srv = &http.Server{Addr: conf.HttpListen, Handler: CheckSession(mux)}
     }
 
     go func() {
@@ -76,8 +81,9 @@ func SetupHttpEndpoint(conf *config.Config, mux http.Handler) (*http.Server) {
     return srv
 }
 
+// Starts an TLS encrypted http endpoint.
 func SetupHttpsEndpoint(conf *config.Config, mux http.Handler) (*http.Server) {
-    srv := &http.Server{Addr: conf.HttpsListen, Handler: mux}
+    srv := &http.Server{Addr: conf.HttpsListen, Handler: CheckSession(mux)}
     go func() {
         log.Info(LOG_TAG_HTTP, "https server is listening on https://" + conf.HttpsListen)
 
@@ -94,15 +100,18 @@ func SetupHttpsEndpoint(conf *config.Config, mux http.Handler) (*http.Server) {
     return srv
 }
 
+// Gracefully destroys a http endpoint with the given timeout.
 func ShutdownHttp(srv *http.Server, timeout time.Duration) {
     httpCtx, _ := context.WithTimeout(context.Background(), timeout)
     srv.Shutdown(httpCtx)
 }
 
+
 // ----------------------------------------------------------------------------------
 //  private functions
 // ----------------------------------------------------------------------------------
 
+// Redirects to the configured https endpoint.
 func RedirectHttps(w http.ResponseWriter, r *http.Request) {
     host, _, err := net.SplitHostPort(r.Host)
     if err != nil {
@@ -112,6 +121,7 @@ func RedirectHttps(w http.ResponseWriter, r *http.Request) {
     // replace port with the configured https port
     _, httpsPort, err := net.SplitHostPort(ctx.Conf.HttpsListen)
     if err != nil {
+        log.Error(LOG_TAG_HTTP,"invalid value in https_listen property")
         http.Error(w, "misconfigured server", http.StatusInternalServerError)
         return
     }
@@ -121,4 +131,51 @@ func RedirectHttps(w http.ResponseWriter, r *http.Request) {
 
     url := "https://" + host + r.URL.String()
     http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+}
+
+// Checks if the session token is valid.
+func IsSessionValid(r *http.Request) (error) {
+    cookie, err := r.Cookie("session")
+    if err != nil {
+        return errors.New("no session cookie")
+    }
+
+    if cookie.Value != "test" {
+        return errors.New("invalid session token")
+    }
+
+    return nil
+}
+
+// Session Middleware.
+// Checks if a proper session token is supplied by the caller.
+func CheckSession(h http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+        url := r.URL.String()
+        err := IsSessionValid(r)
+
+        // the whole rest api is secured by a session token
+        // except the login endpoint
+        if strings.HasPrefix(url, HTTP_API_BASE) {
+            if  url != HTTP_API_BASE + "/login" && err != nil {
+                http.Error(w, err.Error(), http.StatusUnauthorized)
+                return
+            }
+
+        // on all other frontend pages a redirect to the login page
+        } else if !strings.HasPrefix(url, "/login") &&
+                  !strings.HasPrefix(url, "/css") &&
+                  !strings.HasPrefix(url, "/img") &&
+                  !strings.HasPrefix(url, "/js") &&
+                  !strings.HasSuffix(url, "html") {
+
+            if err != nil {
+                http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
+                return
+            }
+        }
+
+        h.ServeHTTP(w, r)
+    })
 }

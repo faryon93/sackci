@@ -68,6 +68,8 @@ func routes(router *mux.Router) {
     Get(api,"/project/{Project}/build/{Num}/log", rest.BuildRawLog)
     Get(api,"/project/{Project}/build/{Num}/log/{stage}", rest.BuildStageLog)
     Get(api,"/project/{Project}/build/{Num}/artifacts.tar.gz", rest.BuildArtifacts)
+    Post(api, "/login", rest.Login)
+    Get(api, "/logout", rest.Logout)
 
     // register model-based REST endpoints
     rest.QueryOne(api, "/project/{Id:[0-9]+}", ctx.Conf.Projects)
@@ -92,6 +94,10 @@ func Get(router *mux.Router, path string, fn HttpFn) (*mux.Route) {
     return router.Methods(http.MethodGet).Path(path).HandlerFunc(fn)
 }
 
+// Registers a handler function for the POST Method on the given path.
+func Post(router *mux.Router, path string, fn HttpFn) (*mux.Route) {
+    return router.Methods(http.MethodPost).Path(path).HandlerFunc(fn)
+}
 
 // --------------------------------------------------------------------------------------
 //  common handlers

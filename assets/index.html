@@ -44,7 +44,7 @@
           </ul>
           <ul class="nav navbar-nav navbar-right">
             <li ng-show="liveUpdates"><a href="#" style="color: #39aa56; cursor: default;"><i class="fa fa-signal"></i>&nbsp;Live Update</a></li>
-            <li ng-if="!hideNavigation"><a href="#"><span class="glyphicon glyphicon-log-in"></span>&nbsp;Logout</a></li>
+            <li ng-if="!hideNavigation"><a href="#" ng-click="logout()"><span class="glyphicon glyphicon-log-in"></span>&nbsp;Logout</a></li>
            </ul>
         </div>
       </div>

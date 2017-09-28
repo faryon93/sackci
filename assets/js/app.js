@@ -1,6 +1,6 @@
 // ------------------------------------------------------------------------------------------------
 var app = angular.module('app', ["ngRoute", "ngResource", "ui.bootstrap", "infinite-scroll", "angular-loading-bar"]);
-app.config(function($routeProvider, $locationProvider) {
+app.config(function($routeProvider, $locationProvider, $httpProvider) {
     $routeProvider
         .when("/", {
             templateUrl : "home.html"
@@ -27,6 +27,7 @@ app.config(function($routeProvider, $locationProvider) {
         });
 
     $locationProvider.html5Mode(true);
+    $httpProvider.interceptors.push('authInterceptor')
 });
 
 // ------------------------------------------------------------------------------------------------
@@ -46,10 +47,18 @@ app.run(function($rootScope) {
 });
 
 // ------------------------------------------------------------------------------------------------
-app.controller("navigation", function($scope, $location) {
+app.controller("navigation", function($scope, $location, $http) {
     $scope.isActive = function (viewLocation) { 
         return $location.path().startsWith(viewLocation);
     };
+
+    $scope.logout = function() {
+        $http.get('/api/v1/logout');
+    };
+});
+
+app.controller("login", function($scope, $location, $routeParams) {
+    $scope.error = $routeParams.error !== undefined;
 });
 
 app.controller("projectlist", function($scope, $location, projects, feed) {
@@ -764,4 +773,16 @@ app.directive("ngButton", function($compile) {
             };
         }
     }
+});
+
+// ------------------------------------------------------------------------------------------------
+app.service('authInterceptor', function($q) {
+    var service = this;
+
+    service.responseError = function(response) {
+        if (response.status === 401){
+            window.location = "/login";
+        }
+        return $q.reject(response);
+    };
 });

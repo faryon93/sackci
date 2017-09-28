@@ -1,4 +1,12 @@
-<div class="container login">
+<div class="container login" ng-controller="login">
+    <div ng-if="error" class="row">
+        <div class="col-md-4 col-md-4 col-md-offset-4">
+            <div class="alert alert-danger">
+                Incorrect username or password.
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-md-4 col-md-offset-4">
             <div class="panel panel-default">
@@ -6,11 +14,11 @@
                     <h3 class="panel-title">Login</h3>
                 </div>
                 <div class="panel-body">
-                    <form accept-charset="UTF-8" role="form">
+                    <form accept-charset="UTF-8" role="form" method="post" action="/api/v1/login">
                         <fieldset>
                             <div class="form-group">
                                 <label>Username</label>
-                                <input class="form-control" name="email" type="text">
+                                <input class="form-control" name="username" type="text">
                             </div>
                             <div class="form-group">
                                 <label>Password</label>
