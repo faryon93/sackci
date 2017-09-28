@@ -26,6 +26,18 @@ import (
     "time"
 )
 
+
+// ----------------------------------------------------------------------------------
+//  constants
+// ----------------------------------------------------------------------------------
+
+const (
+    // Time the session cookie should be valid when remember
+    // me option is used during login.
+    REMEMBERME_EXPIRATION = 7 * 24 * time.Hour
+)
+
+
 // ----------------------------------------------------------------------------------
 //  types
 // ----------------------------------------------------------------------------------
@@ -41,6 +53,7 @@ type loginRequest struct {
 //  public functions
 // ----------------------------------------------------------------------------------
 
+// Try to login the user with provided credentials.
 func Login(w http.ResponseWriter, r *http.Request) {
     body, err := ioutil.ReadAll(r.Body)
     defer r.Body.Close()
@@ -59,12 +72,21 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
     // validate username and password
     if login.Username == "test" && login.Password == "test" {
-        // create the session cookie and send it
-        // in the http response
-        http.SetCookie(w, &http.Cookie{
+        // create the session cookie
+        cookie := http.Cookie{
             Path: "/", Name: "session",
-            Value: "test", HttpOnly: true,
-        })
+            Value: "test",
+            HttpOnly: true,
+        }
+
+        // set an expiration time on the cookie
+        // if the remeber me option is used
+        if login.Remeber {
+            cookie.Expires = time.Now().Add(REMEMBERME_EXPIRATION)
+        }
+
+        // send the cookie back to client in the http response
+        http.SetCookie(w, &cookie)
 
     // the password / username matching failed -> return an error
     } else {
@@ -73,6 +95,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
     }
 }
 
+// Logout the user.
 func Logout(w http.ResponseWriter, r *http.Request) {
     // Just send an already expired and empty cookie back to the client.
     // When we return the Unauthorized HTTP code the frontend
