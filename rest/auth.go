@@ -21,8 +21,20 @@ package rest
 
 import (
     "net/http"
+    "io/ioutil"
+    "encoding/json"
     "time"
 )
+
+// ----------------------------------------------------------------------------------
+//  types
+// ----------------------------------------------------------------------------------
+
+type loginRequest struct {
+    Username string `json:"username"`
+    Password string `json:"password"`
+    Remeber bool `json:"remember"`
+}
 
 
 // ----------------------------------------------------------------------------------
@@ -30,36 +42,46 @@ import (
 // ----------------------------------------------------------------------------------
 
 func Login(w http.ResponseWriter, r *http.Request) {
-    err := r.ParseForm()
+    body, err := ioutil.ReadAll(r.Body)
+    defer r.Body.Close()
     if err != nil {
-        http.Error(w, "faild to parse login data", http.StatusNotAcceptable)
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    // parse the login information
+    var login loginRequest
+    err = json.Unmarshal(body, &login)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusNotAcceptable)
         return
     }
 
     // validate username and password
-    if r.Form.Get("username") == "test" &&
-       r.Form.Get("password") == "test" {
-
-
+    if login.Username == "test" && login.Password == "test" {
+        // create the session cookie and send it
+        // in the http response
         http.SetCookie(w, &http.Cookie{
             Path: "/", Name: "session",
             Value: "test", Secure: true,
         })
-        http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 
     // the password / username matching failed -> return an error
     } else {
-        http.Redirect(w, r, "/login?error=invalid_credentials", http.StatusSeeOther)
+        http.Error(w, "Invalid username or password", http.StatusNotAcceptable)
+        return
     }
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {
-    // just send an already expired and empty cookie
-    // back to the client
-    // when we return the Unauthorized HTTP code
-    // the frontend will rediret to the login page itself
+    // Just send an already expired and empty cookie back to the client.
+    // When we return the Unauthorized HTTP code the frontend
+    // will rediret to the login page automatically
     http.SetCookie(w, &http.Cookie{
-        Name: "session", Value: "", Secure: true, Path: "/", Expires: time.Now().Add(-5 * time.Minute),
+        Path: "/", Name: "session",
+        Value: "",
+        Secure: true,
+        Expires: time.Now().Add(-5 * time.Minute),
     })
     http.Error(w, "logout successfull", http.StatusUnauthorized)
 }

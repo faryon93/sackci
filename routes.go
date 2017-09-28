@@ -115,7 +115,7 @@ func PrettyUrl(fs http.FileSystem) http.Handler {
 
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         // the webpage root cannot be checked in fs
-        // everything with a file ending should to be
+        // everything without a file ending should to be
         // rewritten to index page for a more convenient
         // user experiance and to prevent the server from delivering
         // wrong file content to expected filetype

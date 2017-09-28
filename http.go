@@ -21,15 +21,15 @@ package main
 
 import (
     "net/http"
-
-    "github.com/faryon93/sackci/log"
-    "github.com/faryon93/sackci/config"
+    "strings"
+    "errors"
     "time"
     "context"
     "net"
+
+    "github.com/faryon93/sackci/log"
+    "github.com/faryon93/sackci/config"
     "github.com/faryon93/sackci/ctx"
-    "strings"
-    "errors"
 )
 
 
@@ -151,7 +151,6 @@ func IsSessionValid(r *http.Request) (error) {
 // Checks if a proper session token is supplied by the caller.
 func CheckSession(h http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
         url := r.URL.String()
         err := IsSessionValid(r)
 
@@ -163,13 +162,9 @@ func CheckSession(h http.Handler) http.Handler {
                 return
             }
 
-        // on all other frontend pages a redirect to the login page
-        } else if !strings.HasPrefix(url, "/login") &&
-                  !strings.HasPrefix(url, "/css") &&
-                  !strings.HasPrefix(url, "/img") &&
-                  !strings.HasPrefix(url, "/js") &&
-                  !strings.HasSuffix(url, "html") {
-
+        // all non api pages should be redirected to the login page
+        // except for all static assets
+        } else if !strings.HasPrefix(url, "/login") && !AssetFileExists(url) {
             if err != nil {
                 http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
                 return

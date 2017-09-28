@@ -57,8 +57,24 @@ app.controller("navigation", function($scope, $location, $http) {
     };
 });
 
-app.controller("login", function($scope, $location, $routeParams) {
-    $scope.error = $routeParams.error !== undefined;
+app.controller("login", function($scope, $http, $location) {
+    $scope.form = {
+        username: "",
+        password: "",
+        remember: false
+    };
+
+    $scope.login = function(scope) {
+        $http.post("/api/v1/login", $scope.form)
+            .then(function () {
+                $location.path("/");
+            },function (error){
+                $scope.error = error.data;
+                scope.reset();
+            });
+
+        return true;
+    }
 });
 
 app.controller("projectlist", function($scope, $location, projects, feed) {
@@ -718,6 +734,7 @@ app.directive("ngButton", function($compile) {
             // variable initialization
             scope.errorText = "";
             scope.text = element.text();
+            scope.classes = element[0].className;
 
             // add error message popover
             attrs.$set("popover-title", "Internal Server Error");
@@ -755,9 +772,7 @@ app.directive("ngButton", function($compile) {
 
             // eventhandler: blur()
             scope.blur = function() {
-                scope.errorText = "";
-                setClass("btn-default");
-                element.html(scope.text);
+                scope.reset();
             };
 
             // functions for use within callback
@@ -770,6 +785,12 @@ app.directive("ngButton", function($compile) {
                 setClass("btn-danger");
                 element.html('<i class="fa fa-exclamation-triangle"></i>&nbsp;Error');
                 scope.errorText = text;
+            };
+
+            scope.reset = function() {
+                scope.errorText = "";
+                element[0].className = scope.classes;
+                element.html(scope.text);
             };
         }
     }
