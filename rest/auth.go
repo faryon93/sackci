@@ -24,6 +24,7 @@ import (
     "io/ioutil"
     "encoding/json"
     "time"
+    "github.com/faryon93/sackci/ctx"
 )
 
 
@@ -77,6 +78,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
             Path: "/", Name: "session",
             Value: "test",
             HttpOnly: true,
+            Secure: ctx.Conf.IsHttpsEnabled(),
         }
 
         // set an expiration time on the cookie
