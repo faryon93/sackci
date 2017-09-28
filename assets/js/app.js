@@ -70,6 +70,7 @@ app.controller("login", function($scope, $http, $location) {
                 $location.path("/");
             },function (error){
                 $scope.error = error.data;
+                $scope.form.password = "";
                 scope.reset();
             });
 
