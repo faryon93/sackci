@@ -193,7 +193,7 @@ var _escData = map[string]*_escFile{
 	"/config.html": {
 		local:   "../assets.min/config.html",
 		size:    0,
-		modtime: 1506605902,
+		modtime: 1506606091,
 		compressed: `
 H4sIAAAAAAAA/wEAAP//AAAAAAAAAAA=
 `,
@@ -202,7 +202,7 @@ H4sIAAAAAAAA/wEAAP//AAAAAAAAAAA=
 	"/css/flat.css": {
 		local:   "../assets.min/css/flat.css",
 		size:    692,
-		modtime: 1506605902,
+		modtime: 1506606091,
 		compressed: `
 H4sIAAAAAAAA/3yQ3Y6jMAyFX6WrvdmVGkQL2+6kEu9icKDRBDsyoT9CvPuobToDnXbuwmfrOwcnBAcV
 oOwKZwsYShY0ogTQ9p1Ox8SS74NqhHtfdB5oChQgMi1nO9d3UrO0qmIKwu670wOZJ7gMpLzYFuS8vH4g
@@ -216,7 +216,7 @@ mH6mjR8BAAD//8bgaAm0AgAA
 	"/css/pipeline.css": {
 		local:   "../assets.min/css/pipeline.css",
 		size:    1259,
-		modtime: 1506605902,
+		modtime: 1506606091,
 		compressed: `
 H4sIAAAAAAAA/6RU4W6jPBB8lUifqv75jCANrc48jcFrsqrjteylIUX37iewe8k1bnXSiR+A7dnZmR3Q
 +FZ59GDRwa6KrEaIC8PMQlkcnRzAMYTufEQGEb0aQDo6B+V/lpD5vmiM3qqLRLfuit7S8NoZciwivoNs
@@ -232,7 +232,7 @@ JUiYnEM3FjCmf/ou/neANYCfvrBPeKsuEP7uh/UrAAD//8EK/7DrBAAA
 	"/css/style.css": {
 		local:   "../assets.min/css/style.css",
 		size:    2915,
-		modtime: 1506605902,
+		modtime: 1506606091,
 		compressed: `
 H4sIAAAAAAAA/5xW7W7yNhS+lUhVpTLhKAVCW0dDr7Tfu4JpP5zYCV4d27MPBRbl3qfjJBAS6DtNSGCO
 z/fH47OHWi1zw8/NXshqD/Q1SZ5bpDbmS7hSmSM5U184o1Qb+CzjXOqKgLE0TeypjUupVFNLTUYqstyc
@@ -258,7 +258,7 @@ L78WRpE/d908z7ay8b6LQWtgUguH7XGdXyzxGr14GNc3gq9hPW7/DQAA//8sNsajYwsAAA==
 	"/favicon.ico": {
 		local:   "../assets.min/favicon.ico",
 		size:    212430,
-		modtime: 1506605902,
+		modtime: 1506606091,
 		compressed: `
 H4sIAAAAAAAA/0S6VVDcT7D+/d1dZHH34AkeJLi7uzssrkGCBl2c4ARIIHiABNcQHJYgIbi7huDuuvDW
 75zzr3eq+uIzT/dM11NTU3MxAAACMID/BgigA/z7AOATAABw+P8yCxQE4PYDAAz2v1yaDgACoyBASel/
@@ -1808,7 +1808,7 @@ fZt9D7uu+kh8dPuh12Ab9CyxP3SfHqdnpKlOoXiWpWd4qlco7poVCgQKxf8fAAD//xriCNzOPQMA
 	"/home.html": {
 		local:   "../assets.min/home.html",
 		size:    236,
-		modtime: 1506605902,
+		modtime: 1506606091,
 		compressed: `
 H4sIAAAAAAAA/ySOMWoDMRBFrzK5wAqTKmEtMHhJ5cYuUoaRPNIoljRmNJvg24eNiw+/eA/ezDv/STVK
 IzCBgfEWy8vseOcvVCkaINxVvrcnHYwJtGS2Df4p9AthLfUKXIaJPkAUImPPNGCQWel5THNQv+1CBLIq
@@ -1820,7 +1820,7 @@ kEQhrWpMCqUn0YZWpE9/AQAA///Irf0y7AAAAA==
 	"/img/failed.svg": {
 		local:   "../assets.min/img/failed.svg",
 		size:    726,
-		modtime: 1506605902,
+		modtime: 1506606091,
 		compressed: `
 H4sIAAAAAAAA/4yS34vcIBDH/xWZpdDCJmpiuGuJeSrcU58K926iRotrgrr5cX99sb0e2+1uOQRhxvl8
 5zuDbVxGtJ2cjxxMSvMXjNd1Lde6nMKIK0IIjssIaLUyGQ6PFJBRdjSJQ0Wga531SoSnIKRVPiErOQhA
@@ -1835,7 +1835,7 @@ AAA=
 	"/img/passed.svg": {
 		local:   "../assets.min/img/passed.svg",
 		size:    724,
-		modtime: 1506605902,
+		modtime: 1506606091,
 		compressed: `
 H4sIAAAAAAAA/5SSXasbIRCG/4pMKLSQXXU/ejhl3avCuepV4dy7q64W4y5q9iO/vpimIU2TQhGEGed5
 553BJswDWg/WBQY6xukLxsuy5EuZj37ABSEEh3kAtBgRNYNXAkhLM+jIoCDQNtY4yf2b58JIF5ERDDig
@@ -1849,7 +1849,7 @@ oI0Bra8zEprOr/Bm5SW03dFY0eAEP5KonlR8Lv6nycRDMG54LlL9VYOHtkmftf0ZAAD//yNy3HPUAgAA
 	"/img/running.svg": {
 		local:   "../assets.min/img/running.svg",
 		size:    724,
-		modtime: 1506605902,
+		modtime: 1506606091,
 		compressed: `
 H4sIAAAAAAAA/5SS3arcIBCAX0VmKbSwiZqfHk6JuSqcq14Vzr2JGi2uCWr+9umL7bJst7uFEgjMON/n
 zGATlgFtJ+sCAx3j9AXjdV3ztcxHP+CCEILDMgBajYiawSsBpKUZdGRQEGgba5zk/s1zYaSLyAgGHNBW
@@ -1863,7 +1863,7 @@ Aa2vMxKavt/hzcpLaLvZWNHgBD9SVE8qPhf/c4mfnTNueC6p/qrBQ9ukx9r+DAAA//8uS+XC1AIAAA==
 	"/img/waiting.svg": {
 		local:   "../assets.min/img/waiting.svg",
 		size:    730,
-		modtime: 1506605902,
+		modtime: 1506606091,
 		compressed: `
 H4sIAAAAAAAA/5SSXavbMAyG/4pRGWzQxHY+djgjztXgXO1q0HsntmMP1wm2m4/++uGtK13XDg6CgBQ9
 r14JN2Ee0Hq0LjDQMU5fMF6WJV/KfPQDLgghOMwDoMWIqBm8EkBamkFHBgWBtrHGSe7fPBdGuoiMYMAB
@@ -1878,7 +1878,7 @@ AA==
 	"/index.html": {
 		local:   "../assets.min/index.html",
 		size:    3596,
-		modtime: 1506605902,
+		modtime: 1506606091,
 		compressed: `
 H4sIAAAAAAAA/7RXbW/cNhL+fr+CkXHnBDhK6zhOLo6kQ1CgQIGgKFD0czBLjqSxKVLhi+wg2f9eUG+r
 3dSbpHG/SOJw5pl5HnJm7fyJNMJ/7JA1vlVlHp9Mga4L1EzXHLqugK4r8xY9MNGAdeiL4Cv+v8nWeN9x
@@ -1906,7 +1906,7 @@ PJyJqD2P/zytfpOOZ9b/2fk04l6fs+tlcfH8fKggRh/N3vj8MwAA//9wMXKeDA4AAA==
 	"/js/ansi_up.js": {
 		local:   "../assets.min/js/ansi_up.js",
 		size:    8345,
-		modtime: 1506605902,
+		modtime: 1506606091,
 		compressed: `
 H4sIAAAAAAAA/6xZ23LbONK+11PQnCqJHFEUJdsTxxTsf/6t2aq52GRrsrs3JIcFUiCFmKcFoEguRfvs
 WzjwKNpxtpJyJBLo/vrrBtBoQEayL2KGy8IgZcmsBMasJM/mCScGe65QmWhblOACAQBmtehsOpWNNsy3
@@ -1959,7 +1959,7 @@ Pk++mRfFlSB0z/VRSVZk7pkfHMevRdVv65Yehoj+rdzuM6Rbpy8w2ze3kvVv/ur3eVCDmqb73wAAAP//
 	"/js/app.js": {
 		local:   "../assets.min/js/app.js",
 		size:    13722,
-		modtime: 1506605902,
+		modtime: 1506606091,
 		compressed: `
 H4sIAAAAAAAA/8w6a3PbOJLf/StklC8kI5qms4lnVjScOIlnk90kMzVxdivncaUgEqKQkAAXAKX4FP33
 Kzz4phTfzFzVVrksEd3obvQbTa0Qn6CigIimZYZ4kLOkzLDroKJw/BtA019ZKTHw1TcsWMlj9VCSYM6Y
@@ -2035,7 +2035,7 @@ vzcbnYZXb6amBelxG5h3nBn+GmfI5EQVnoimGW7z1uHseFFfU4qlaoVU2vrfAAAA///kTangmjUAAA==
 	"/login.html": {
 		local:   "../assets.min/login.html",
 		size:    674,
-		modtime: 1506605902,
+		modtime: 1506606091,
 		compressed: `
 H4sIAAAAAAAA/4xSS2rsMBDcv1MI7YUXM4u3kHWC9yAk5AD6tG0xLclIrZnM7YN/jI0JZNPudlVXFW5L
 5+/Moi6l5TZF0j5CZph6H7nagTk91JGLIjhxZWuTuq4AiethiY86ArK5CgedrkgHwoIMoJ2PvZLD5fCe
@@ -2048,28 +2048,28 @@ qN8BAAD///Fi0OWiAgAA
 
 	"/project.html": {
 		local:   "../assets.min/project.html",
-		size:    2159,
-		modtime: 1506605902,
+		size:    2088,
+		modtime: 1506606091,
 		compressed: `
-H4sIAAAAAAAA/5yVUW+jOBDH3/spfD6pbh8outce9kmVetp9W20/wMrAhMyuM0bG0EYp331lMCRNadLN
-S2Jm/vzMjMczWYkdK4xuGlk7+xMKn3QIz4yqpLDknTUG3OQK1mZtn6WxuoRSZet/VJar3S7670hvoO+z
-NFdXGUYsX2m20ommykBS2jY3kDis1p6rLEWVNbWmAMaV5F7nTEom8hZNKbi6pryp/30IT1kahOpqUb/G
-xlu3FVwNWvZlfD75To01GCQQXH2Ly5N6oE5w9UgdOksbIH9S3YD3SFUjuHqKy0X9ECn7S7KWSlghQcmu
-r9lsFUZ7aLzg6ubv3W4w9/1tJGVpyH9rpkST7hjpLvE6b7jKDA6nOPp2uvDYwT17m+Keq0wH2drBSqbx
-HNP9iWLZ9+mgTef9xyTfXxjIPo4TCZGHnNdXNlv3nHExp0KfC3iqkTHkk/FG6XExnd1iLqlP7DFpD4rv
-LD+U4CfQQN3bOj0Lnqv1E/RJe1DXIz92kdaY8X6rLG+9t8T8tgYZ1/ELck8s95TUDjfabfnBx3mHVQXu
-yWvfNmPYzlkn2H9MhFdKTRU4we7Hx0gQEYHFLxkJN7fBlJvWTZYH0wZrbWvbgUs8egOSfyUPjrRhT+A6
-cOwxbMdZi3kSlXK3i4TB1/czoja6gJBkaWDl9+RRLbkgGzrM7MAmsTXQx1Hy435yrHtzLd5TBFfHnbc2
-ejv22rGdfm9puXW9gz1rDCe8wCxsFf6aGuky9BTtMRheCqM32qOlkMVhahzu8L9GA+V868eqUlnaGnUw
-ykIbHuYXkGeFAe1W+MLfKWpNwMa7wD8YQYOZCtOWILmIF+HH4Lxb+40JIaQldn/EnsfVMj26L+cPo2qZ
-DdRdzt0PtWX45D/a4eD3dwAAAP//JqIZ7m8IAAA=
+H4sIAAAAAAAA/5yVwW7jOAyG730KrQpU7cE19tq1tECBLnYOAwymDzCQbcbhjEIZsuw2SP3uA1mKk6Zp
+2sklkcnfH02KoooaB1YZ3XWydfYnVD4bEJ4YNVllyTtrDLitK1i7pX2SxuoaalUs/1ZFqTab5L8lvYJx
+LPJSXRSYsHyh2UJnmhoDWW370kDmsFl6roocVdG1mgIYF5J7XTIpmSh7NLXg6orKrv3nPjwVeRCqi6P6
+JXbeurXgatKy/+PzyXdabMEggeDqW1qe1AMNgqsHGtBZWgH5k+oOvEdqOsHVY1oe1U+Zsr8k66mGBRLU
+7OqKzVZhtIfOC66uLzebyTyON4lU5KH+vdkWmvTASA+Z12XHVWFw2sXo2+jK4wB37HWJR64KHWRLBwuZ
+p33MdzuK9Tjmkzaf48ci352ZyC6PEwWR+5yXFzZbd5y4mEuhP0p42yMx5ZP5JulhM00h5pcv1VfwDqvu
+E7FD73wiLtDwusE+BM9t9gn6VrvXkJGfjn9vTDyYqih77y0xv25BpnX6gtITKz1lrcOVdmu+93HeYdOA
+e/Ta911M2znrBPuXifBKrakBJ9hdfEwEkRBY/ZKJcH0TTKXp3dZyb/pgbW1rB3CZR29A8i/kwZE27BHc
+AI49hHCc9VhmSSk3m0SYfOM4I1qjKwhFlgYWfkeOaskF2TAaZgd2mW2B3s+SHw6CQ92rfn5LEVwdjszW
+6HUcknEOfu/p+Mx5A3vSGHb4CLOyTfjrWqTz0NtsD8HwXBm90h4thSpO434/wn8aDdTzcY1dpYq8N2rv
+Dgrzc7p4gDyrDGi3wGf+RtFqAhbPAn/n7pjMVJm+BslFOgg/Juft0q9MSCGvcfgj9nzPHKcn9/n86Y45
+zgYazufubqPj8K3/IMLe7+8AAAD//53VdwQoCAAA
 `,
 	},
 
 	"/project_build.html": {
 		local:   "../assets.min/project_build.html",
 		size:    4329,
-		modtime: 1506605902,
+		modtime: 1506606091,
 		compressed: `
 H4sIAAAAAAAA/6RXbW/bNhD+3l9xcbc4wSo7WdICcyUNXVesGNJ2SPu9oMSTxIUiVfKUxHX83wdSL5Yt
 J+naL7Is8njPvT13DLm4hlQya6OkFpIHHIkJaUHlQaoVGS0lmqgy+l9M6Q+3JR7ITJhEQ+CfAWcqRzNx
@@ -2102,7 +2102,7 @@ ltoPad6s+yt08PwvAAD//+4KO4XpEAAA
 	"/project_env.html": {
 		local:   "../assets.min/project_env.html",
 		size:    1174,
-		modtime: 1506605902,
+		modtime: 1506606091,
 		compressed: `
 H4sIAAAAAAAA/4xSzWrcMBC+71NM91ASiHeh0FNtQWgb6KWX/kCPY2l2ra4smZmRgxvy7kXebWqyS5uL
 kMcz35+mdn6EuK9sisopBOJm4PSTrH6Mo/mRMliMkIWA4ug5xZ6iwojssQ0koAkGZOxJ2f8imFJmaLMP
@@ -2120,7 +2120,7 @@ AAA=
 	"/project_history.html": {
 		local:   "../assets.min/project_history.html",
 		size:    2003,
-		modtime: 1506605902,
+		modtime: 1506606091,
 		compressed: `
 H4sIAAAAAAAA/5yV23LcNgyGX4VWZrzJBVfrOsnFRlKnh8z4okk7nrwAJUISaxLQkJC96nrfvaOT7ZXX
 beIbDQ8A8eEHKCba3AqsZEHInqwFnzae/oaCr0xg8l02WBRWhZBGyoJnMXylVliBj3rnUNNdGoH35MVZ
@@ -2142,7 +2142,7 @@ M2non6BnFXv+PX6g5pfo8Tf61KIgq/sqX/z03Y9MaAwi+Hk4kv9Bqu8J4ciDWK/XL8H9GwAA//8cuyPd
 	"/project_settings.html": {
 		local:   "../assets.min/project_settings.html",
 		size:    5512,
-		modtime: 1506605902,
+		modtime: 1506606091,
 		compressed: `
 H4sIAAAAAAAA/+xY3W/buhV/N3D/hzMPWDagkm9z78sySUNyG9wWvS2CpO3QvQxH4pHEhSIFfsTV0vzv
 A0nJlmPH3ZZhwLAFiC3zfJLndz6ojPE7kE1SKWm1EoJ0bshaLhtTZO0pGDsIyjvUDZeJVf3Z98WVVn+l
