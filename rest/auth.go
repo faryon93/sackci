@@ -63,7 +63,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
         // in the http response
         http.SetCookie(w, &http.Cookie{
             Path: "/", Name: "session",
-            Value: "test", Secure: true,
+            Value: "test", HttpOnly: true,
         })
 
     // the password / username matching failed -> return an error
@@ -80,8 +80,9 @@ func Logout(w http.ResponseWriter, r *http.Request) {
     http.SetCookie(w, &http.Cookie{
         Path: "/", Name: "session",
         Value: "",
-        Secure: true,
+        HttpOnly: true,
         Expires: time.Now().Add(-5 * time.Minute),
+        MaxAge: -1,
     })
     http.Error(w, "logout successfull", http.StatusUnauthorized)
 }
