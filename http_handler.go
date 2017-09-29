@@ -25,6 +25,7 @@ import (
 
     "github.com/faryon93/sackci/ctx"
     "github.com/faryon93/sackci/log"
+    "github.com/faryon93/sackci/assets"
 )
 
 
@@ -68,7 +69,7 @@ func PrettyUrl(fs http.FileSystem) http.Handler {
         // rewritten to index page for a more convenient
         // user experiance and to prevent the server from delivering
         // wrong file content to expected filetype
-        if r.URL.Path != "/" && !AssetFileExists(r.URL.String()) {
+        if r.URL.Path != "/" && !assets.FileExists(r.URL.String()) {
             r.URL.Path = "/"
         }
 

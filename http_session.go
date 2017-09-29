@@ -25,6 +25,7 @@ import (
     "errors"
 
     "github.com/faryon93/sackci/ctx"
+    "github.com/faryon93/sackci/assets"
 )
 
 
@@ -49,7 +50,7 @@ func CheckSession(h http.Handler) http.Handler {
 
         // all non api pages should be redirected to the login page
         // except for all static assets
-        } else if !strings.HasPrefix(url, "/login") && !AssetFileExists(url) {
+        } else if !strings.HasPrefix(url, "/login") && !assets.FileExists(url) {
             if err != nil {
                 http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
                 return

@@ -28,6 +28,7 @@ import (
     "github.com/faryon93/sackci/sse"
     "github.com/faryon93/sackci/ctx"
     "github.com/faryon93/sackci/rest"
+    "github.com/faryon93/sackci/assets"
 )
 
 
@@ -55,7 +56,7 @@ type HttpFn func(http.ResponseWriter, *http.Request)
 func routes(router *mux.Router) {
     api := router.PathPrefix(HTTP_API_BASE).Subrouter()
     api.NotFoundHandler = http.HandlerFunc(NotFound)
-    rest.Fs = FS(false)
+    rest.Fs = assets.FS(false)
 
     // register classic REST endpoints
     Get(api,"/project", rest.ProjectList)
@@ -84,7 +85,7 @@ func routes(router *mux.Router) {
     sse.Register(api, "/feed", ctx.Feed)
 
     // register static assets
-    router.PathPrefix("/").Handler(PrettyUrl(FS(false)))
+    router.PathPrefix("/").Handler(PrettyUrl(assets.FS(false)))
 }
 
 

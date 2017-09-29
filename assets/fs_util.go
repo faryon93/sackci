@@ -1,4 +1,4 @@
-package main
+package assets
 // sackci
 // Copyright (C) 2017 Maximilian Pachl
 
@@ -16,12 +16,22 @@ package main
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // ----------------------------------------------------------------------------------
+//  generate rules
+// ----------------------------------------------------------------------------------
+//go:generate lessc css/pipeline.less css/pipeline.css
+//go:generate minify -a -r -o ../assets.min/ ./
+//go:generate cp favicon.ico ../assets.min/
+//go:generate esc -pkg assets -prefix=../assets.min -ignore (.*).go -o fs.go ../assets.min
+//go:generate rm -rf ../assets.min
+
+
+// ----------------------------------------------------------------------------------
 //  public functions
 // ----------------------------------------------------------------------------------
 
 // Returns true if file exists in the embedded asset
 // filesystem used to serve static http content.
-func AssetFileExists(file string) bool {
+func FileExists(file string) bool {
     entry, exists := _escData[file]
     if !exists {
         return false

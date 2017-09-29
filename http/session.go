@@ -138,6 +138,7 @@ func (s *SessionStore) newSessionToken() (string, error) {
     }
 
     // TODO: how to make sure this token is unique?
+    // TODO: use JWT as token technology?
 
     return base64.StdEncoding.EncodeToString(b), nil
 }
