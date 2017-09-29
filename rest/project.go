@@ -26,10 +26,10 @@ import (
     "errors"
 
     "github.com/gorilla/mux"
+    log "github.com/sirupsen/logrus"
 
     "github.com/faryon93/sackci/ctx"
     "github.com/faryon93/sackci/model"
-    "github.com/faryon93/sackci/log"
 )
 
 
@@ -153,10 +153,10 @@ func ProjectBadge(w http.ResponseWriter, r *http.Request) {
 func ProjectUpdate(r *http.Request) {
     err := ctx.Conf.Save()
     if err != nil {
-        log.Info("project", "failed to write config file:", err.Error())
+        log.Infoln("failed to write config file:", err.Error())
         return
     }
-    log.Info("project", "succesfully updated project with id: \"" + mux.Vars(r)["Id"] + "\"")
+    log.Infoln("succesfully updated project with id: \"" + mux.Vars(r)["Id"] + "\"")
 }
 
 

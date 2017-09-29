@@ -24,17 +24,7 @@ import (
 
     "github.com/asdine/storm/q"
     "github.com/asdine/storm"
-
-    "github.com/faryon93/sackci/log"
-)
-
-
-// ----------------------------------------------------------------------------------
-//  public functions
-// ----------------------------------------------------------------------------------
-
-const (
-    PURGE = "purge"
+    log "github.com/sirupsen/logrus"
 )
 
 
@@ -55,7 +45,7 @@ func PurgeProjects(projects []Project) {
     query := Get().Select(invalidProjects...)
     count, err := query.Count(new(ProjectMapping))
     if err != nil {
-        log.Error(PURGE, "failed to fetch invalid projects:", err.Error())
+        log.Errorln("failed to fetch invalid projects:", err.Error())
         return
     }
 
@@ -63,10 +53,10 @@ func PurgeProjects(projects []Project) {
     if count > 0 {
         err = query.Delete(new(ProjectMapping))
         if err != nil && err != storm.ErrNotFound {
-            log.Error(PURGE, "failed to delete invalid projects:", err.Error())
+            log.Errorln("failed to delete invalid projects:", err.Error())
             return
         }
-        log.Info(PURGE, "successfully deleted", count, "project mappings")
+        log.Infoln("successfully deleted", count, "project mappings")
     }
 
     // get all project mappings
@@ -74,7 +64,7 @@ func PurgeProjects(projects []Project) {
     var mappings []ProjectMapping
     err = Get().All(&mappings)
     if err != nil && err != storm.ErrNotFound {
-        log.Error(PURGE, "failed to fetch mapping:", err.Error())
+        log.Errorln("failed to fetch mapping:", err.Error())
         return
     }
 
@@ -88,7 +78,7 @@ func PurgeProjects(projects []Project) {
     query = Get().Select(unreferenced...)
     count, err = query.Count(new(Build))
     if err != nil {
-        log.Error(PURGE, "failed to fetch unreferenced builds:", err.Error())
+        log.Errorln("failed to fetch unreferenced builds:", err.Error())
         return
     }
 
@@ -96,11 +86,11 @@ func PurgeProjects(projects []Project) {
     if count > 0 {
         err = query.Delete(new(Build))
         if err != nil && err != storm.ErrNotFound {
-            log.Error(PURGE, "failed to delete unreferenced builds:", err.Error())
+            log.Errorln("failed to delete unreferenced builds:", err.Error())
             return
         }
-        log.Info(PURGE, "successfully deleted", count, "builds from the database")
+        log.Infoln("successfully deleted", count, "builds from the database")
     }
 
-    log.Info(PURGE, "metadata purge finished successfully in", time.Since(start))
+    log.Infoln("metadata purge finished successfully in", time.Since(start))
 }

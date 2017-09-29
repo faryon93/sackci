@@ -23,8 +23,9 @@ import (
     "net/http"
     "net"
 
+    log "github.com/sirupsen/logrus"
+
     "github.com/faryon93/sackci/ctx"
-    "github.com/faryon93/sackci/log"
     "github.com/faryon93/sackci/assets"
 )
 
@@ -48,7 +49,7 @@ func RedirectHttps(w http.ResponseWriter, r *http.Request) {
     // replace port with the configured https port
     _, httpsPort, err := net.SplitHostPort(ctx.Conf.HttpsListen)
     if err != nil {
-        log.Error(LOG_TAG_HTTP,"invalid value in https_listen property")
+        log.Errorln("invalid value in https_listen property")
         http.Error(w, "misconfigured server", http.StatusInternalServerError)
         return
     }

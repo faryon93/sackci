@@ -23,9 +23,10 @@ import (
     "time"
     "sync"
 
+    log "github.com/sirupsen/logrus"
+
     "github.com/faryon93/sackci/model"
     "github.com/faryon93/sackci/agent"
-    "github.com/faryon93/sackci/log"
     "github.com/faryon93/sackci/ctx"
     "github.com/faryon93/sackci/util"
 )
@@ -36,9 +37,6 @@ import (
 // --------------------------------------------------------------------------------------
 
 const (
-    // common constants
-    LOG_TAG = "scm"
-
     // minimal polling interval in seconds
     MIN_POLLING_INTERVAL = 10
 )
@@ -81,7 +79,7 @@ func Setup() {
         timer := util.NewTimer(interval, func(t *util.CycleTimer) {
             poll(project, t)
         }, func() {
-            log.Info(LOG_TAG, "polling for \"" + project.Name + "\" exited")
+            log.Infoln("polling for \"" + project.Name + "\" exited")
             waitgroup.Done()
         })
 
@@ -90,7 +88,7 @@ func Setup() {
         timers = append(timers, timer)
 
         // execute the poller async
-        log.Info(LOG_TAG, "setup project \"" + project.Name +
+        log.Infoln("setup project \"" + project.Name +
                              "\" for scm polling (interval:", project.Interval, ")")
         timer.Start()
     }
@@ -118,30 +116,30 @@ func poll(project *model.Project, t *util.CycleTimer) {
     // create a new pipeline
     pipeline, err := agent.CreatePipeline()
     if err != nil {
-        log.Error(LOG_TAG, "failed to create scm polling pipeline:", err.Error())
+        log.Errorln("failed to create scm polling pipeline:", err.Error())
         return
     }
     pipeline.SetProject(project)
     pipeline.SetArtifactsDir(ctx.Conf.GetArtifactsDir())
     defer pipeline.Destroy()    // make sure the pipeline gets destroyed
 
-    log.Info(LOG_TAG, "starting scm polling for project \"" + project.Name + "\"")
+    log.Infoln("starting scm polling for project \"" + project.Name + "\"")
 
     // check if changes have happend since the last polling cycle
     newRef, err := pipeline.HeadRef()
     if err != nil {
-        log.Error(LOG_TAG, "failed to compare scm refs:", err.Error())
+        log.Errorln("failed to compare scm refs:", err.Error())
         return
     }
 
     // get the last build for the project
     lastBuild, err := project.GetLastBuild()
     if err != nil {
-        log.Error(LOG_TAG, "failed to get get last build:", err.Error())
+        log.Errorln("failed to get get last build:", err.Error())
         return
     }
 
-    log.Info(LOG_TAG, "scm polling took", time.Since(t.StartTime))
+    log.Infoln("scm polling took", time.Since(t.StartTime))
 
     // detect if new changes are available in the repository
     // trigger a new build if changes are detected
@@ -153,7 +151,7 @@ func poll(project *model.Project, t *util.CycleTimer) {
         }
         defer project.Unlock()
 
-        log.Error(LOG_TAG, "changes detected for project", project.Name,
+        log.Errorln("changes detected for project", project.Name,
                               "with ref:", util.ShortHash(newRef))
 
         // construct the build object for saving in the database
@@ -165,7 +163,7 @@ func poll(project *model.Project, t *util.CycleTimer) {
         }
         err = build.Save()
         if err != nil {
-            log.Error(LOG_TAG, "failed to save build:", err.Error())
+            log.Errorln("failed to save build:", err.Error())
             return
         }
         pipeline.SetBuild(build)
@@ -181,7 +179,7 @@ func poll(project *model.Project, t *util.CycleTimer) {
         // execute the pipeline
         err = pipeline.Execute()
         if err != nil {
-            log.Error(LOG_TAG, "failed to execute pipeline:", err.Error())
+            log.Errorln("failed to execute pipeline:", err.Error())
             return
         }
     }

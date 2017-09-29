@@ -22,7 +22,7 @@ package model
 import (
     "github.com/asdine/storm"
     "github.com/asdine/storm/codec/gob"
-    "github.com/faryon93/sackci/log"
+    log "github.com/sirupsen/logrus"
 )
 
 
@@ -53,7 +53,7 @@ func Open(path string) (error) {
 
 // Closes the bolt database.
 func Close() (error) {
-    log.Info("bolt", "closed bolt database handle")
+    log.Infoln("closed bolt database handle")
     return db.Close()
 }
 

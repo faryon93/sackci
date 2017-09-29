@@ -24,7 +24,8 @@ import (
     "time"
     "context"
 
-    "github.com/faryon93/sackci/log"
+    log "github.com/sirupsen/logrus"
+
     "github.com/faryon93/sackci/config"
 )
 
@@ -62,16 +63,16 @@ func SetupHttpEndpoint(conf *config.Config, mux http.Handler) (*http.Server) {
     }
 
     go func() {
-        log.Info(LOG_TAG_HTTP, "http server is listening on http://" + conf.HttpListen)
+        log.Infoln("http server is listening on http://" + conf.HttpListen)
 
         // serve the http connection as configured
         err := srv.ListenAndServe()
         if err != nil && err != http.ErrServerClosed {
-            log.Error(LOG_TAG_HTTP, "failed to serv http:", err.Error())
+            log.Errorln("failed to serv http:", err.Error())
             return
         }
 
-        log.Info(LOG_TAG_HTTP, "http server is now closed")
+        log.Infoln("http server is now closed")
     }()
 
     return srv
@@ -81,16 +82,16 @@ func SetupHttpEndpoint(conf *config.Config, mux http.Handler) (*http.Server) {
 func SetupHttpsEndpoint(conf *config.Config, mux http.Handler) (*http.Server) {
     srv := &http.Server{Addr: conf.HttpsListen, Handler: getHandler(conf, mux)}
     go func() {
-        log.Info(LOG_TAG_HTTP, "https server is listening on https://" + conf.HttpsListen)
+        log.Infoln("https server is listening on https://" + conf.HttpsListen)
 
         // serve the http connection as configured
         err := srv.ListenAndServeTLS(conf.HttpsCert, conf.HttpsKey)
         if err != nil && err != http.ErrServerClosed {
-            log.Error(LOG_TAG_HTTP, "failed to serv https:", err.Error())
+            log.Errorln("failed to serv https:", err.Error())
             return
         }
 
-        log.Info(LOG_TAG_HTTP, "https server is now closed")
+        log.Infoln("https server is now closed")
     }()
 
     return srv

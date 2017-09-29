@@ -25,9 +25,9 @@ import (
     "time"
 
     "gopkg.in/yaml.v2"
+    log "github.com/sirupsen/logrus"
 
     "github.com/faryon93/sackci/agent"
-    "github.com/faryon93/sackci/log"
     "github.com/faryon93/sackci/model"
     "github.com/faryon93/sackci/util"
 )
@@ -97,14 +97,14 @@ func (c *Config) Setup() {
     for i, project := range c.Projects {
         err := project.IsMissconfigured()
         if err != nil {
-            log.Error(LOG_TAG, "ignoring project", project.Name + ":", err.Error())
+            log.Errorln("ignoring project", project.Name + ":", err.Error())
             continue
         }
 
         // assign a project id wich is fixed
         err = c.Projects[i].AssignId()
         if err != nil {
-            log.Info(LOG_TAG,"ignoring project \"" + project.Name + "\":", err.Error())
+            log.Infoln("ignoring project \"" + project.Name + "\":", err.Error())
             c.Projects[i].Id = -1
             continue
         }
@@ -118,21 +118,21 @@ func (c *Config) Setup() {
         }
 
         // everything was fine -> we want to keep this project in our list
-        log.Info(LOG_TAG, "adding project", project.Name, "(" + util.MaskCredentials(project.Repository) + ")")
+        log.Infoln("adding project", project.Name, "(" + util.MaskCredentials(project.Repository) + ")")
     }
 
     // save config file to disk -> a hash might have been inserted
     // TODO: only save when necessary
     err := c.Save()
     if err != nil {
-        log.Error(LOG_TAG, "failed to save conf file:", err.Error())
+        log.Errorln("failed to save conf file:", err.Error())
     }
 
-    log.Info(LOG_TAG, "project integrity check took", time.Since(start))
+    log.Infoln( "project integrity check took", time.Since(start))
 
     // display a warning when authentication is disabled
     if !c.IsAuthEnabled() {
-        log.Warn(LOG_TAG, "AUTHENTICATION IS DISABLED! SOMEONE MAY STEAL YOUR SENSITIVE DATA!")
+        log.Warn("AUTHENTICATION IS DISABLED! SOMEONE MAY STEAL YOUR SENSITIVE DATA!")
     }
 }
 

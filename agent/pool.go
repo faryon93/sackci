@@ -24,8 +24,7 @@ import (
     "time"
 
     "github.com/fsouza/go-dockerclient"
-
-    "github.com/faryon93/sackci/log"
+    log "github.com/sirupsen/logrus"
 )
 
 // ----------------------------------------------------------------------------------
@@ -62,7 +61,7 @@ func Add(agents ...Agent) {
         // TODO: tls authentication for remote api
         client, err := docker.NewClient(agent.Endpoint)
         if err != nil {
-            log.Error("agent", "failed to create docker client:", err.Error())
+            log.Errorln("failed to create docker client:", err.Error())
             continue
         }
 
@@ -72,7 +71,7 @@ func Add(agents ...Agent) {
 
         // add the agent to the agent pool
         pool = append(pool, agent)
-        log.Error("agent", "adding build agent", agent.Name, "(" + agent.Endpoint + ")")
+        log.Infoln("adding build agent", agent.Name, "(" + agent.Endpoint + ")")
     }
 }
 

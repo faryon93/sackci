@@ -24,10 +24,10 @@ import (
     "strconv"
 
     "github.com/gorilla/mux"
+    log "github.com/sirupsen/logrus"
 
     "github.com/faryon93/sackci/ctx"
     "github.com/faryon93/sackci/agent"
-    "github.com/faryon93/sackci/log"
     "github.com/faryon93/sackci/model"
 )
 
@@ -79,7 +79,7 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
     // create the pipeline on the build agent
     pipeline, err := agent.CreatePipeline()
     if err != nil {
-        log.Error("project", "failed to trigger build:", err.Error())
+        log.Errorln("failed to trigger build:", err.Error())
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }
@@ -95,7 +95,7 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
     }
     err = build.Save()
     if err != nil {
-        log.Error("project", "failed to save build:", err.Error())
+        log.Errorln("failed to save build:", err.Error())
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }

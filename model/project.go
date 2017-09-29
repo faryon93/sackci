@@ -24,8 +24,8 @@ import (
     "errors"
 
     "github.com/asdine/storm"
+    log "github.com/sirupsen/logrus"
 
-    "github.com/faryon93/sackci/log"
     "github.com/faryon93/sackci/util"
     "strings"
     "io/ioutil"
@@ -92,7 +92,8 @@ func (p *Project) NewBuild() (*Build) {
     // we need to get the latest build for the project
     build, err := p.GetLastBuild()
     if err != nil {
-        log.Error("project", "failed to get last build:", err.Error())
+        log.Errorln("failed to get last build:", err.Error())
+        return nil
     }
 
     // assign the next build number
@@ -147,7 +148,7 @@ func (p *Project) AssignId() (error) {
         mapping := ProjectMapping{Hash: hash}
         err := Get().Save(&mapping)
         if err != nil {
-            log.Error("project", "failed to initialize new project \"" + p.Name + "\"")
+            log.Errorln("failed to initialize new project \"" + p.Name + "\"")
             return err
         }
 
@@ -155,7 +156,7 @@ func (p *Project) AssignId() (error) {
         p.Hash = hash
         p.Id = mapping.Id
 
-        log.Info("project", "found new project \"" + p.Name + "\", assigning new hash", hash)
+        log.Infoln("found new project \"" + p.Name + "\", assigning new hash", hash)
         return nil
 
     // there is a hash in the config file -> lookup id
@@ -182,13 +183,13 @@ func (p *Project) CheckIntegrity() {
     if err == storm.ErrNotFound {
         return
     } else if err != nil {
-        log.Error("project", "integrity check failed:", err.Error())
+        log.Errorln("integrity check failed:", err.Error())
         return
     }
 
     for _, build := range builds {
         if build.Status == BUILD_RUNNING {
-            log.Info("project", "found build", build.Num, "of project \"" + p.Name +
+            log.Infoln("found build", build.Num, "of project \"" + p.Name +
                 "\" which is still \"" + build.Status + "\". Canceling the build.")
 
             // cancel the running stages

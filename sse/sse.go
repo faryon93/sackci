@@ -26,8 +26,7 @@ import (
     "reflect"
 
     "github.com/gorilla/mux"
-
-    "github.com/faryon93/sackci/log"
+    log "github.com/sirupsen/logrus"
 )
 
 
@@ -72,7 +71,7 @@ func handler(group *Group, w http.ResponseWriter, r *http.Request) {
     for action := range ch {
         err := writeEvent(w, action)
         if err != nil {
-            log.Error(group.Name, "failed to write event to client:", err.Error())
+            log.Errorln("failed to write event to client:", err.Error())
             continue
         }
     }

@@ -25,9 +25,10 @@ import (
     "time"
     "path/filepath"
 
+    log "github.com/sirupsen/logrus"
+
     "github.com/faryon93/sackci/model"
     "github.com/faryon93/sackci/pipelinefile"
-    "github.com/faryon93/sackci/log"
     "github.com/faryon93/sackci/util"
 )
 
@@ -65,7 +66,7 @@ func (p *Pipeline) Execute() (error) {
     }
 
     // begin the build for the project
-    log.Info(LOG_TAG,"executing build for project \"" + p.project.Name + "\"")
+    log.Infoln("executing build for project \"" + p.project.Name + "\"")
     p.BeginPipeline(p.StartTime, p.Agent.Name)
 
     // assign the ci server generated environment variables
@@ -136,9 +137,9 @@ func (p *Pipeline) Execute() (error) {
         // download as tar.gz archive through docker api
         err := p.SavePath(containerPath, localPath)
         if err != nil {
-            log.Error(LOG_TAG, "failed to download artifacts:", err.Error())
+            log.Errorln("failed to download artifacts:", err.Error())
         }
-        log.Info(LOG_TAG, "downloaded artifacts for project \"" + p.project.Name + "\" in", time.Since(start))
+        log.Infoln("downloaded artifacts for project \"" + p.project.Name + "\" in", time.Since(start))
     }
 
     p.FinishPipeline(model.BUILD_PASSED, time.Since(p.StartTime))

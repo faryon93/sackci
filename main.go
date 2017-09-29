@@ -29,10 +29,10 @@ import (
     "flag"
 
     "github.com/gorilla/mux"
+    log "github.com/sirupsen/logrus"
 
     "github.com/faryon93/sackci/model"
     "github.com/faryon93/sackci/ctx"
-    "github.com/faryon93/sackci/log"
     "github.com/faryon93/sackci/config"
     "github.com/faryon93/sackci/agent"
     "github.com/faryon93/sackci/scm"
@@ -55,8 +55,11 @@ const (
 // --------------------------------------------------------------------------------------
 
 var (
+    // command line options
     configPath string
     purge bool
+    color bool
+    timestamp bool
 )
 
 
@@ -65,21 +68,29 @@ var (
 // --------------------------------------------------------------------------------------
 
 func main() {
-    log.Info("main", "starting", GetAppVersion())
+    // parse command line arguments
+    flag.StringVar(&configPath, "conf", DEFAULT_CONFIG, "path to config file")
+    flag.BoolVar(&purge, "purge", false, "purge unreferenced metadata")
+    flag.BoolVar(&color, "color", false, "force logging with colors")
+    flag.BoolVar(&timestamp, "timestamp", false, "prepend full timestamps")
+    flag.Parse()
+
+    // setup the logging
+    formater := log.TextFormatter{ForceColors: color, FullTimestamp: timestamp}
+    log.SetFormatter(&formater)
+    log.SetOutput(os.Stdout)
+
+    // begin with the application startup
+    log.Infoln("starting", GetAppVersion())
 
     // setup go environment
     runtime.GOMAXPROCS(runtime.NumCPU())
     rand.Seed(time.Now().Unix())
 
-    // parse command line arguments
-    flag.StringVar(&configPath, "conf", DEFAULT_CONFIG, "path to config file")
-    flag.BoolVar(&purge, "purge", false, "purge unreferenced metadata")
-    flag.Parse()
-
     // load the configuration file
     conf, err := config.Load(configPath)
     if err != nil {
-        log.Error("main", "failed to load config:", err.Error())
+        log.Errorln("failed to load config:", err.Error())
         return
     }
     ctx.Conf = conf
@@ -88,11 +99,11 @@ func main() {
     // open database
     err = model.Open(ctx.Conf.GetDatabaseFile())
     if err != nil {
-        log.Error("bolt", "failed to open database:", err.Error())
+        log.Errorln("failed to open database:", err.Error())
         return
     }
     defer model.Close()
-    log.Info("bolt", "successfully opened bolt database")
+    log.Infoln("successfully opened bolt database")
 
     // initialize the global application context
     // purge all unreferenced metadata if user wants to
@@ -120,11 +131,11 @@ func main() {
         defer ShutdownHttp(srv, HTTP_SHUTDOWN_TIMEOUT)
     }
 
-    log.Info("main", "everything is now up and running, ready to build!")
+    log.Infoln("everything is now up and running, ready to build!")
 
     // wait for a signal to shutdown the application
     wait(os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-    log.Info("main", "initiating application shutdown (SIGINT / SIGTERM)")
+    log.Infoln("initiating application shutdown (SIGINT / SIGTERM)")
 }
 
 
@@ -136,4 +147,7 @@ func wait(sig ...os.Signal) {
     signals := make(chan os.Signal)
     signal.Notify(signals, sig...)
     <- signals
+}
+
+func setupLog() {
 }

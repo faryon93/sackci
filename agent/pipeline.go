@@ -24,9 +24,10 @@ import (
     "errors"
     "time"
 
+    log "github.com/sirupsen/logrus"
+
     "github.com/faryon93/sackci/model"
     "github.com/faryon93/sackci/pipelinefile"
-    "github.com/faryon93/sackci/log"
 )
 
 
@@ -108,7 +109,7 @@ func (p *Pipeline) Destroy() {
     for _, container := range p.Containers {
         err := p.Agent.RemoveContainer(container)
         if err != nil {
-            log.Error(LOG_TAG, "failed to remove container:", err.Error())
+            log.Errorln("failed to remove container:", err.Error())
             continue
         }
     }
@@ -116,7 +117,7 @@ func (p *Pipeline) Destroy() {
     // destroy the volume
     err := p.Agent.RemoveVolume(p.Volume)
     if err != nil {
-        log.Error(LOG_TAG, "failed to remove volume:", err.Error())
+        log.Errorln("failed to remove volume:", err.Error())
     }
 
     // free the agent

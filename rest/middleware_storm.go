@@ -29,9 +29,9 @@ import (
     "github.com/asdine/storm"
     "github.com/gorilla/mux"
     "github.com/asdine/storm/q"
+    log "github.com/sirupsen/logrus"
 
     "github.com/faryon93/sackci/model"
-    "github.com/faryon93/sackci/log"
     "github.com/faryon93/sackci/util"
 )
 
@@ -107,12 +107,12 @@ func stormDeleteAll(w http.ResponseWriter, r *http.Request, typ reflect.Type, su
     for i := 0; i < element.Len(); i++ {
         err := model.Get().DeleteStruct(element.Index(i).Addr().Interface())
         if err != nil {
-            log.Error(LOG_TAG, "failed to delete entry:", err.Error())
+            log.Errorln("failed to delete entry:", err.Error())
             continue
         }
     }
 
-    log.Info(LOG_TAG, "DELETE", r.RequestURI, "took",
+    log.Infoln("DELETE", r.RequestURI, "took",
         time.Since(start), "to delete", element.Len(), "items")
 
     // call the success handler and return a json success

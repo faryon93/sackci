@@ -22,7 +22,8 @@ package agent
 import (
     "os"
     "path/filepath"
-    "github.com/faryon93/sackci/log"
+
+    log "github.com/sirupsen/logrus"
 )
 
 
@@ -57,7 +58,7 @@ func (p *Pipeline) Container(image string, cmd string, workdir string, stdio fun
 
     // there was an error loading the private key
     } else {
-        log.Error(LOG_TAG, "failed to get private key:", err.Error())
+        log.Errorln("failed to get private key:", err.Error())
     }
 
     // execute the container

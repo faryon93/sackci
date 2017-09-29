@@ -24,8 +24,9 @@ import (
     "strings"
     "fmt"
 
+    log "github.com/sirupsen/logrus"
+
     "github.com/faryon93/sackci/model"
-    "github.com/faryon93/sackci/log"
 )
 
 
@@ -64,7 +65,7 @@ func (p *Pipeline) Log(stage int, v ...interface{}) {
     trimmed := strings.TrimSpace(fmt.Sprintln(v...))
     message := "\u001b[0;33m[pipeline] " + trimmed + "\u001b[m\n"
 
-    log.Info("pipeline", trimmed)
+    log.Infoln(trimmed)
     p.Events <- model.EvtStageLog{
         p.getBaseEvent(),
         stage, message,
