@@ -145,5 +145,7 @@ func (s *SessionStore) newSessionToken() (string, error) {
         return "", err
     }
 
+    // TODO: how to make sure this token is unique?
+
     return base64.StdEncoding.EncodeToString(b), nil
 }
