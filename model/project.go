@@ -278,3 +278,20 @@ func (p *Project) GetRepository() (string) {
 
     return repo
 }
+
+// Returns an error if the project is missconfigured.
+func (p *Project) IsMissconfigured() (error) {
+    if len(p.Repository) <= 0 {
+        return errors.New("invalid repository url")
+    }
+
+    if len(p.Name) <= 0 {
+        return errors.New("invalid project name")
+    }
+
+    if len(p.Branch) <= 0 {
+        return errors.New("invalid branch")
+    }
+
+    return nil
+}

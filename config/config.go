@@ -95,7 +95,14 @@ func (c *Config) Setup() {
 
     // each project has to be completed for runtime
     for i, project := range c.Projects {
-        err := c.Projects[i].AssignId()
+        err := project.IsMissconfigured()
+        if err != nil {
+            log.Error(LOG_TAG, "ignoring project", project.Name + ":", err.Error())
+            continue
+        }
+
+        // assign a project id wich is fixed
+        err = c.Projects[i].AssignId()
         if err != nil {
             log.Info(LOG_TAG,"ignoring project \"" + project.Name + "\":", err.Error())
             c.Projects[i].Id = -1
