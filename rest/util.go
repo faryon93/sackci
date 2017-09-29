@@ -23,6 +23,7 @@ import (
     "net/http"
     "encoding/json"
     "io"
+    "time"
 )
 
 
@@ -93,4 +94,30 @@ func NoCaching(w http.ResponseWriter) {
     w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
     w.Header().Set("Pragma", "no-cache")
     w.Header().Set("Expires", "0")
+}
+
+// Gets the value of a cookie.
+func GetCookie(r *http.Request, name string) (string, error) {
+    cookie, err := r.Cookie(name)
+    if err != nil {
+        return "", err
+    }
+
+    if cookie == nil {
+        return "", ErrNoCookie
+    }
+
+    return cookie.Value, nil
+}
+
+// Invalidates the given cookie.
+func InvalidateCookie(path, name string) (*http.Cookie) {
+    return &http.Cookie{
+        Path:     path,
+        Name:     name,
+        Value:    "",
+        HttpOnly: true,
+        Expires:  time.Now().Add(-5 * time.Minute),
+        MaxAge:   -1,
+    }
 }

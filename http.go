@@ -30,6 +30,7 @@ import (
     "github.com/faryon93/sackci/log"
     "github.com/faryon93/sackci/config"
     "github.com/faryon93/sackci/ctx"
+    "github.com/faryon93/sackci/rest"
 )
 
 
@@ -134,15 +135,18 @@ func RedirectHttps(w http.ResponseWriter, r *http.Request) {
 }
 
 // Checks if the session token is valid.
-func IsSessionValid(r *http.Request) (error) {
-    cookie, err := r.Cookie("session")
-    if err != nil {
+func ValidateSession(r *http.Request) (error) {
+    cookie, err := r.Cookie(rest.SESSION_COOKIE)
+    if err != nil || cookie == nil {
         return errors.New("no session cookie")
     }
 
-    if cookie.Value != "test" {
+    if !rest.Sessions.IsValid(cookie.Value) {
         return errors.New("invalid session token")
     }
+
+    // the session is valid -> we can refresh the token
+    rest.Sessions.Refresh(cookie.Value)
 
     return nil
 }
@@ -152,7 +156,7 @@ func IsSessionValid(r *http.Request) (error) {
 func CheckSession(h http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         url := r.URL.String()
-        err := IsSessionValid(r)
+        err := ValidateSession(r)
 
         // the whole rest api is secured by a session token
         // except the login endpoint

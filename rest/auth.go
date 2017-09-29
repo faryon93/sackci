@@ -35,7 +35,20 @@ import (
 const (
     // Time the session cookie should be valid when remember
     // me option is used during login.
-    REMEMBERME_EXPIRATION = 7 * 24 * time.Hour
+    SESSION_TIMEOUT_REMEBERME = 7 * 24 * time.Hour
+    SESSION_TIMEOUT_NORMAL    = 15 * time.Minute
+
+    // Name of the session cookie.
+    SESSION_COOKIE = "token"
+)
+
+
+// ----------------------------------------------------------------------------------
+//  global variables
+// ----------------------------------------------------------------------------------
+
+var (
+    Sessions = NewSessionStore()
 )
 
 
@@ -73,18 +86,33 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
     // validate username and password
     if login.Username == "test" && login.Password == "test" {
+        // if the rember me option is not selected we have
+        // a defined session timeout. The session will be refereshed
+        // on each request don by the user.
+        timeout := SESSION_TIMEOUT_NORMAL
+        if login.Remeber {
+            timeout = SESSION_TIMEOUT_REMEBERME
+        }
+
+        // create the new session
+        token, err := Sessions.Create(timeout)
+        if err != nil {
+            http.Error(w, err.Error(), http.StatusInternalServerError)
+            return
+        }
+
         // create the session cookie
         cookie := http.Cookie{
-            Path: "/", Name: "session",
-            Value: "test",
+            Path:     "/", Name: SESSION_COOKIE,
+            Value:    token,
             HttpOnly: true,
-            Secure: ctx.Conf.IsHttpsEnabled(),
+            Secure:   ctx.Conf.IsHttpsEnabled(),
         }
 
         // set an expiration time on the cookie
         // if the remeber me option is used
         if login.Remeber {
-            cookie.Expires = time.Now().Add(REMEMBERME_EXPIRATION)
+            cookie.Expires = time.Now().Add(timeout)
         }
 
         // send the cookie back to client in the http response
@@ -99,15 +127,18 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 // Logout the user.
 func Logout(w http.ResponseWriter, r *http.Request) {
+    // trying to logout without a session cookie should
+    // result in the same behaviour as with a valid session
+    token, err := GetCookie(r, SESSION_COOKIE)
+    if err == nil {
+        Sessions.Delete(token)
+    }
+
+    // TODO: how to handle SSE disconnect?
+
     // Just send an already expired and empty cookie back to the client.
     // When we return the Unauthorized HTTP code the frontend
     // will rediret to the login page automatically
-    http.SetCookie(w, &http.Cookie{
-        Path: "/", Name: "session",
-        Value: "",
-        HttpOnly: true,
-        Expires: time.Now().Add(-5 * time.Minute),
-        MaxAge: -1,
-    })
+    http.SetCookie(w, InvalidateCookie("/", SESSION_COOKIE))
     http.Error(w, "logout successfull", http.StatusUnauthorized)
 }
