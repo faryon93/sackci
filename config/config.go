@@ -50,13 +50,14 @@ const (
 // ----------------------------------------------------------------------------------
 
 type Config struct {
-    HttpListen  string          `yaml:"http_listen,omitempty"`
-    HttpsListen string          `yaml:"https_listen,omitempty"`
-    HttpsKey    string          `yaml:"https_key,omitempty"`
-    HttpsCert   string          `yaml:"https_cert,omitempty"`
-    DataDir     string          `yaml:"datadir,omitempty"`
-    Agents      []agent.Agent   `yaml:"agents,omitempty"`
-    Projects    []model.Project `yaml:"projects,omitempty"`
+    HttpListen  string            `yaml:"http_listen,omitempty"`
+    HttpsListen string            `yaml:"https_listen,omitempty"`
+    HttpsKey    string            `yaml:"https_key,omitempty"`
+    HttpsCert   string            `yaml:"https_cert,omitempty"`
+    DataDir     string            `yaml:"datadir,omitempty"`
+    Users       UserList          `yaml:"users,omitempty"`
+    Agents      []agent.Agent     `yaml:"agents,omitempty"`
+    Projects    []model.Project   `yaml:"projects,omitempty"`
 
     // path of the config file this
     // instance was loaded from
@@ -121,6 +122,11 @@ func (c *Config) Setup() {
     }
 
     log.Info(LOG_TAG, "project integrity check took", time.Since(start))
+
+    // display a warning when authentication is disabled
+    if !c.IsAuthEnabled() {
+        log.Warn(LOG_TAG, "AUTHENTICATION IS DISABLED! SOMEONE MAY STEAL YOUR SENSITIVE DATA!")
+    }
 }
 
 // Saves the configuration file to the filesystem.
@@ -165,3 +171,7 @@ func (c *Config) IsHttpsEnabled() bool {
     return !util.StrEmpty(c.HttpsListen, c.HttpsCert, c.HttpsKey)
 }
 
+// Returns true if user authentication is enabled.
+func (c *Config) IsAuthEnabled() (bool) {
+    return len(c.Users) > 0
+}

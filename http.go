@@ -58,7 +58,7 @@ func SetupHttpEndpoint(conf *config.Config, mux http.Handler) (*http.Server) {
 
     // serve the normal api and frontend endpoints
     } else {
-        srv = &http.Server{Addr: conf.HttpListen, Handler: CheckSession(mux)}
+        srv = &http.Server{Addr: conf.HttpListen, Handler: getHandler(conf, mux)}
     }
 
     go func() {
@@ -79,7 +79,7 @@ func SetupHttpEndpoint(conf *config.Config, mux http.Handler) (*http.Server) {
 
 // Starts an TLS encrypted http endpoint.
 func SetupHttpsEndpoint(conf *config.Config, mux http.Handler) (*http.Server) {
-    srv := &http.Server{Addr: conf.HttpsListen, Handler: CheckSession(mux)}
+    srv := &http.Server{Addr: conf.HttpsListen, Handler: getHandler(conf, mux)}
     go func() {
         log.Info(LOG_TAG_HTTP, "https server is listening on https://" + conf.HttpsListen)
 
@@ -100,4 +100,19 @@ func SetupHttpsEndpoint(conf *config.Config, mux http.Handler) (*http.Server) {
 func ShutdownHttp(srv *http.Server, timeout time.Duration) {
     httpCtx, _ := context.WithTimeout(context.Background(), timeout)
     srv.Shutdown(httpCtx)
+}
+
+
+// ----------------------------------------------------------------------------------
+//  private functions
+// ----------------------------------------------------------------------------------
+
+func getHandler(conf *config.Config, mux http.Handler) (http.Handler) {
+    // only apply session check if authentication is enabled
+    handler := mux
+    if conf.IsAuthEnabled() {
+        handler = CheckSession(mux)
+    }
+
+    return handler
 }

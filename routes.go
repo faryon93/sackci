@@ -65,8 +65,13 @@ func routes(router *mux.Router) {
     Get(api,"/project/{Project}/build/{Num}/log", rest.BuildRawLog)
     Get(api,"/project/{Project}/build/{Num}/log/{stage}", rest.BuildStageLog)
     Get(api,"/project/{Project}/build/{Num}/artifacts.tar.gz", rest.BuildArtifacts)
-    Post(api, "/login", rest.Login)
-    Get(api, "/logout", rest.Logout)
+
+    // the authentication endpoints should only be available when
+    // authentication is enabled in the config file
+    if ctx.Conf.IsAuthEnabled() {
+        Post(api, "/login", rest.Login)
+        Get(api, "/logout", rest.Logout)
+    }
 
     // register model-based REST endpoints
     rest.QueryOne(api, "/project/{Id:[0-9]+}", ctx.Conf.Projects)
@@ -81,6 +86,7 @@ func routes(router *mux.Router) {
     // register static assets
     router.PathPrefix("/").Handler(PrettyUrl(FS(false)))
 }
+
 
 // --------------------------------------------------------------------------------------
 //  helper functions

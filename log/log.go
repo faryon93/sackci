@@ -43,6 +43,10 @@ func Info(module string, v ...interface{}) {
     log.Printf("[%s] %s", module, fmt.Sprintln(v...))
 }
 
+func Warn(module string, v ...interface{}) {
+    log.Printf("[%s] %s", module, fmt.Sprintln(v...))
+}
+
 func Error(module string, v ...interface{}) {
     log.Printf("[%s] %s", module, fmt.Sprintln(v...))
 }

@@ -85,7 +85,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
     }
 
     // validate username and password
-    if login.Username == "test" && login.Password == "test" {
+    if ctx.Conf.Users.Verify(login.Username, login.Password) {
         // if the rember me option is not selected we have
         // a defined session timeout. The session will be refereshed
         // on each request don by the user.
