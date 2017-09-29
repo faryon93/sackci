@@ -42,7 +42,7 @@ const (
 // ----------------------------------------------------------------------------------
 
 type SessionStore struct {
-    Sessions map[string]session
+    Sessions map[string]*session
     CookieName string
 
     mutex sync.Mutex
@@ -61,7 +61,7 @@ type session struct {
 // Creates a new session store.
 func NewSessionStore() (*SessionStore) {
     return &SessionStore{
-        Sessions: make(map[string]session),
+        Sessions: make(map[string]*session),
     }
 }
 
@@ -72,9 +72,6 @@ func NewSessionStore() (*SessionStore) {
 
 // Checks if the given token belongs to a valid session.
 func (s *SessionStore) IsValid(token string) (bool) {
-    s.mutex.Lock()
-    defer s.mutex.Unlock()
-
     // does the session exist?
     session, exists := s.Sessions[token]
     if !exists {
@@ -84,7 +81,6 @@ func (s *SessionStore) IsValid(token string) (bool) {
     // check if the session is expired
     expires := session.Creation.Add(session.Timeout)
     if expires.Before(time.Now()) {
-        delete(s.Sessions, token)
         return false
     }
 
@@ -101,7 +97,7 @@ func (s *SessionStore) Create(timeout time.Duration) (string, error) {
     s.mutex.Lock()
     defer s.mutex.Unlock()
 
-    s.Sessions[token] = session{
+    s.Sessions[token] = &session{
         Creation: time.Now(),
         Timeout: timeout,
     }
