@@ -28,9 +28,6 @@ import (
     "github.com/faryon93/sackci/sse"
     "github.com/faryon93/sackci/ctx"
     "github.com/faryon93/sackci/rest"
-    "strings"
-    "path"
-    "os"
 )
 
 
@@ -97,39 +94,4 @@ func Get(router *mux.Router, path string, fn HttpFn) (*mux.Route) {
 // Registers a handler function for the POST Method on the given path.
 func Post(router *mux.Router, path string, fn HttpFn) (*mux.Route) {
     return router.Methods(http.MethodPost).Path(path).HandlerFunc(fn)
-}
-
-// --------------------------------------------------------------------------------------
-//  common handlers
-// --------------------------------------------------------------------------------------
-
-// Default not found handler.
-func NotFound(w http.ResponseWriter, r *http.Request) {
-    http.Error(w, "not found", http.StatusNotFound)
-}
-
-// Redirects all 404s to the index path in order to get
-// HTML5 in-browser routes working.
-func PrettyUrl(fs http.FileSystem) http.Handler {
-    fsh := http.FileServer(fs)
-
-    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        // the webpage root cannot be checked in fs
-        // everything without a file ending should to be
-        // rewritten to index page for a more convenient
-        // user experiance and to prevent the server from delivering
-        // wrong file content to expected filetype
-        if r.URL.Path != "/" && !strings.Contains(path.Base(r.URL.Path), ".") {
-            // if the file does not exist in the virtual fs
-            // we just redirect to the root in order
-            // to support pretty urls
-            // TODO: not a perfect solution, because double parsing of file
-            _, err := fs.Open(path.Clean(r.URL.Path))
-            if os.IsNotExist(err) {
-                r.URL.Path = "/"
-            }
-        }
-
-        fsh.ServeHTTP(w, r)
-    })
 }

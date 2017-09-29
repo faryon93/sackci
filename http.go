@@ -21,16 +21,11 @@ package main
 
 import (
     "net/http"
-    "strings"
-    "errors"
     "time"
     "context"
-    "net"
 
     "github.com/faryon93/sackci/log"
     "github.com/faryon93/sackci/config"
-    "github.com/faryon93/sackci/ctx"
-    "github.com/faryon93/sackci/rest"
 )
 
 
@@ -105,76 +100,4 @@ func SetupHttpsEndpoint(conf *config.Config, mux http.Handler) (*http.Server) {
 func ShutdownHttp(srv *http.Server, timeout time.Duration) {
     httpCtx, _ := context.WithTimeout(context.Background(), timeout)
     srv.Shutdown(httpCtx)
-}
-
-
-// ----------------------------------------------------------------------------------
-//  private functions
-// ----------------------------------------------------------------------------------
-
-// Redirects to the configured https endpoint.
-func RedirectHttps(w http.ResponseWriter, r *http.Request) {
-    host, _, err := net.SplitHostPort(r.Host)
-    if err != nil {
-        host = r.Host
-    }
-
-    // replace port with the configured https port
-    _, httpsPort, err := net.SplitHostPort(ctx.Conf.HttpsListen)
-    if err != nil {
-        log.Error(LOG_TAG_HTTP,"invalid value in https_listen property")
-        http.Error(w, "misconfigured server", http.StatusInternalServerError)
-        return
-    }
-    if httpsPort != "443" {
-        host = net.JoinHostPort(host, httpsPort)
-    }
-
-    url := "https://" + host + r.URL.String()
-    http.Redirect(w, r, url, http.StatusTemporaryRedirect)
-}
-
-// Checks if the session token is valid.
-func ValidateSession(r *http.Request) (error) {
-    cookie, err := r.Cookie(rest.SESSION_COOKIE)
-    if err != nil || cookie == nil {
-        return errors.New("no session cookie")
-    }
-
-    if !rest.Sessions.IsValid(cookie.Value) {
-        return errors.New("invalid session token")
-    }
-
-    // the session is valid -> we can refresh the token
-    rest.Sessions.Refresh(cookie.Value)
-
-    return nil
-}
-
-// Session Middleware.
-// Checks if a proper session token is supplied by the caller.
-func CheckSession(h http.Handler) http.Handler {
-    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        url := r.URL.String()
-        err := ValidateSession(r)
-
-        // the whole rest api is secured by a session token
-        // except the login endpoint
-        if strings.HasPrefix(url, HTTP_API_BASE) {
-            if  url != HTTP_API_BASE + "/login" && err != nil {
-                http.Error(w, err.Error(), http.StatusUnauthorized)
-                return
-            }
-
-        // all non api pages should be redirected to the login page
-        // except for all static assets
-        } else if !strings.HasPrefix(url, "/login") && !AssetFileExists(url) {
-            if err != nil {
-                http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
-                return
-            }
-        }
-
-        h.ServeHTTP(w, r)
-    })
 }
