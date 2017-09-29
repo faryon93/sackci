@@ -1,4 +1,4 @@
-package rest
+package http
 // sackci
 // Copyright (C) 2017 Maximilian Pachl
 
@@ -24,7 +24,6 @@ import (
     "sync"
     "crypto/rand"
     "encoding/base64"
-    "errors"
 )
 
 
@@ -37,10 +36,6 @@ const (
     TOKEN_SIZE = 64
 )
 
-var (
-    ErrNoCookie = errors.New("cookie not found")
-)
-
 
 // ----------------------------------------------------------------------------------
 //  types
@@ -48,6 +43,7 @@ var (
 
 type SessionStore struct {
     Sessions map[string]session
+    CookieName string
 
     mutex sync.Mutex
 }
@@ -140,8 +136,8 @@ func (s *SessionStore) Refresh(token string) {
 func (s *SessionStore) newSessionToken() (string, error) {
     // generate a cryptographically secure random token
     b := make([]byte, TOKEN_SIZE)
-    _, err := rand.Read(b)
-    if err != nil {
+    n, err := rand.Read(b)
+    if err != nil || n < TOKEN_SIZE {
         return "", err
     }
 

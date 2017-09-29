@@ -22,6 +22,7 @@ package ctx
 import (
     "github.com/faryon93/sackci/sse"
     "github.com/faryon93/sackci/config"
+    "github.com/faryon93/sackci/http"
 )
 
 
@@ -30,8 +31,9 @@ import (
 // --------------------------------------------------------------------------------------
 
 var (
-    Feed *sse.Group
-    Conf *config.Config
+    Feed     *sse.Group
+    Conf     *config.Config
+    Sessions *http.SessionStore
 )
 
 
@@ -42,4 +44,5 @@ var (
 func init() {
     // initialize the context variables
     Feed = sse.NewGroup("feed")
+    Sessions = http.NewSessionStore()
 }

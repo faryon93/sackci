@@ -24,6 +24,7 @@ import (
     "encoding/json"
     "io"
     "time"
+    "errors"
 )
 
 
@@ -104,7 +105,7 @@ func GetCookie(r *http.Request, name string) (string, error) {
     }
 
     if cookie == nil {
-        return "", ErrNoCookie
+        return "", errors.New("no cookie")
     }
 
     return cookie.Value, nil

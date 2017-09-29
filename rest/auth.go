@@ -37,18 +37,6 @@ const (
     // me option is used during login.
     SESSION_TIMEOUT_REMEBERME = 7 * 24 * time.Hour
     SESSION_TIMEOUT_NORMAL    = 15 * time.Minute
-
-    // Name of the session cookie.
-    SESSION_COOKIE = "token"
-)
-
-
-// ----------------------------------------------------------------------------------
-//  global variables
-// ----------------------------------------------------------------------------------
-
-var (
-    Sessions = NewSessionStore()
 )
 
 
@@ -95,7 +83,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
         }
 
         // create the new session
-        token, err := Sessions.Create(timeout)
+        token, err := ctx.Sessions.Create(timeout)
         if err != nil {
             http.Error(w, err.Error(), http.StatusInternalServerError)
             return
@@ -103,7 +91,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
         // create the session cookie
         cookie := http.Cookie{
-            Path:     "/", Name: SESSION_COOKIE,
+            Path:     "/", Name: ctx.Sessions.CookieName,
             Value:    token,
             HttpOnly: true,
             Secure:   ctx.Conf.IsHttpsEnabled(),
@@ -129,9 +117,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 func Logout(w http.ResponseWriter, r *http.Request) {
     // trying to logout without a session cookie should
     // result in the same behaviour as with a valid session
-    token, err := GetCookie(r, SESSION_COOKIE)
+    token, err := GetCookie(r, ctx.Sessions.CookieName)
     if err == nil {
-        Sessions.Delete(token)
+        ctx.Sessions.Delete(token)
     }
 
     // TODO: how to handle SSE disconnect?
@@ -139,6 +127,6 @@ func Logout(w http.ResponseWriter, r *http.Request) {
     // Just send an already expired and empty cookie back to the client.
     // When we return the Unauthorized HTTP code the frontend
     // will rediret to the login page automatically
-    http.SetCookie(w, InvalidateCookie("/", SESSION_COOKIE))
+    http.SetCookie(w, InvalidateCookie("/", ctx.Sessions.CookieName))
     http.Error(w, "logout successfull", http.StatusUnauthorized)
 }

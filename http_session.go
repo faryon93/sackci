@@ -22,8 +22,9 @@ package main
 import (
     "net/http"
     "strings"
-    "github.com/faryon93/sackci/rest"
     "errors"
+
+    "github.com/faryon93/sackci/ctx"
 )
 
 
@@ -31,7 +32,7 @@ import (
 //  public functions
 // ----------------------------------------------------------------------------------
 
-// Session Middleware.
+// Sessions Middleware.
 // Checks if a proper session token is supplied by the caller.
 func CheckSession(h http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -66,17 +67,17 @@ func CheckSession(h http.Handler) http.Handler {
 
 // Checks if the session token is valid.
 func validateSession(r *http.Request) (error) {
-    cookie, err := r.Cookie(rest.SESSION_COOKIE)
+    cookie, err := r.Cookie(ctx.Sessions.CookieName)
     if err != nil || cookie == nil {
         return errors.New("no session cookie")
     }
 
-    if !rest.Sessions.IsValid(cookie.Value) {
+    if !ctx.Sessions.IsValid(cookie.Value) {
         return errors.New("invalid session token")
     }
 
     // the session is valid -> we can refresh the token
-    rest.Sessions.Refresh(cookie.Value)
+    ctx.Sessions.Refresh(cookie.Value)
 
     return nil
 }

@@ -46,6 +46,7 @@ import (
 const (
     DEFAULT_CONFIG = "sackci.conf"
     HTTP_SHUTDOWN_TIMEOUT = 1 * time.Second
+    SESSION_COOKIE_NAME = "token"
 )
 
 
@@ -82,6 +83,7 @@ func main() {
         return
     }
     ctx.Conf = conf
+    ctx.Sessions.CookieName = SESSION_COOKIE_NAME
 
     // open database
     err = model.Open(ctx.Conf.GetDatabaseFile())
