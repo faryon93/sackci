@@ -12,4 +12,4 @@ if [ -S ${DOCKER_SOCKET} ]; then
 fi
 
 # run sackci as unprivileged user
-gosu ${USER}:${DOCKER_GROUP} /usr/sbin/sackci $@
+exec gosu ${USER}:${DOCKER_GROUP} /usr/sbin/sackci $@
