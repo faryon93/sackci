@@ -21,11 +21,7 @@ package main
 
 import (
     "net/http"
-    "net"
 
-    log "github.com/sirupsen/logrus"
-
-    "github.com/faryon93/sackci/ctx"
     "github.com/faryon93/sackci/assets"
 )
 
@@ -41,23 +37,7 @@ func NotFound(w http.ResponseWriter, r *http.Request) {
 
 // Redirects to the configured https endpoint.
 func RedirectHttps(w http.ResponseWriter, r *http.Request) {
-    host, _, err := net.SplitHostPort(r.Host)
-    if err != nil {
-        host = r.Host
-    }
-
-    // replace port with the configured https port
-    _, httpsPort, err := net.SplitHostPort(ctx.Conf.HttpsListen)
-    if err != nil {
-        log.Errorln("invalid value in https_listen property")
-        http.Error(w, "misconfigured server", http.StatusInternalServerError)
-        return
-    }
-    if httpsPort != "443" {
-        host = net.JoinHostPort(host, httpsPort)
-    }
-
-    url := "https://" + host + r.URL.String()
+    url := "https://" + r.Host + r.URL.String()
     http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
