@@ -114,7 +114,7 @@ app.controller("projectlist", function($scope, $location, projects, feed) {
     });
 });
 
-app.controller("project", function($scope, $location, $routeParams, projects, trigger) {
+app.controller("project", function($scope, $location, $routeParams, $http, projects) {
     // default tab is the history tab
     $scope.tab = $routeParams.tab;
     if ($scope.tab === undefined)
@@ -138,12 +138,20 @@ app.controller("project", function($scope, $location, $routeParams, projects, tr
         $scope.triggerStatus = "waiting";
         $scope.triggerError = "";
 
-        var response = trigger.get({id: $routeParams.id}, function() {
-            $location.path("/project/" + $routeParams.id + "/build/" + response.build_id);
-        }, function (error) {
-            $scope.triggerStatus = "error";
-            $scope.triggerError = error.data;
-        });
+        $http.post("/api/v1/project/" + $routeParams.id + "/trigger", {})
+             .then(function(response) {
+                 $location.path("/project/" + $routeParams.id + "/build/" + response.data.build_id);
+             }, function(error) {
+                 $scope.triggerStatus = "error";
+                 $scope.triggerError = error.data;
+             });
+
+        // var response = trigger.save({id: $routeParams.id}, function() {
+        //     $location.path("/project/" + $routeParams.id + "/build/" + response.build_id);
+        // }, function (error) {
+        //     $scope.triggerStatus = "error";
+        //     $scope.triggerError = error.data;
+        // });
     };
 
     $scope.triggerBlur = function() {
@@ -491,10 +499,6 @@ app.factory('builds', function($resource){
 app.factory('history', function($resource){
    return $resource('/api/v1/project/:id/history?limit=:limit&skip=:skip',
        {limit:'@limit', skip: '@skip', id: '@id'});
-});
-
-app.factory('trigger', function($resource){
-    return $resource('/api/v1/project/:id/trigger');
 });
 
 app.factory('log', function($resource){

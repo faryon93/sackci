@@ -61,7 +61,7 @@ func routes(router *mux.Router) {
     // register classic REST endpoints
     Get(api,"/project", rest.ProjectList)
     Get(api,"/project/{Project}/badge", rest.ProjectBadge)
-    Get(api,"/project/{Project}/trigger", rest.ProjectTrigger)
+    Post(api,"/project/{Project}/trigger", rest.ProjectTrigger)
     Get(api,"/project/{Project}/build/latest", rest.ProjectLatestBuild)
     Get(api,"/project/{Project}/build/{Num}/log", rest.BuildRawLog)
     Get(api,"/project/{Project}/build/{Num}/log/{stage}", rest.BuildStageLog)
