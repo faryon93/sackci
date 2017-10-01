@@ -23,7 +23,6 @@ import (
     "errors"
     "strconv"
     "time"
-    "path/filepath"
 
     log "github.com/sirupsen/logrus"
 
@@ -132,10 +131,9 @@ func (p *Pipeline) Execute() (error) {
 
         // construct the filepaths
         containerPath := p.Agent.Filepath(WORKDIR, definition.Artifacts)
-        localPath := filepath.Join(p.artifactDir, strconv.Itoa(p.project.Id), strconv.Itoa(p.build.Num) + ".tar.gz")
 
         // download as tar.gz archive through docker api
-        err := p.SavePath(containerPath, localPath)
+        err := p.SavePath(containerPath, p.build.GetArtifactName(p.artifactDir))
         if err != nil {
             log.Errorln("failed to download artifacts:", err.Error())
         }
@@ -143,6 +141,15 @@ func (p *Pipeline) Execute() (error) {
     }
 
     p.FinishPipeline(model.BUILD_PASSED, time.Since(p.StartTime))
+
+    // run garbage collection for the project
+    start = time.Now()
+    err = p.project.RunGc(p.artifactDir)
+    if err != nil {
+        log.Errorf("gc for project \"%s\" failed: %s", p.project.Name, err.Error())
+        return err
+    }
+    log.Infof("gc for project \"%s\" took %s", p.project.Name, time.Since(start).String())
 
     return nil
 }

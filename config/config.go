@@ -117,6 +117,12 @@ func (c *Config) Setup() {
             c.Projects[i].Trigger = model.TRIGGER_MANUAL
         }
 
+        // run the garbage collection
+        err = project.RunGc(c.GetArtifactsDir())
+        if err != nil {
+            log.Errorf("gc for project \"%s\" failed: %s", project.Name, err.Error())
+        }
+
         // everything was fine -> we want to keep this project in our list
         log.Infoln("adding project", project.Name, "(" + util.MaskCredentials(project.Repository) + ")")
     }

@@ -66,6 +66,7 @@ type Project struct {
     BadgeEnable bool `yaml:"badge" json:"badge"`
     Hash string `yaml:"hash,omitempty" json:"-"`
     PrivateKey string `yaml:"key,omitempty" json:"key"`
+    KeepHistory int `yaml:"keep_history,omitempty"`
 
     // runtime variables
     mutex sync.Mutex `json:"-" yaml:"-"`

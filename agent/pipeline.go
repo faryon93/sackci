@@ -149,6 +149,7 @@ func (p *Pipeline) SetBuild(build *model.Build) {
     p.build = build
 }
 
+// Sets the local directory where artifacts are stored.
 func (p *Pipeline) SetArtifactsDir(dir string) {
     p.artifactDir = dir
 }

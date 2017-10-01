@@ -22,6 +22,8 @@ package model
 import (
     "time"
     "strings"
+    "path/filepath"
+    "strconv"
 )
 
 
@@ -77,6 +79,14 @@ type Stage struct {
 // --------------------------------------------------------------------------------------
 //  public members
 // --------------------------------------------------------------------------------------
+
+// Get the local artifact name for this build in respect to the given basepath.
+func (b *Build) GetArtifactName(basepath string) (string) {
+    projectId := strconv.Itoa(int(b.Project))
+    buildNum := strconv.Itoa(b.Num)
+
+    return filepath.Join(basepath, projectId, buildNum + ".tar.gz")
+}
 
 // Inserts or Updates the Build in the database.
 func (b *Build) Save() (error) {
