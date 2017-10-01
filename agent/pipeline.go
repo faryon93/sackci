@@ -37,7 +37,6 @@ import (
 
 const (
     EVENT_STREAM_BUFFER = 128
-    LOG_TAG = "pipeline"
 )
 
 // errors

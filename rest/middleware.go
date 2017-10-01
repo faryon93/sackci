@@ -50,8 +50,6 @@ const (
 
     // flags
     QUERY_REVERSE = iota
-
-    LOG_TAG = "middleware"
 )
 
 var (

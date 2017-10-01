@@ -38,8 +38,6 @@ import (
 // ----------------------------------------------------------------------------------
 
 const (
-    LOG_TAG = "conf"
-
     DATABASE = "meta.db"
     ARTIFACTS = "artifacts"
 )
