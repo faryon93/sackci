@@ -64,9 +64,9 @@ type Project struct {
     Env map[string]string `yaml:"env,omitempty" json:"env"`
     CommitUrl string `yaml:"commit_url,omitempty" json:"commit_url"`
     BadgeEnable bool `yaml:"badge" json:"badge"`
+    KeepHistory int `yaml:"keep_history,omitempty"`
     Hash string `yaml:"hash,omitempty" json:"-"`
     PrivateKey string `yaml:"key,omitempty" json:"key"`
-    KeepHistory int `yaml:"keep_history,omitempty"`
 
     // runtime variables
     mutex sync.Mutex `json:"-" yaml:"-"`
