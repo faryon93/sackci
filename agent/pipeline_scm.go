@@ -82,7 +82,7 @@ func (p *Pipeline) HeadRef() (string, error) {
     ref := ""
 
     // start the special SCM container to detect new changes
-    ret, err := p.Container(p.project.Scm, args, WORKDIR, func(line string) {
+    ret, err := p.Container(p.project.Scm, args, MOUNTPOINT, func(line string) {
         ref = line
     })
     if err != nil {
