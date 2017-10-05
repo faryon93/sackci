@@ -5,13 +5,16 @@ MAINTAINER Maximilian Pachl <m@ximilian.info>
 ENV BUILD_TOOLS="go git musl-dev"
 ENV GOPATH=/tmp/go
 
-COPY . /tmp/go/src/github.com/faryon93/sackci
+ADD . /tmp/go/src/github.com/faryon93/sackci
 
 # compile and install sackci
-RUN rm -rf /var/cache/apk/* && \
+RUN cd /tmp/go/src/github.com/faryon93/sackci && \
+	rm -rf /var/cache/apk/* && \
 	apk add --no-cache $BUILD_TOOLS && \
-	go get github.com/faryon93/sackci && \
-	go install github.com/faryon93/sackci && \
+	go get -v github.com/faryon93/sackci && \
+	go build -v -ldflags "-X main.GIT_COMMIT=`git log --pretty=format:'%h' -n 1`" \
+			 -o /tmp/go/bin/sackci \
+			 github.com/faryon93/sackci && \
 	go get github.com/tianon/gosu && \
 	cp /tmp/go/bin/sackci /usr/sbin/ && \
 	cp /tmp/go/bin/gosu /usr/bin && \
