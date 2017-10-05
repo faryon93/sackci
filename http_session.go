@@ -36,7 +36,7 @@ import (
 // Checks if a proper session token is supplied by the caller.
 func CheckSession(h http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        url := r.URL.String()
+        url := r.URL.Path
         token, err := ctx.Sessions.ValiadeRequest(r)
         if err == nil {
             ctx.Sessions.Refresh(token)
@@ -44,8 +44,12 @@ func CheckSession(h http.Handler) http.Handler {
 
         // the whole rest api is secured by a session token
         // except the login endpoint
+        // the trigger endpoint handls authentication himself
         if strings.HasPrefix(url, HTTP_API_BASE) {
-            if  url != HTTP_API_BASE + "/login" && err != nil {
+            secured := url != HTTP_API_BASE + "/login" &&
+                     !strings.HasSuffix(url, "/trigger")
+
+            if secured && err != nil {
                 http.Error(w, err.Error(), http.StatusUnauthorized)
                 return
             }

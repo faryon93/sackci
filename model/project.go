@@ -61,6 +61,7 @@ type Project struct {
     Branch string `yaml:"branch,omitempty" json:"branch"`
     Trigger string `yaml:"trigger,omitempty" json:"trigger"`
     Interval int `yaml:"interval,omitempty" json:"interval"`
+    TriggerTokens []string `yaml:"trigger_tokens,omitempty"`
     Env map[string]string `yaml:"env,omitempty" json:"env"`
     CommitUrl string `yaml:"commit_url,omitempty" json:"commit_url"`
     BadgeEnable bool `yaml:"badge" json:"badge"`

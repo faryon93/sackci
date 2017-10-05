@@ -29,6 +29,16 @@ import (
     "github.com/faryon93/sackci/ctx"
     "github.com/faryon93/sackci/agent"
     "github.com/faryon93/sackci/model"
+    "errors"
+)
+
+
+// --------------------------------------------------------------------------------------
+//  constants
+// --------------------------------------------------------------------------------------
+
+const (
+    TOKEN_QUERY_NAME = "token"
 )
 
 
@@ -62,6 +72,14 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
     project := ctx.Conf.GetProject(id)
     if project == nil {
         http.Error(w, "not found", http.StatusNotFound)
+        return
+    }
+
+    // if trigger tokens are definied we need to
+    // check if the user supplied token is valid
+    err = isTriggerAllowed(project, r)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusUnauthorized)
         return
     }
 
@@ -120,4 +138,47 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
     }()
 
     Jsonify(w, triggerResponse{true, build.Num})
+}
+
+
+// --------------------------------------------------------------------------------------
+//  private functions
+// --------------------------------------------------------------------------------------
+
+// Returns nil when the calling request is allowed to perform a build trigger.
+// Otherwise an error with the reason is returned.
+func isTriggerAllowed(project *model.Project, r *http.Request) (error) {
+    // trigger is allowed at anytime when authentication is turned off
+    if !ctx.Conf.IsAuthEnabled() {
+        return nil
+    }
+
+    queryToken := r.URL.Query().Get(TOKEN_QUERY_NAME)
+    accessGranted := false
+    if len(queryToken) > 0 {
+        // check if the supplied token is in the token list
+        // in order to grad access
+        for _, token := range project.TriggerTokens {
+            if queryToken == token {
+                accessGranted = true
+                break
+            }
+        }
+
+        // the provided token is invalid -> tell the caller
+        if !accessGranted {
+            return errors.New("invalid trigger token")
+        }
+    }
+
+    // the token based authentication was not successfull
+    // next try the session based authentication
+    if !accessGranted {
+        _, err := ctx.Sessions.ValiadeRequest(r)
+        if err != nil {
+            return err
+        }
+    }
+
+    return nil
 }
