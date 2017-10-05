@@ -44,7 +44,7 @@ const (
 )
 
 var (
-    ErrBuildRunning = errors.New("build running")
+    ErrBuildRunning = errors.New("build already running")
     ErrUnknownHash = errors.New("unknown hash")
 )
 
@@ -297,4 +297,15 @@ func (p *Project) IsMissconfigured() (error) {
     }
 
     return nil
+}
+
+// Returns true if token is a valid token for this project.
+func (p *Project) IsTriggerTokenValid(token string) (bool) {
+    for _, trigToken := range p.TriggerTokens {
+        if trigToken == token {
+            return true
+        }
+    }
+
+    return false
 }

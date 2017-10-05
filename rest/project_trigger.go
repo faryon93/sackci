@@ -23,17 +23,14 @@ import (
     "net/http"
     "strconv"
     "errors"
-    "io/ioutil"
-    "encoding/json"
+    "strings"
 
     "github.com/gorilla/mux"
-    "github.com/jmoiron/jsonq"
     log "github.com/sirupsen/logrus"
 
     "github.com/faryon93/sackci/ctx"
     "github.com/faryon93/sackci/agent"
     "github.com/faryon93/sackci/model"
-    "strings"
 )
 
 
@@ -83,6 +80,7 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
     // check if the user supplied token is valid
     err = isTriggerAllowed(project, r)
     if err != nil {
+        log.Errorf("trigger for project \"%s\" rejected: %s", project.Name, err.Error())
         http.Error(w, err.Error(), http.StatusUnauthorized)
         return
     }
@@ -91,13 +89,15 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
     defer r.Body.Close()
     err = isCorrectBranch(project, r)
     if err != nil {
+        log.Warnf("trigger for project \"%s\" ignored: %s", project.Name, err.Error())
         http.Error(w, err.Error(), http.StatusNotAcceptable)
         return
     }
 
     // try to lock the project -> if fails, a build is already running
     if err := project.Lock(); err != nil {
-        http.Error(w, "Build already running", http.StatusConflict)
+        log.Errorf("failed to trigger build for project \"%s\": %s", project.Name, err.Error())
+        http.Error(w, err.Error(), http.StatusConflict)
         return
     }
     defer func() {
@@ -109,7 +109,7 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
     // create the pipeline on the build agent
     pipeline, err := agent.CreatePipeline()
     if err != nil {
-        log.Errorln("failed to trigger build:", err.Error())
+        log.Errorf("failed to trigger build for project \"%s\": %s", project.Name, err.Error())
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }
@@ -125,7 +125,7 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
     }
     err = build.Save()
     if err != nil {
-        log.Errorln("failed to save build:", err.Error())
+        log.Errorf("failed save build for project \"%s\": %s", project.Name, err.Error())
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }
@@ -165,27 +165,20 @@ func isTriggerAllowed(project *model.Project, r *http.Request) (error) {
         return nil
     }
 
-    queryToken := r.URL.Query().Get(TOKEN_QUERY_NAME)
-    accessGranted := false
-    if len(queryToken) > 0 {
+    token := r.URL.Query().Get(TOKEN_QUERY_NAME)
+    tokenValid := false
+    if len(token) > 0 {
         // check if the supplied token is in the token list
-        // in order to grad access
-        for _, token := range project.TriggerTokens {
-            if queryToken == token {
-                accessGranted = true
-                break
-            }
-        }
-
-        // the provided token is invalid -> tell the caller
-        if !accessGranted {
+        // in order to grant access
+        tokenValid = project.IsTriggerTokenValid(token)
+        if !tokenValid {
             return errors.New("invalid trigger token")
         }
     }
 
     // the token based authentication was not successfull
     // next try the session based authentication
-    if !accessGranted {
+    if !tokenValid {
         _, err := ctx.Sessions.ValiadeRequest(r)
         if err != nil {
             return err
@@ -199,37 +192,21 @@ func isTriggerAllowed(project *model.Project, r *http.Request) (error) {
 func isCorrectBranch(project *model.Project, r *http.Request) (error) {
     // TODO: this applies for gitlab / github, how to handle other webhook types?
 
-    body, err := ioutil.ReadAll(r.Body)
-    if err != nil {
+    // parse the POST body as a JSON object
+    jq, err := JsonBody(r)
+    if err == ErrEmptyJson {
+        return nil
+    } else if err != nil {
         return err
     }
 
-    // if no body is present we should trigger the build
-    // it is very likely the trigger came from the web ui
-    if len(strings.TrimSpace(string(body))) == 0 {
-        return nil
-    }
-
-    // decode the json object
-    data := map[string]interface{}{}
-    dec := json.NewDecoder(strings.NewReader(string(body)))
-    err = dec.Decode(&data)
-    if err != nil {
-        return err
-    }
-
-    // an empty json object was supplied in the body
-    if len(data) == 0 {
-        return nil
-    }
-
-    // get ref from the webhook data
-    jq := jsonq.NewQuery(data)
+    // query for the ref field, which contains the branch
     ref, err := jq.String("ref")
     if err != nil {
         return errors.New("no property \"ref\" in body")
     }
 
+    // check if the ref property has the correct branch in it
     if strings.Contains(ref, project.Branch) {
         return nil
     } else {

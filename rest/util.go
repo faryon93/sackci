@@ -25,6 +25,10 @@ import (
     "io"
     "time"
     "errors"
+    "io/ioutil"
+    "strings"
+
+    "github.com/jmoiron/jsonq"
 )
 
 
@@ -42,11 +46,16 @@ var (
 // --------------------------------------------------------------------------------------
 
 const (
-    CONTENT_TYPE_JSON   = "application/json"
-    CONTENT_TYPE_SVG    = "image/svg+xml"
-    CONTENT_TYPE_TEXT   = "text/plain"
+    CONTENT_TYPE_JSON    = "application/json"
+    CONTENT_TYPE_SVG     = "image/svg+xml"
+    CONTENT_TYPE_TEXT    = "text/plain"
     CONTENT_TYPE_STREAM  = "application/octet-stream"
 )
+
+var (
+    ErrEmptyJson = errors.New("empty json object")
+)
+
 
 // --------------------------------------------------------------------------------------
 //  public functions
@@ -64,6 +73,30 @@ func Jsonify(w http.ResponseWriter, v interface{}) {
 
     w.Header().Set("Content-Type", CONTENT_TYPE_JSON)
     w.Write(js)
+}
+
+// Reads the body of the request an parses the JSON data.
+func JsonBody(r *http.Request) (*jsonq.JsonQuery, error) {
+    // read the whole body of the request
+    body, err := ioutil.ReadAll(r.Body)
+    if err != nil {
+        return nil, err
+    }
+
+    // decode the json object
+    data := map[string]interface{}{}
+    dec := json.NewDecoder(strings.NewReader(string(body)))
+    err = dec.Decode(&data)
+    if err != nil {
+        return nil, err
+    }
+
+    // an empty object was supplied in the http request
+    if len(data) == 0 {
+        return nil, ErrEmptyJson
+    }
+
+    return jsonq.NewQuery(data), nil
 }
 
 // Serves a file from the global assetfs.
