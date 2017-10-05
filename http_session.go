@@ -22,7 +22,6 @@ package main
 import (
     "net/http"
     "strings"
-    "errors"
 
     "github.com/faryon93/sackci/ctx"
     "github.com/faryon93/sackci/assets"
@@ -38,7 +37,10 @@ import (
 func CheckSession(h http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         url := r.URL.String()
-        err := validateSession(r)
+        token, err := ctx.Sessions.ValiadeRequest(r)
+        if err == nil {
+            ctx.Sessions.Refresh(token)
+        }
 
         // the whole rest api is secured by a session token
         // except the login endpoint
@@ -59,26 +61,4 @@ func CheckSession(h http.Handler) http.Handler {
 
         h.ServeHTTP(w, r)
     })
-}
-
-
-// ----------------------------------------------------------------------------------
-//  private functions
-// ----------------------------------------------------------------------------------
-
-// Checks if the session token is valid.
-func validateSession(r *http.Request) (error) {
-    cookie, err := r.Cookie(ctx.Sessions.CookieName)
-    if err != nil || cookie == nil {
-        return errors.New("no session cookie")
-    }
-
-    if !ctx.Sessions.IsValid(cookie.Value) {
-        return errors.New("invalid session token")
-    }
-
-    // the session is valid -> we can refresh the token
-    ctx.Sessions.Refresh(cookie.Value)
-
-    return nil
 }

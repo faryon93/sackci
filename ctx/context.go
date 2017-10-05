@@ -25,6 +25,14 @@ import (
     "github.com/faryon93/sackci/http"
 )
 
+// --------------------------------------------------------------------------------------
+//  constants
+// --------------------------------------------------------------------------------------
+
+const (
+    SESSION_COOKIE = "token"
+)
+
 
 // --------------------------------------------------------------------------------------
 //  global variables
@@ -44,5 +52,5 @@ var (
 func init() {
     // initialize the context variables
     Feed = sse.NewGroup("feed")
-    Sessions = http.NewSessionStore()
+    Sessions = http.NewSessionStore(SESSION_COOKIE)
 }

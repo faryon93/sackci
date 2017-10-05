@@ -24,6 +24,8 @@ import (
     "sync"
     "crypto/rand"
     "encoding/base64"
+    "net/http"
+    "errors"
 )
 
 
@@ -34,6 +36,12 @@ import (
 const (
     // Length of the session token in bytes.
     TOKEN_SIZE = 64
+)
+
+var (
+    ErrExpired = errors.New("session is expired")
+    ErrNoCookie = errors.New("no session cookie")
+    ErrInvalidToken = errors.New("invalid session token")
 )
 
 
@@ -59,8 +67,9 @@ type session struct {
 // ----------------------------------------------------------------------------------
 
 // Creates a new session store.
-func NewSessionStore() (*SessionStore) {
+func NewSessionStore(cookie string) (*SessionStore) {
     return &SessionStore{
+        CookieName: cookie,
         Sessions: make(map[string]*session),
     }
 }
@@ -71,20 +80,27 @@ func NewSessionStore() (*SessionStore) {
 // ----------------------------------------------------------------------------------
 
 // Checks if the given token belongs to a valid session.
-func (s *SessionStore) IsValid(token string) (bool) {
+func (s *SessionStore) ValiadeRequest(r *http.Request) (string, error) {
+    // get the cookie which contains the session token
+    cookie, err := r.Cookie(s.CookieName)
+    if err != nil || cookie == nil {
+        return "", ErrNoCookie
+    }
+
     // does the session exist?
-    session, exists := s.Sessions[token]
+    session, exists := s.Sessions[cookie.Value]
     if !exists {
-        return false
+        return cookie.Value, ErrInvalidToken
     }
 
     // check if the session is expired
+    // TODO: maybe as a member of session?
     expires := session.Creation.Add(session.Timeout)
     if expires.Before(time.Now()) {
-        return false
+        return cookie.Value, ErrExpired
     }
 
-    return true
+    return cookie.Value, nil
 }
 
 // Creates a new session with the given expiration time.
