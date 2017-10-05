@@ -54,7 +54,7 @@ func (p *Project) RunGc(artifacts string) (error) {
     for _, build := range builds {
         err := os.Remove(build.GetArtifactName(artifacts))
         if err != nil {
-            log.Errorf("failed to remove artifact file:", err.Error())
+            log.Errorln("failed to remove artifact file:", err.Error())
             continue
         }
     }

@@ -22,14 +22,18 @@ package rest
 import (
     "net/http"
     "strconv"
+    "errors"
+    "io/ioutil"
+    "encoding/json"
 
     "github.com/gorilla/mux"
+    "github.com/jmoiron/jsonq"
     log "github.com/sirupsen/logrus"
 
     "github.com/faryon93/sackci/ctx"
     "github.com/faryon93/sackci/agent"
     "github.com/faryon93/sackci/model"
-    "errors"
+    "strings"
 )
 
 
@@ -80,6 +84,14 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
     err = isTriggerAllowed(project, r)
     if err != nil {
         http.Error(w, err.Error(), http.StatusUnauthorized)
+        return
+    }
+
+    // check if the webhook was triggered for the right branch
+    defer r.Body.Close()
+    err = isCorrectBranch(project, r)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusNotAcceptable)
         return
     }
 
@@ -181,4 +193,46 @@ func isTriggerAllowed(project *model.Project, r *http.Request) (error) {
     }
 
     return nil
+}
+
+// Returns nil when the webhook was meant for the configured branch.
+func isCorrectBranch(project *model.Project, r *http.Request) (error) {
+    // TODO: this applies for gitlab / github, how to handle other webhook types?
+
+    body, err := ioutil.ReadAll(r.Body)
+    if err != nil {
+        return err
+    }
+
+    // if no body is present we should trigger the build
+    // it is very likely the trigger came from the web ui
+    if len(strings.TrimSpace(string(body))) == 0 {
+        return nil
+    }
+
+    // decode the json object
+    data := map[string]interface{}{}
+    dec := json.NewDecoder(strings.NewReader(string(body)))
+    err = dec.Decode(&data)
+    if err != nil {
+        return err
+    }
+
+    // an empty json object was supplied in the body
+    if len(data) == 0 {
+        return nil
+    }
+
+    // get ref from the webhook data
+    jq := jsonq.NewQuery(data)
+    ref, err := jq.String("ref")
+    if err != nil {
+        return errors.New("no property \"ref\" in body")
+    }
+
+    if strings.Contains(ref, project.Branch) {
+        return nil
+    } else {
+        return errors.New("invalid branch")
+    }
 }
