@@ -15,3 +15,5 @@ function trigger_filter(body, branch)
     return string.find(body, ref) ~= nil
 end
 ```
+
+If no `trigger_filter` is configured or the request body is empty a build is triggered anyway.
