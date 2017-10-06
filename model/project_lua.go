@@ -25,6 +25,10 @@ import (
 
     log "github.com/sirupsen/logrus"
     "github.com/yuin/gopher-lua"
+    "github.com/faryon93/sackci/assets"
+    "io/ioutil"
+    "regexp"
+    "github.com/faryon93/sackci/util"
 )
 
 
@@ -36,6 +40,12 @@ const (
     LUA_TAG = "lua"
 )
 
+var (
+    // regular expressions
+    ReFnAlias = regexp.MustCompile("^\\s*\\${(.*?)}\\s*$")
+)
+
+
 // ----------------------------------------------------------------------------------
 //  public members
 // ----------------------------------------------------------------------------------
@@ -44,6 +54,13 @@ const (
 func (p *Project) CreateLuaVm() (error) {
     // setup the lua vm
     p.lua = lua.NewState()
+
+    // we want to apply the global lua contenxt
+    // with predefined functions for the user
+    err := loadGlobalLua(p.lua)
+    if err != nil {
+        log.Errorf("failed to load global lua context: %s", util.FirstLine(err.Error()))
+    }
 
     // range over all members and find the lua enabled fields
     typ := reflect.TypeOf(*p)
@@ -59,10 +76,15 @@ func (p *Project) CreateLuaVm() (error) {
                 continue
             }
 
+            // TODO: arguments more generic...
+            // parse the configured script
+            // e.g. apply fn aliases, ...
+            src := ParseLuaScript(tagValue, "body, branch", script)
+
             // evaluate the lua script
-            err := p.lua.DoString(val.Field(i).String())
+            err := p.lua.DoString(src)
             if err != nil {
-                log.Errorln("failed to execute lua script:", err.Error())
+                log.Errorln("failed to execute lua script:", util.FirstLine(err.Error()))
                 continue
             }
 
@@ -111,4 +133,36 @@ func (p *Project) EvalTriggerFilter(body string) (bool, error) {
     p.lua.Pop(1)
 
     return lua.LVAsBool(returnValue), nil
+}
+
+
+// ----------------------------------------------------------------------------------
+//  private functions
+// ----------------------------------------------------------------------------------
+
+// Applies the global lua file to the VM.
+func loadGlobalLua(lua *lua.LState) (error) {
+    file, err := assets.FS(false).Open("/lua/global.lua")
+    if err != nil {
+        return err
+    }
+
+    buf, err := ioutil.ReadAll(file)
+    if err != nil {
+        return err
+    }
+
+    return lua.DoString(string(buf))
+}
+
+// Parses the lua script in an configuration property.
+// Applies all custom syntax.
+func ParseLuaScript(fn string, args string, src string) (string) {
+    // apply function aliases
+    match := ReFnAlias.FindStringSubmatch(src)
+    if len(match) == 2 {
+        return "function " + fn + "(" + args + ") return " + match[1] +  "(" + args + ") end"
+    }
+
+    return src
 }

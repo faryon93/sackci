@@ -21,6 +21,7 @@ package assets
 //go:generate lessc css/pipeline.less css/pipeline.css
 //go:generate minify -a -r -o ../assets.min/ ./
 //go:generate cp favicon.ico ../assets.min/
+//go:generate cp -r lua ../assets.min/lua
 //go:generate esc -pkg assets -prefix=../assets.min -ignore (.*).go -o fs.go ../assets.min
 //go:generate rm -rf ../assets.min
 

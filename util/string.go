@@ -21,6 +21,7 @@ package util
 
 import (
     "regexp"
+    "strings"
 )
 
 
@@ -66,4 +67,16 @@ func StrEmpty(strs ...string) bool {
     }
 
     return false
+}
+
+// Returns the first line of a string.
+func FirstLine(str string) string {
+    result := str
+
+    lines := strings.Split(str, "\n")
+    if len(lines) > 0 {
+        result = lines[0]
+    }
+
+    return result
 }

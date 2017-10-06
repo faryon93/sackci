@@ -31,6 +31,7 @@ import (
     "github.com/faryon93/sackci/ctx"
     "github.com/faryon93/sackci/agent"
     "github.com/faryon93/sackci/model"
+    "github.com/faryon93/sackci/util"
 )
 
 
@@ -99,7 +100,7 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
         // filter the trigger with lua script configured in project
         valid, err := project.EvalTriggerFilter(string(buf))
         if err != nil {
-            log.Errorf("trigger for project \"%s\" failed: %s", project.Name, err.Error())
+            log.Errorf("trigger for project \"%s\" failed: %s", project.Name, util.FirstLine(err.Error()))
             http.Error(w, err.Error(), http.StatusNotAcceptable)
             return
         }

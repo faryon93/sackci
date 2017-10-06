@@ -23,6 +23,8 @@ import (
     "net/http"
 
     "github.com/faryon93/sackci/assets"
+//    "strings"
+    "strings"
 )
 
 
@@ -45,6 +47,12 @@ func RedirectHttps(w http.ResponseWriter, r *http.Request) {
 // to the root path in order to support HTML5 in browser naivation.
 func PrettyUrl(fs http.FileSystem) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        // do not serve lua files from assetfs
+        if strings.HasSuffix(r.URL.Path, ".lua") {
+            http.Error(w, "not found", http.StatusNotFound)
+            return
+        }
+
         // the webpage root cannot be checked in fs
         // everything without a file ending should to be
         // rewritten to index page for a more convenient
