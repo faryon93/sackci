@@ -23,7 +23,7 @@ import (
     "net/http"
     "strconv"
     "errors"
-    "strings"
+    "io/ioutil"
 
     "github.com/gorilla/mux"
     log "github.com/sirupsen/logrus"
@@ -87,11 +87,28 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
 
     // check if the webhook was triggered for the right branch
     defer r.Body.Close()
-    err = isCorrectBranch(project, r)
+    buf, err := ioutil.ReadAll(r.Body)
     if err != nil {
-        log.Warnf("trigger for project \"%s\" ignored: %s", project.Name, err.Error())
-        http.Error(w, err.Error(), http.StatusNotAcceptable)
+        log.Errorf("trigger for project \"%s\" failed: %s", project.Name, err.Error())
+        http.Error(w, err.Error(), http.StatusInternalServerError)
         return
+    }
+
+    // only try to filter if there is a body in the POST request
+    if len(buf) > 0 {
+        // filter the trigger with lua script configured in project
+        valid, err := project.EvalTriggerFilter(string(buf))
+        if err != nil {
+            log.Errorf("trigger for project \"%s\" failed: %s", project.Name, err.Error())
+            http.Error(w, err.Error(), http.StatusNotAcceptable)
+            return
+        }
+
+        if !valid {
+            log.Warnf("trigger for project \"%s\" ignored: rejected by trigger_filter", project.Name)
+            http.Error(w, "rejected by trigger filter", http.StatusNotAcceptable)
+            return
+        }
     }
 
     // try to lock the project -> if fails, a build is already running
@@ -186,30 +203,4 @@ func isTriggerAllowed(project *model.Project, r *http.Request) (error) {
     }
 
     return nil
-}
-
-// Returns nil when the webhook was meant for the configured branch.
-func isCorrectBranch(project *model.Project, r *http.Request) (error) {
-    // TODO: this applies for gitlab / github, how to handle other webhook types?
-
-    // parse the POST body as a JSON object
-    jq, err := JsonBody(r)
-    if err == ErrEmptyJson {
-        return nil
-    } else if err != nil {
-        return err
-    }
-
-    // query for the ref field, which contains the branch
-    ref, err := jq.String("ref")
-    if err != nil {
-        return errors.New("no property \"ref\" in body")
-    }
-
-    // check if the ref property has the correct branch in it
-    if strings.Contains(ref, project.Branch) {
-        return nil
-    } else {
-        return errors.New("invalid branch")
-    }
 }

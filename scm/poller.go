@@ -58,8 +58,7 @@ var (
 
 // Setup the necessary go routines for all projects with "polling" trigger.
 func Setup() {
-    for i := range ctx.Conf.Projects {
-        project := &ctx.Conf.Projects[i]
+    for _, project := range ctx.Conf.Projects {
         if !project.IsValid() {
             continue
         }

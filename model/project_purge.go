@@ -32,7 +32,7 @@ import (
 //  public functions
 // ----------------------------------------------------------------------------------
 
-func PurgeProjects(projects []Project) {
+func PurgeProjects(projects []*Project) {
     start := time.Now()
 
     // construct the query for all invalid projects

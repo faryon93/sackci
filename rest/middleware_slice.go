@@ -94,11 +94,18 @@ func findInSlice(slice reflect.Value, query map[string]string) (*reflect.Value) 
 
 // Checks if a structs matches the given query fields.
 func structMatches(o interface{}, query map[string]string) (bool) {
+    var val reflect.Value
+    if reflect.TypeOf(o).Kind() == reflect.Ptr {
+        val = reflect.ValueOf(o).Elem()
+    } else {
+        val = reflect.ValueOf(o)
+    }
+
     matches := true
     for fieldName, fieldValue := range query {
         // check if the field is present in the struct.
         // if not we should not consider this struct as a matching one
-        field := reflect.ValueOf(o).FieldByName(fieldName)
+        field := val.FieldByName(fieldName)
         if !field.IsValid() {
             matches = false
             break

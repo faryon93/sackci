@@ -138,7 +138,7 @@ app.controller("project", function($scope, $location, $routeParams, $http, proje
         $scope.triggerStatus = "waiting";
         $scope.triggerError = "";
 
-        $http.post("/api/v1/project/" + $routeParams.id + "/trigger", {})
+        $http.post("/api/v1/project/" + $routeParams.id + "/trigger", "")
              .then(function(response) {
                  $location.path("/project/" + $routeParams.id + "/build/" + response.data.build_id);
              }, function(error) {

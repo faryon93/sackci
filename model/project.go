@@ -30,6 +30,7 @@ import (
     "strings"
     "io/ioutil"
     "net/url"
+    "github.com/yuin/gopher-lua"
 )
 
 
@@ -62,6 +63,7 @@ type Project struct {
     Trigger string `yaml:"trigger,omitempty" json:"trigger"`
     Interval int `yaml:"interval,omitempty" json:"interval"`
     TriggerTokens []string `yaml:"trigger_tokens,omitempty"`
+    TriggerFilter string `yaml:"trigger_filter,omitempty" lua:"trigger_filter"`
     Env map[string]string `yaml:"env,omitempty" json:"env"`
     CommitUrl string `yaml:"commit_url,omitempty" json:"commit_url"`
     BadgeEnable bool `yaml:"badge" json:"badge"`
@@ -73,6 +75,9 @@ type Project struct {
     mutex sync.Mutex `json:"-" yaml:"-"`
     buildMutex sync.Mutex `json:"-" yaml:"-"`
     buildRunning bool `yaml:"-" json:"-"`
+
+    // lua vm
+    lua *lua.LState `json:"-" yaml:"-"`
 }
 
 type ProjectMapping struct {

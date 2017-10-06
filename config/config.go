@@ -55,7 +55,7 @@ type Config struct {
     DataDir     string            `yaml:"datadir,omitempty"`
     Users       UserList          `yaml:"users,omitempty"`
     Agents      []agent.Agent     `yaml:"agents,omitempty"`
-    Projects    []model.Project   `yaml:"projects,omitempty"`
+    Projects    []*model.Project   `yaml:"projects,omitempty"`
 
     // path of the config file this
     // instance was loaded from
@@ -92,7 +92,7 @@ func (c *Config) Setup() {
     start := time.Now()
 
     // each project has to be completed for runtime
-    for i, project := range c.Projects {
+    for _, project := range c.Projects {
         err := project.IsMissconfigured()
         if err != nil {
             log.Errorln("ignoring project", project.Name + ":", err.Error())
@@ -100,25 +100,30 @@ func (c *Config) Setup() {
         }
 
         // assign a project id wich is fixed
-        err = c.Projects[i].AssignId()
+        err = project.AssignId()
         if err != nil {
             log.Infoln("ignoring project \"" + project.Name + "\":", err.Error())
-            c.Projects[i].Id = -1
+            project.Id = -1
             continue
         }
 
         // check the project integrity
-        c.Projects[i].CheckIntegrity()
+        project.CheckIntegrity()
 
         // an empty trigger means manual triggering
         if project.Trigger == "" {
-            c.Projects[i].Trigger = model.TRIGGER_MANUAL
+            project.Trigger = model.TRIGGER_MANUAL
         }
 
         // run the garbage collection
         err = project.RunGc(c.GetArtifactsDir())
         if err != nil {
             log.Errorf("gc for project \"%s\" failed: %s", project.Name, err.Error())
+        }
+
+        err = project.CreateLuaVm()
+        if err != nil {
+            log.Errorf("failed to create lua vm:", err.Error())
         }
 
         // everything was fine -> we want to keep this project in our list
@@ -153,9 +158,9 @@ func (c *Config) Save() (error) {
 // Returns a project by its ID.
 func (c *Config) GetProject(id int) (*model.Project) {
     // serach for project with given id field
-    for i, project := range c.Projects {
+    for _, project := range c.Projects {
         if project.IsValid() && project.Id == id {
-            return &c.Projects[i]
+            return project
         }
     }
 
