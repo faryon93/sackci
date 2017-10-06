@@ -112,6 +112,8 @@ func ProjectTrigger(w http.ResponseWriter, r *http.Request) {
         }
     }
 
+    log.Infof("trigger for project \"%s\" from %s accepted", project.Name, r.RemoteAddr)
+
     // try to lock the project -> if fails, a build is already running
     if err := project.Lock(); err != nil {
         log.Errorf("failed to trigger build for project \"%s\": %s", project.Name, err.Error())

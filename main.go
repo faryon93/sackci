@@ -146,6 +146,3 @@ func wait(sig ...os.Signal) {
     signal.Notify(signals, sig...)
     <- signals
 }
-
-func setupLog() {
-}
