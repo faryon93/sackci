@@ -22,7 +22,24 @@
 					</button>
 				</td>
 			</tr>
-			<tr>
+            <tr ng-repeat="(key, value) in project.env_secret">
+                <td class="code">{{key}}</td>
+                <td class="code" ng-init="showSecret = false">
+					<span ng-show="showSecret">{{value}}</span>
+					<span ng-show="!showSecret">********</span>
+				</td>
+                <td>
+                    <button type="button" class="btn btn-danger" confirm="delete">
+                        <i class="fa fa-trash-o"></i>&nbsp;Delete
+                    </button>
+                    <button type="button" class="btn btn-warning" ng-click="showSecret = !showSecret">
+                        <i class="fa fa-eye"></i>&nbsp
+						<span ng-show="!showSecret">Show</span>
+                        <span ng-show="showSecret">Hide</span>
+                    </button>
+                </td>
+            </tr>
+            <tr>
 				<td><input type="text" ng-show="showForm" ng-model="addName"></td>
 				<td><input type="text" ng-show="showForm" ng-model="addValue"></td>
 				<td>

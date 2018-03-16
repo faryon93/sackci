@@ -440,7 +440,7 @@ app.controller("projectEnv", function($scope, $routeParams, projects) {
     // delete an env variable
     $scope.delete = function (scope) {
 
-    }
+    };
 });
 
 app.controller("settings", function($scope, $routeParams, $timeout, history, projects) {
