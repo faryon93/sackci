@@ -23,11 +23,11 @@ import (
     "strconv"
     "errors"
     "encoding/json"
+    "strings"
 
     "github.com/faryon93/sackci/model"
     "github.com/faryon93/sackci/util"
 )
-
 
 // ----------------------------------------------------------------------------------
 //  constants
@@ -42,7 +42,6 @@ const (
     SCM_RET_SUCCESS        = 0
     SCM_RET_INVALID_BRANCH = 1
 )
-
 
 // ----------------------------------------------------------------------------------
 //  public members
@@ -71,7 +70,17 @@ func (p *Pipeline) Clone() (*model.Commit, error) {
 
     // parse the commit information
     var commit model.Commit
-    return &commit, json.Unmarshal([]byte(lastLine), &commit)
+    err = json.Unmarshal([]byte(lastLine), &commit)
+    if err != nil {
+        return nil, err
+    }
+
+    // remova all leading and trailing spaces
+    commit.Ref = strings.TrimSpace(commit.Ref)
+    commit.Message = strings.TrimSpace(commit.Message)
+    commit.Author = strings.TrimSpace(commit.Author)
+
+    return &commit, nil
 }
 
 // Gets the head reference of the given pipeline.
