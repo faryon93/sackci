@@ -160,15 +160,9 @@ func (p *Pipeline) SetArtifactsDir(dir string) {
 
 // Gets the accumulated environment (pipeline and project) settings of this pipeline.
 func (p *Pipeline) getEnv() []string {
-    env := make([]string, len(p.Env) + len(p.project.Env))
+    env := make([]string, len(p.Env))
+
     i := 0
-
-    // project specific variables
-    for key, val := range p.project.Env {
-        env[i] = key + "=" + val
-        i++
-    }
-
     // pipeline specific variables
     for key, val := range p.Env {
         env[i] = key + "=" + val
