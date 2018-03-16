@@ -165,6 +165,22 @@ div.panel-body h5.commit
 	font-weight: bold;
 }
 
+div.panel-body h5.commit i.btn-more
+{
+	cursor: pointer;
+	color: #333;
+	background-color: #f5f5f5;
+	border: 1px solid #ddd;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+div.panel-body h5.commit span.more {
+	margin-left: 19px;
+	font-weight: normal;
+	font-family: Menlo,Courier,monospace;
+}
+
 div.panel-body.passed h5.commit,
 div.panel-body.passed h5.commit a
 {

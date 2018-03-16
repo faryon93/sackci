@@ -23,7 +23,16 @@
               <i class="fa fa-check" ng-if="build.status == 'passed'"></i>
               <i class="fa fa-remove" ng-if="build.status == 'failed'"></i>
               <i class="fa fa-exchange" ng-if="build.status == 'running'"></i>
-              <span ng-bind-html="build.commit.message | unknown"></span>&nbsp;(#{{build.num}})
+              <span ng-bind-html="build.commit.message | split: 0 | unknown"></span>&nbsp;(#{{build.num}})
+              <span ng-if="(build.commit.message | split | length) > 1">
+                <i class="fa fa-ellipsis-h btn-more"  ng-click="expand()"></i><br/>
+              </span>
+              <span ng-repeat="line in build.commit.message | split"
+                    ng-if="$index > 0 && line != ''"
+                    ng-show="expandCommit"
+                    class="more text-muted">
+                  {{line}}<br>
+              </span>
             </h5>
             <h5 class="text-muted"><i class="fa fa-user-o"></i> <span><b>Author:</b> <span ng-bind-html="build.commit.author | unknown"></span></span></h5>
             <h5 class="text-muted">

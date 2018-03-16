@@ -169,6 +169,7 @@ app.controller("projectBuild", function($scope, $routeParams, builds, feed, log)
     $scope.errorCode = 404;
     $scope.error = "not found";
     $scope.loadingLog = false;
+    $scope.expandCommit = false;
 
     var cleanTerminal = function(str) {
         // find the last line with actual text in it
@@ -181,6 +182,10 @@ app.controller("projectBuild", function($scope, $routeParams, builds, feed, log)
 
         // fallback: nothing to split
         return str;
+    };
+
+    $scope.expand = function() {
+        $scope.expandCommit = !$scope.expandCommit;
     };
 
     // handler: select a stage
@@ -689,6 +694,22 @@ app.filter('badgeUrl', function() {
 
         return window.location.origin + "/api/v1/project/" + project.id + "/badge";
     }
+});
+
+app.filter('split', function() {
+    return function (input, line) {
+        if (line === undefined)
+            return input.split("\n");
+        else
+            return input.split("\n")[line];
+    };
+});
+
+app.filter('length', function() {
+    return function (input) {
+        return input.length;
+    };
+
 });
 
 // ------------------------------------------------------------------------------------------------
