@@ -141,6 +141,13 @@ func (p *Pipeline) SetProject(project *model.Project) {
             p.Env[key] = val
         }
     }
+
+    // copy the projects secret env
+    if project.EnvSecret != nil {
+        for key, val := range project.EnvSecret {
+            p.Env[key] = val
+        }
+    }
 }
 
 // Assigns a build to this pipeline.
@@ -177,4 +184,16 @@ func (p *Pipeline) addContainer(container string) {
     p.mutex.Lock()
     p.Containers = append(p.Containers, container)
     p.mutex.Unlock()
+}
+
+// Returns a blacklist of words and its replacement for this pipeline.
+func (p *Pipeline) getBlacklist() map[string]string {
+    blacklist := make(map[string]string)
+
+    // the content of secret env variables should be filtered
+    for key, val := range p.project.EnvSecret {
+        blacklist[val] = "$" + key
+    }
+
+    return blacklist
 }

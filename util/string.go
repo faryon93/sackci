@@ -80,3 +80,12 @@ func FirstLine(str string) string {
 
     return result
 }
+
+// Replaces all occurencies of blacklist keys in str with the map value.
+func StrFilter(str string, blacklist map[string]string) string {
+    for find, replace := range blacklist {
+        str = strings.Replace(str, find, replace, -1)
+    }
+
+    return str
+}

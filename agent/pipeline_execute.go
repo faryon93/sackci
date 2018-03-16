@@ -190,8 +190,11 @@ func (p *Pipeline) ExecuteStage(stageId int, stage *pipelinefile.Stage) (error) 
     p.Log(stageId, "executing stage \"" + stage.Name + "\"", "in image \"" + image + "\"")
 
     // execute the steps inside a container on the build agent
+    blacklist := p.getBlacklist()
     ret, err := p.Container(image, steps, WORKDIR, func(line string) {
-        p.LogTerminal(stageId, util.MaskCredentials(line))
+        cleanLine := util.MaskCredentials(line)
+        cleanLine  = util.StrFilter(cleanLine, blacklist)
+        p.LogTerminal(stageId, cleanLine)
     })
     if err != nil {
         return err

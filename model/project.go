@@ -65,6 +65,7 @@ type Project struct {
     TriggerTokens []string `yaml:"trigger_tokens,omitempty"`
     TriggerFilter string `yaml:"trigger_filter,omitempty" lua:"trigger_filter"`
     Env map[string]string `yaml:"env,omitempty" json:"env"`
+    EnvSecret map[string]string `yaml:"env_secret,omitempty" json:"env_secret"`
     CommitUrl string `yaml:"commit_url,omitempty" json:"commit_url"`
     BadgeEnable bool `yaml:"badge" json:"badge"`
     KeepHistory int `yaml:"keep_history,omitempty"`
