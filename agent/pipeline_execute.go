@@ -50,6 +50,7 @@ const (
     CI_BUILDNR = "CI_BUILDNR"
     CI_AGENT = "CI_AGENT"
     CI_COMMIT_REF = "CI_COMMIT_REF"
+    CI_BRANCH = "CI_BRANCH"
 )
 
 
@@ -85,6 +86,7 @@ func (p *Pipeline) Execute() (error) {
     }
     p.CommitFound(commit)
     p.Env[CI_COMMIT_REF] = commit.Ref
+    p.Env[CI_BRANCH] = p.project.Branch
     p.Log(STAGE_SCM_ID, "scm checkout completed successfully in", time.Since(scmStart))
 
     // get the pipeline definition
