@@ -178,7 +178,6 @@ app.controller("projectBuild", function($scope, $routeParams, builds, feed, log)
         for (var i = (lines.length - 1); i >= 0; i--)
         {
             const line = lines[i];
-            console.log(str);
             if (line !== "" && line !== "\r" && line !== '\n' && line !== '\033[1B')
                 return lines[i]
         }
