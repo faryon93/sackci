@@ -23,10 +23,10 @@
               <i class="fa fa-remove" ng-if="build.status == 'failed'"></i>
               <i class="fa fa-exchange" ng-if="build.status == 'running'"></i>
               <span><a href="/project/{{project.id}}/build/{{build.num}}">
-                  <span ng-bind-html="build.commit.message | split: 0 | unknown"></span>&nbsp;(#{{build.num}})
+                  <span ng-class="{'font-italic': build.commit.message == 'unknown'}" ng-bind="build.commit.message | split: 0"></span>&nbsp;(#{{build.num}})
               </a></span>
             </h5>
-            <h5 class="text-muted"><i class="fa fa-user-o"></i> <span><b>Author:</b> <span ng-bind-html="build.commit.author | unknown"></span></span></h5>
+            <h5 class="text-muted"><i class="fa fa-user-o"></i> <span><b>Author:</b> <span ng-class="{'font-italic': build.commit.message == 'unknown'}" ng-bind="build.commit.author"></span></span></h5>
             <h5 class="text-muted"><i class="fa fa-circle-o-notch"></i><span><b>Commit:</b> #<span ng-bind="build.commit.ref | short" ></span></span></h5>
           </div>
 

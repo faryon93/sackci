@@ -75,7 +75,7 @@ func (p *Pipeline) Clone() (*model.Commit, error) {
         return nil, err
     }
 
-    // remova all leading and trailing spaces
+    // remove all leading and trailing spaces
     commit.Ref = strings.TrimSpace(commit.Ref)
     commit.Message = strings.TrimSpace(commit.Message)
     commit.Author = strings.TrimSpace(commit.Author)

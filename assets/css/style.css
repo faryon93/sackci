@@ -23,6 +23,10 @@ body {
 	float: none;
 }
 
+.font-italic {
+	font-style: italic;
+}
+
 
 /********************************************************************
  * project list
