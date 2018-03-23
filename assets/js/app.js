@@ -172,11 +172,14 @@ app.controller("projectBuild", function($scope, $routeParams, builds, feed, log)
     $scope.expandCommit = false;
 
     var cleanTerminal = function(str) {
+
         // find the last line with actual text in it
         var lines = str.split("\r");
         for (var i = (lines.length - 1); i >= 0; i--)
         {
-            if (lines[i] !== "" && lines[i] !== "\r" && lines[i] !== '\n')
+            const line = lines[i];
+            console.log(str);
+            if (line !== "" && line !== "\r" && line !== '\n' && line !== '\033[1B')
                 return lines[i]
         }
 
