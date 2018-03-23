@@ -1,0 +1,12 @@
+:80 {
+	log stdout
+	root assets
+
+	proxy /api/v1 127.0.0.1:8000
+
+	rewrite / {
+		ext /
+		if {path} not_starts_with /api
+    	to {path} {path}/ /
+	}
+}
