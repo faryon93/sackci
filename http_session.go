@@ -37,7 +37,7 @@ import (
 func CheckSession(h http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         url := r.URL.Path
-        token, err := ctx.Sessions.ValiadeRequest(r)
+        token, err := ctx.Sessions.ValidateRequest(r)
         if err == nil {
             ctx.Sessions.Refresh(token)
         }

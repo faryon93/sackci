@@ -199,7 +199,7 @@ func isTriggerAllowed(project *model.Project, r *http.Request) (error) {
     // the token based authentication was not successfull
     // next try the session based authentication
     if !tokenValid {
-        _, err := ctx.Sessions.ValiadeRequest(r)
+        _, err := ctx.Sessions.ValidateRequest(r)
         if err != nil {
             return err
         }

@@ -80,7 +80,7 @@ func NewSessionStore(cookie string) (*SessionStore) {
 // ----------------------------------------------------------------------------------
 
 // Checks if the given token belongs to a valid session.
-func (s *SessionStore) ValiadeRequest(r *http.Request) (string, error) {
+func (s *SessionStore) ValidateRequest(r *http.Request) (string, error) {
     // get the cookie which contains the session token
     cookie, err := r.Cookie(s.CookieName)
     if err != nil || cookie == nil {
