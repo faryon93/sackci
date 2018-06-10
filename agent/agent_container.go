@@ -21,9 +21,9 @@ package agent
 
 import (
     "strings"
-    "unicode"
 
     "github.com/fsouza/go-dockerclient"
+    "github.com/kballard/go-shellquote"
 )
 
 // ----------------------------------------------------------------------------------
@@ -51,11 +51,17 @@ func(a *Agent) CreateContainer(vol string, image string, cmd string, env []strin
         volumes = append(volumes, DOCKER_SOCKET + ":" + DOCKER_SOCKET)
     }
 
+    // split the command like the shell would do it
+    command, err := shellquote.Split(cmd)
+    if err != nil {
+        return "", err
+    }
+
     // create the container in order to start it
     container, err := a.docker.CreateContainer(docker.CreateContainerOptions{
         Config: &docker.Config{
             Image: image,
-            Cmd: removeOutter(splitQuoted(cmd), "'"),
+            Cmd: command,
             Tty: true,
             AttachStderr: true,
             AttachStdout: true,
@@ -101,41 +107,4 @@ func (a *Agent) StartContainer(container string, stdio func(string)) (int, error
 // Removes a container with the given ID from the build agent.
 func (a *Agent) RemoveContainer(id string) (error) {
     return a.docker.RemoveContainer(docker.RemoveContainerOptions{ID: id})
-}
-
-
-// ----------------------------------------------------------------------------------
-//  private functions
-// ----------------------------------------------------------------------------------
-
-func splitQuoted(s string) ([]string) {
-    lastQuote := rune(0)
-    return strings.FieldsFunc(s, func(c rune) bool {
-        switch {
-        case c == lastQuote:
-            lastQuote = rune(0)
-            return false
-        case lastQuote != rune(0):
-            return false
-        case unicode.In(c, unicode.Quotation_Mark):
-            lastQuote = c
-            return false
-        default:
-            return unicode.IsSpace(c)
-        }
-    })
-}
-
-func removeOutter(s []string, sep string) []string {
-    for i := range s {
-        if strings.HasPrefix(s[i], sep) {
-            s[i] = s[i][1:len(s[i])]
-        }
-
-        if strings.HasSuffix(s[i], sep) {
-            s[i] = s[i][0:len(s[i])-1]
-        }
-    }
-
-    return s
 }

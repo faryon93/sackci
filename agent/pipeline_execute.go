@@ -23,6 +23,7 @@ import (
     "errors"
     "strconv"
     "time"
+    "strings"
 
     log "github.com/sirupsen/logrus"
 
@@ -174,7 +175,17 @@ func (p *Pipeline) ExecuteStage(stageId int, stage *pipelinefile.Stage) (error) 
     // insert an echo of the command
     steps := "/bin/sh -c '"
     for i := 0; i < len(stage.Steps); i++ {
-        steps += "echo $: " + stage.Steps[i] + " && " + stage.Steps[i]
+        // escape single quotes, because the enclosing /bin/sh -c '...'
+        // is already single quoted
+        cmd := stage.Steps[i]
+        cmd = strings.Replace(cmd, "'", "'\\''", -1)
+
+        // escape the double quotes because the argument of
+        // the step echo command is already double quoted
+        echo := strings.Replace(cmd, "\"", "\\\"", -1)
+
+        // construct the full command
+        steps += "echo \"$: " + echo + "\" && " + cmd
         if i < len(stage.Steps) - 1 {
             steps += " && "
         }
